@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디지털 피노타이핑 연구 앱 · 한국연구재단</title>
+<meta name="description" content="자해 위험도 예측 연구를 위해 생체정보와 설문 데이터를 수집하는 iOS 앱과 서버. 반복 측정 데이터를 시점과 함께 저장하고 조회까지 연결했습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-back" aria-hidden="true">←</span>
+      <span class="brand-name"><span class="ko">이수빈</span><span class="en">Suebin Lee</span></span>
+      <span class="brand-alt"><span class="ko">전체 프로젝트</span><span class="en">All projects</span></span>
+    </a>
+    <div class="utils">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang-set="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<header class="case-head">
+  <div class="wrap">
+    <p class="case-eyebrow">
+      <span class="ko">케이스 스터디</span><span class="en">Case study</span>
+      <span class="sep">/</span>
+      <span>2023.03 – 08</span>
+      <span class="sep">/</span>
+      <span class="ko">국가연구과제</span><span class="en">national research project</span>
+    </p>
+    <h1>
+      <span class="ko">디지털 피노타이핑 연구 데이터 수집 시스템</span>
+      <span class="en">Digital Phenotyping Research Data System</span>
+    </h1>
+    <p class="case-lede">
+      <span class="ko">자해 위험도를 예측하는 국가연구과제에서 참여자의 생체정보와 설문 응답을 모으는 iOS 앱과 서버를 만들었습니다. <b>같은 참여자가 2주 동안 매일 답하는 구조</b>라 응답 내용만큼 언제 받았는지가 중요했습니다. 완성한 앱은 TestFlight로 배포해 연구진이 실제 아이폰에서 썼습니다.</span>
+      <span class="en">For a study predicting self-harm risk, I built the iOS app and server that collect participants' biometric and survey data. Research data here is not a value taken once but <b>the same question answered by the same person at many points in time</b> — so when a response was given mattered as much as what it said.</span>
+    </p>
+
+    <dl class="case-meta">
+      <div>
+        <dt><span class="ko">담당</span><span class="en">My scope</span></dt>
+        <dd><span class="ko">iOS 앱 · API · DB 설계 · 서버 운영 · 배포</span><span class="en">iOS app, API, database design, server operation, release</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">기간</span><span class="en">Period</span></dt>
+        <dd>2023.03 – 08</dd>
+      </div>
+      <div>
+        <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
+        <dd><span class="ko">국가연구과제 (한국연구재단) · 학부연구생</span><span class="en">National research project (NRF Korea) · undergraduate researcher</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">환경</span><span class="en">Stack</span></dt>
+        <dd>SwiftUI · PHP 8 · MySQL · AWS RDS</dd>
+      </div>
+    </dl>
+
+    <div class="kpis">
+      <div class="kpi"><b>85</b><span><span class="ko">SwiftUI 화면 · 뷰</span><span class="en">SwiftUI views</span></span></div>
+      <div class="kpi"><b>66</b><span><span class="ko">PHP API 엔드포인트</span><span class="en">PHP API endpoints</span></span></div>
+      <div class="kpi"><b>14</b><span><span class="ko">일 연속 일일 기록</span><span class="en">days of daily entries</span></span></div>
+      <div class="kpi"><b>TestFlight</b><span><span class="ko">연구진 기기에 배포</span><span class="en">on researchers’ devices</span></span></div>
+    </div>
+
+    <ul class="stack case-stack">
+      <li>SwiftUI</li><li>Swift</li><li>DeviceActivity</li><li>PHP 8</li><li>MySQL</li><li>MariaDB</li><li>AWS RDS</li><li>AWS EC2</li><li>TestFlight</li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <aside class="rail">
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#data"><span class="ko">수집하는 데이터</span><span class="en">What is collected</span></a></li>
+        <li><a href="#design"><span class="ko">설계 결정</span><span class="en">Design decisions</span></a></li>
+        <li><a href="#ops"><span class="ko">서버와 배포</span><span class="en">Server &amp; release</span></a></li>
+        <li><a href="#care"><span class="ko">민감 데이터</span><span class="en">Sensitive data</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- scope -->
+    <section id="scope" class="rv">
+      <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
+      <div class="blk">
+        <p class="ko">한국연구재단 일반공동연구 지원사업으로 진행된 국가연구과제에 학부연구생으로 참여했습니다. 자해위험군의 생체정보와 설문 데이터를 합쳐 위험도를 예측하는 연구였습니다. 저는 데이터를 모으는 앱과 서버를 맡았습니다.</p>
+        <p class="en">I joined this NRF-funded joint research project as an undergraduate researcher. The study aimed to predict risk among people at risk of self-harm by analysing biometric and survey data together, and my part was the system that collects that data.</p>
+        <p class="note">
+          <span class="ko">SwiftUI로 iOS 앱을, PHP 8로 API를 만들었습니다. MySQL과 MariaDB로 데이터베이스를 설계했고, AWS에 웹 서버와 RDS를 직접 세워 개발 서버를 운영했습니다. 완성한 앱은 TestFlight로 배포했습니다.</span>
+          <span class="en">I built the SwiftUI iOS app and the PHP 8 API, designed the database on MySQL and MariaDB, set up the web server and RDS environment on AWS to run the development server, and released the app through TestFlight.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- data -->
+    <section id="data" class="rv">
+      <div class="sec-head"><h2><span class="ko">수집하는 데이터</span><span class="en">What the app collects</span></h2></div>
+      <div class="blk">
+        <p class="ko">한 참여자에게서 세 종류의 데이터를 서로 다른 주기로 받습니다. 나중에 분석할 때 이 셋을 시점으로 맞춰야 해서, 받는 순간에 시각을 같이 저장했습니다.</p>
+        <p class="en">Three kinds of data come from one participant on three different schedules. Because the analysis has to line them up by time, each record was stored with its timestamp from the point of collection.</p>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">종류</span><span class="en">Type</span></th>
+                <th><span class="ko">주기</span><span class="en">Cadence</span></th>
+                <th><span class="ko">내용</span><span class="en">Content</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ko">사전 · 사후 설문</span><span class="en">Pre / post survey</span></td>
+                <td><span class="ko">연구 시작 · 종료</span><span class="en">start and end</span></td>
+                <td><span class="ko">참여 전후를 비교하기 위한 기준 응답</span><span class="en">baseline responses for before-and-after comparison</span></td>
+              </tr>
+              <tr>
+                <td><span class="ko">일일 기록 (EMA)</span><span class="en">Daily entries (EMA)</span></td>
+                <td><span class="ko">14일간 매일</span><span class="en">daily for 14 days</span></td>
+                <td><span class="ko">그날의 상태를 당일에 기록 (돌이켜 적는 응답과 다른 값)</span><span class="en">state recorded on the day itself, not reconstructed later</span></td>
+              </tr>
+              <tr>
+                <td><span class="ko">생체정보</span><span class="en">Biometric</span></td>
+                <td><span class="ko">기기에서 연속 수집</span><span class="en">continuous, from the device</span></td>
+                <td><span class="ko">수면·활동 등 설문과 맞춰 볼 지표</span><span class="en">sleep, activity and similar signals to align with the survey</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="shots" style="margin-top:20px">
+          <figure class="shot">
+            <img src="../assets/img/nssi-home.jpg" alt="앱 홈 화면" loading="lazy" width="562" height="1000">
+            <figcaption><span class="ko">홈</span><span class="en">Home</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../assets/img/nssi-daily.jpg" alt="일일 기록 화면" loading="lazy" width="562" height="1000">
+            <figcaption><span class="ko">일일 기록</span><span class="en">Daily entry</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../assets/img/nssi-sleep.jpg" alt="수면 리포트 화면" loading="lazy" width="562" height="1000">
+            <figcaption><span class="ko">수면 리포트</span><span class="en">Sleep report</span></figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="../assets/img/nssi-assess.jpg" alt="마음평가 리포트 화면" loading="lazy" width="562" height="1000">
+            <figcaption><span class="ko">평가 리포트</span><span class="en">Assessment report</span></figcaption>
+          </figure>
+        </div>
+        <p class="ko" style="margin-top:12px;font-size:13.5px;color:var(--muted)">디자인 도구로 만든 시안이 아니라 SwiftUI 코드로 직접 구현한 화면입니다. 수면 리포트의 주간 그래프도 차트 라이브러리 없이 SwiftUI로 그렸습니다. 자해 관련 문항 화면은 민감해서 여기에 싣지 않았습니다.</p>
+        <p class="en" style="margin-top:12px;font-size:13.5px;color:var(--muted)">Not design mockups — these screens are built directly in SwiftUI. The weekly sleep chart is drawn in SwiftUI too, with no charting library. Screens carrying the self-harm items are sensitive and are not shown here.</p>
+
+        <p class="ko" style="margin-top:14px">설문마다 화면이 따로 필요했습니다. 척도 문항, 예·아니오 분기, 선택 목록처럼 응답 형식이 달랐습니다. 앞 답에 따라 다음 문항이 바뀌는 것도 있었습니다. 화면만 85개가 나왔습니다.</p>
+        <p class="en" style="margin-top:14px">Each survey type needed its own screens — Likert scales, yes/no branches, pickers — and some answers changed which question came next. That came to 85 views.</p>
+      </div>
+    </section>
+
+    <!-- design -->
+    <section id="design" class="rv">
+      <div class="sec-head"><h2><span class="ko">설계 결정</span><span class="en">Design decisions</span></h2></div>
+      <div class="blk">
+        <div class="dgm-wrap" style="margin-top:8px">
+          <p class="dgm-hint">
+            <span class="ko">테이블을 클릭하면 무엇을 담는지 나타납니다</span>
+            <span class="en">Click a table to see what it holds</span>
+          </p>
+          <div class="dgm-stage">
+            <svg class="dgm" viewBox="0 0 1020 390" role="img"
+                 aria-label="참여자에서 설문, 일자, 시점으로 내려가며 측정 테이블이 붙는 데이터베이스 구조">
+              <defs>
+                <marker id="arP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path class="arrow" d="M0,1 L9,5 L0,9 z"/>
+                </marker>
+              </defs>
+
+              <g class="edge" data-ends="SurveyUser Survey"><path d="M196,120 H240" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="Survey SurveyDaily"><path d="M400,120 H444" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyDaily SurveyTime"><path d="M620,120 H664" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyUser PrePost"><path d="M118,142 V250 H240" marker-end="url(#arP)"/></g>
+
+              <g class="edge" data-ends="SurveyTime SleepCheck"><path d="M856,106 H890 V46 H922" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyTime ConditionCheck"><path d="M856,114 H890 V92 H922" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyTime EmotionCheck"><path d="M856,126 H890 V138 H922" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyTime EmotionLog"><path d="M856,134 H890 V184 H922" marker-end="url(#arP)"/></g>
+              <g class="edge" data-ends="SurveyTime Schedule"><path d="M856,140 H890 V230 H922" marker-end="url(#arP)"/></g>
+
+              <g class="node" data-node="SurveyUser" tabindex="0" role="button" aria-label="SurveyUser">
+                <rect x="20" y="100" width="176" height="42"/><text x="108" y="122">SurveyUser</text>
+              </g>
+              <g class="node" data-node="Survey" tabindex="0" role="button" aria-label="Survey">
+                <rect x="240" y="100" width="160" height="42"/><text x="320" y="122">Survey</text>
+              </g>
+              <g class="node" data-node="SurveyDaily" tabindex="0" role="button" aria-label="SurveyDaily">
+                <rect x="444" y="100" width="176" height="42"/><text x="532" y="122">SurveyDaily</text>
+              </g>
+              <g class="node" data-node="SurveyTime" tabindex="0" role="button" aria-label="SurveyTime">
+                <rect x="664" y="100" width="192" height="42"/><text x="760" y="122">SurveyTime</text>
+              </g>
+
+              <g class="node" data-node="SleepCheck" tabindex="0" role="button" aria-label="SleepCheck">
+                <rect x="922" y="28" width="90" height="36"/><text x="967" y="47" style="font-size:11px">SleepCheck</text>
+              </g>
+              <g class="node" data-node="ConditionCheck" tabindex="0" role="button" aria-label="ConditionCheck">
+                <rect x="922" y="74" width="90" height="36"/><text x="967" y="93" style="font-size:10px">ConditionCheck</text>
+              </g>
+              <g class="node" data-node="EmotionCheck" tabindex="0" role="button" aria-label="EmotionCheck">
+                <rect x="922" y="120" width="90" height="36"/><text x="967" y="139" style="font-size:10px">EmotionCheck</text>
+              </g>
+              <g class="node" data-node="EmotionLog" tabindex="0" role="button" aria-label="EmotionLog">
+                <rect x="922" y="166" width="90" height="36"/><text x="967" y="185" style="font-size:11px">EmotionLog</text>
+              </g>
+              <g class="node" data-node="Schedule" tabindex="0" role="button" aria-label="Schedule">
+                <rect x="922" y="212" width="90" height="36"/><text x="967" y="231" style="font-size:11px">Schedule</text>
+              </g>
+
+              <g class="node" data-node="PrePost" tabindex="0" role="button" aria-label="PrePost">
+                <rect x="240" y="230" width="300" height="42"/><text x="390" y="252">PrePost · PrePost1 – 15</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="dgm-info" aria-live="polite">
+            <p class="idle-card idle">
+              <span class="ko">테이블을 선택하면 무엇을 담는지 표시됩니다.</span>
+              <span class="en">Select a table to see what it holds.</span>
+            </p>
+            <div data-for="SurveyUser" hidden>
+              <h4>SurveyUser</h4>
+              <p class="ko">참여자 계정입니다. 기기 정보와 가입 경로를 따로 테이블로 빼서, 같은 사람이 기기를 바꿔도 참여 기록이 이어지게 했습니다.</p>
+              <p class="en">The participant account. Device and sign-up route live in their own tables, so a change of handset does not break the participation record.</p>
+              <span class="grain">SurveyUser → Device · SNSType</span>
+            </div>
+            <div data-for="Survey" hidden>
+              <h4>Survey</h4>
+              <p class="ko">한 참여자의 연구 참여 한 건입니다. 참여를 시작한 날짜와 진행 상태를 담습니다.</p>
+              <p class="en">One participant's enrolment in the study, holding the start date and its status.</p>
+            </div>
+            <div data-for="SurveyDaily" hidden>
+              <h4>SurveyDaily</h4>
+              <p class="ko"><b>하루 단위</b>입니다. 하루 한 번만 만들어집니다. 참여자가 들어오면 오늘 날짜로 만들어진 행이 있는지 먼저 확인하고, 있으면 그 행에 이어 붙이고 없으면 새로 만듭니다. 하루 한 번 조건이 여기서 지켜집니다.</p>
+              <p class="en">The <b>per-day</b> level, created once a day. When a participant opens the app it checks whether a row exists for today, continues that one if so and creates a new one if not — this is where the once-a-day rule holds.</p>
+            </div>
+            <div data-for="SurveyTime" hidden>
+              <h4>SurveyTime</h4>
+              <p class="ko"><b>하루 안의 시간대</b>입니다. 아침·점심·저녁·밤으로 나뉩니다. 측정 테이블은 전부 여기에 붙기 때문에, 어느 날 어느 시간대의 기록인지가 자동으로 따라옵니다.</p>
+              <p class="en">The <b>slot within a day</b> — morning, midday, evening, night. Every measurement table hangs off this, so the day and the slot travel with each record automatically.</p>
+            </div>
+            <div data-for="SleepCheck" hidden>
+              <h4>SleepCheck</h4>
+              <p class="ko">수면 문항입니다. 잠든 시각과 깬 시각을 시간 자료형으로 저장해, 앱에서 주간 수면시간 그래프로 다시 보여줍니다.</p>
+              <p class="en">The sleep items, storing times as time values so the app can show the week's sleep back as a chart.</p>
+            </div>
+            <div data-for="ConditionCheck" hidden>
+              <h4>ConditionCheck</h4>
+              <p class="ko">컨디션 문항입니다. 분기가 있는 문항은 Q3A1, Q3A2처럼 하위 번호를 붙여, 어떤 답을 골라 나온 문항인지 구분할 수 있게 했습니다.</p>
+              <p class="en">Condition items. Branching questions carry sub-numbers such as Q3A1 and Q3A2, so it stays clear which answer led to which follow-up.</p>
+            </div>
+            <div data-for="EmotionCheck" hidden>
+              <h4>EmotionCheck</h4>
+              <p class="ko">기분 문항입니다. 하루 중 정해진 시간대에 받습니다.</p>
+              <p class="en">Mood items, collected at set points in the day.</p>
+            </div>
+            <div data-for="EmotionLog" hidden>
+              <h4>EmotionLog</h4>
+              <p class="ko">기분 일기입니다. 활동마다 시작·종료 시각을 따로 받습니다. 몇 시에 무엇을 했는지가 수면·기분 기록과 맞춰 볼 값이라, 자유 텍스트로 뭉뚱그리지 않고 시각을 나눠 저장했습니다.</p>
+              <p class="en">The mood diary, taking a start and end time for each activity. What happened when has to line up against the sleep and mood records, so the times are stored as fields rather than buried in free text.</p>
+            </div>
+            <div data-for="Schedule" hidden>
+              <h4>Schedule</h4>
+              <p class="ko">참여자가 적는 일정입니다. 누구와 있었는지와 장소를 함께 받습니다. 활동 유형은 목록에서 고르되 목록에 없으면 직접 쓸 수 있게 두 칸으로 나눴습니다.</p>
+              <p class="en">Participant-entered activities, with who they were with and where. The activity type is picked from a list, with a separate free-text field for anything the list does not cover.</p>
+            </div>
+            <div data-for="PrePost" hidden>
+              <h4>PrePost · PrePost1 – 15</h4>
+              <p class="ko">연구 시작과 끝에 받는 설문입니다. 척도가 서로 다른 15개 검사지라, 하나의 큰 테이블에 몰아넣지 않고 검사지마다 테이블을 나눴습니다. 문항 수와 자료형이 제각각이어서 한 테이블로 묶으면 빈 칸이 대부분인 표가 됩니다.</p>
+              <p class="en">The surveys taken at the start and end of the study — fifteen separate instruments with different scales, each given its own table. Their item counts and types differ enough that one combined table would have been mostly empty columns.</p>
+              <span class="grain">PrePost → PrePost1 … PrePost15</span>
+            </div>
+          </div>
+        </div>
+
+        <ul class="bul">
+          <li class="ko"><b>참여자 · 문항 · 시점을 함께 저장했습니다.</b> 반복 측정 연구라 한 사람이 같은 문항에 여러 번 답합니다. 응답만 남기면 어느 날 몇 번째 답인지 알 수 없습니다. 세 가지를 같이 기록했습니다.</li>
+          <li class="en"><b>A response is stored with its moment, not on its own.</b> In a repeated-measures study the same person answers the same item many times; storing only the answer makes it impossible to say later which day or which round it belonged to, so participant, item and timestamp are recorded together.</li>
+
+          <li class="ko"><b>하루 한 번인지 서버에서 확인했습니다.</b> 일일 기록은 그날 한 번만 유효합니다. 앱에서만 막으면 재설치하거나 기기 시간을 바꿔서 피할 수 있습니다. 서버에 그날 기록이 있는지 확인하는 경로를 따로 뒀습니다.</li>
+          <li class="en"><b>The once-a-day rule is checked on the server.</b> A daily entry only counts once for that day, and a client-side guard can be bypassed by reinstalling or changing the clock — so a server endpoint checks whether that day already has a record.</li>
+
+          <li class="ko"><b>문항을 번호로 관리했습니다.</b> 설문 문구는 연구 중에도 바뀝니다. 번호로 저장해 두면 문구가 바뀌어도 앞서 받은 응답과 이어서 볼 수 있습니다.</li>
+          <li class="en"><b>Items are keyed by number rather than hardcoded.</b> Survey wording changes while a study is running; storing responses against item numbers keeps earlier answers comparable after a rewrite.</li>
+
+          <li class="ko"><b>화면을 전부 SwiftUI로 짰습니다.</b> 척도 문항, 예·아니오 분기, 선택 목록, 리포트 그래프까지 외부 UI·차트 라이브러리 없이 구현했습니다. 수면 리포트의 주간 막대그래프도 값에 따라 높이를 계산해 직접 그렸습니다.</li>
+          <li class="en"><b>Every screen is SwiftUI.</b> Likert items, yes/no branches, pickers and the report charts are all built without an external UI or charting library — the weekly sleep bars are drawn by computing each height from the value.</li>
+
+          <li class="ko"><b>기기 사용 데이터는 DeviceActivity로 받았습니다.</b> 참여자가 따로 입력하지 않아도 모이는 값이라, 설문 응답과 맞춰 보려면 같은 시점 기준으로 저장해야 했습니다.</li>
+          <li class="en"><b>Device-usage data comes through DeviceActivity.</b> It accumulates without the participant entering anything, so it had to be stored against the same time reference as the survey responses to be comparable.</li>
+
+          <li class="ko"><b>조회 기능까지 만들었습니다.</b> 연구자가 모인 데이터를 직접 봐야 해서, 참여자별 응답과 사전·사후 비교를 불러오는 API를 같이 만들었습니다.</li>
+          <li class="en"><b>Collection was wired through to retrieval.</b> Researchers need to see what was gathered, so the API also serves per-participant responses and the pre/post comparison. Data that only accumulates on a server never reaches the study.</li>
+
+          <li class="ko"><b>참여 안내 화면을 앱에 넣었습니다.</b> 연구 소개와 자해 설명을 각각 따로 뒀습니다. 참여자가 무엇에 동의했고 무엇이 기록되는지 알아야 그 응답을 연구에 쓸 수 있습니다.</li>
+          <li class="en"><b>Participant information lives inside the app</b> — screens explaining the study and the subject itself. A response given without understanding what is being consented to and recorded is not usable data.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ops -->
+    <section id="ops" class="rv">
+      <div class="sec-head"><h2><span class="ko">서버와 배포</span><span class="en">Server and release</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>AWS에 개발 서버를 직접 세웠습니다.</b> 웹 서버와 RDS를 설정하고 운영했습니다. 연구 일정에 맞춰 앱과 서버를 같이 고쳐야 해서, 배포 환경까지 제가 들고 있는 편이 빨랐습니다.</li>
+          <li class="en"><b>I set up the development server on AWS</b> — the web server and an RDS-backed database — and ran it. App and server had to change together against the study schedule, so holding the deployment environment myself was faster.</li>
+
+          <li class="ko"><b>API를 기능별로 나눴습니다.</b> 설문 저장, 일일 기록 확인, 사전·사후 조회, 보고서 조회, 알림 발송을 각각 분리했습니다. 연구 중에 설문 하나가 바뀌어도 다른 경로를 건드리지 않고 고칠 수 있게 했습니다.</li>
+          <li class="en"><b>The API is split by function</b> — saving responses, checking the day's entry, reading pre/post data, pulling reports, sending notifications. When one survey changed mid-study, it had to be possible to fix that without touching the rest.</li>
+
+          <li class="ko"><b>TestFlight로 배포했습니다.</b> 연구진이 각자 아이폰에 설치해 직접 써 보고, 거기서 나온 피드백으로 고쳤습니다. 시뮬레이터에서만 돌려 봤다면 못 찾았을 문제가 있었습니다.</li>
+          <li class="en"><b>Released through TestFlight</b> so the research team could install it on real devices. Running in a simulator and running on a participant's phone are not the same thing.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- care -->
+    <section id="care" class="rv">
+      <div class="sec-head"><h2><span class="ko">민감 데이터</span><span class="en">Working with sensitive data</span></h2></div>
+      <div class="blk">
+        <p class="ko">정신건강 연구 데이터라 조심할 부분이 많았습니다. 응답이 어느 시점의 것인지 어긋나면 분석 결과가 달라지고, 그 결과로 참여자의 위험도를 판단하게 됩니다.</p>
+        <p class="en">Mental-health research data cannot simply be deleted away when it goes wrong. If a recorded response drifts from the moment it belongs to, the analysis changes — and that analysis is what a risk judgement rests on.</p>
+        <p class="ko">수집하는 순간에 시각을 같이 저장하고, 하루 한 번 조건을 서버에서 확인한 것도 그 때문입니다.</p>
+        <p class="en">This is where I first felt how directly the accuracy of data carries into whether a system can be trusted. The habit of recording where data came from and when, which runs through my later projects, started here.</p>
+      </div>
+    </section>
+
+    <div class="case-foot">
+      <a class="btn" href="../index.html">←&nbsp;<span class="ko">전체 프로젝트</span><span class="en">All projects</span></a>
+      <a class="btn" href="duktaverse.html"><span class="ko">다음: 덕타버스</span><span class="en">Next: Duktaverse</span>&nbsp;→</a>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>전기차 충전 인프라 데이터 파이프라인 — 이수빈</title>
+<meta name="description" content="출처가 다른 두 공공 데이터를 하나의 공간 데이터베이스로 합친 과정. 수집, 정제, 공간 결합, DuckDB 설계와 재현성 검증.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-back" aria-hidden="true">←</span>
+      <span class="brand-name"><span class="ko">이수빈</span><span class="en">Suebin Lee</span></span>
+      <span class="brand-alt"><span class="ko">전체 프로젝트</span><span class="en">All projects</span></span>
+    </a>
+    <div class="utils">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang-set="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<header class="case-head">
+  <div class="wrap">
+    <p class="case-eyebrow">
+      <span class="ko">케이스 스터디</span><span class="en">Case study</span>
+      <span class="sep">/</span>
+      <span>2026.08 – 09</span>
+      <span class="sep">/</span>
+      <span>The University of Sydney</span>
+    </p>
+    <h1>
+      <span class="ko">전기차 충전 인프라 데이터 파이프라인 · 공간 데이터베이스</span>
+      <span class="en">EV Charging Infrastructure Data Pipeline &amp; Spatial Database</span>
+    </h1>
+    <p class="case-lede">
+      <span class="ko">NSW 교통부의 충전소 데이터와 호주 통계청의 행정경계 데이터를 하나의 공간 데이터베이스로 합쳤습니다. 합치는 작업 자체보다, 각 컬럼이 실제로 무엇을 담고 있는지 확인하는 데 시간이 더 들었습니다.</span>
+      <span class="en">Merging NSW Transport's charger dataset with ABS administrative boundaries into one spatial database. Most of the work was not the merge — it was establishing what each column actually contained.</span>
+    </p>
+
+    <dl class="case-meta">
+      <div>
+        <dt><span class="ko">담당</span><span class="en">My scope</span></dt>
+        <dd><span class="ko">수집 · 정제 · 공간 결합 · DB 설계</span><span class="en">Retrieval, cleaning, spatial integration, database design</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">기간</span><span class="en">Period</span></dt>
+        <dd>2026.08 – 09</dd>
+      </div>
+      <div>
+        <dt><span class="ko">데이터 출처</span><span class="en">Sources</span></dt>
+        <dd><span class="ko">Transport for NSW · ABS</span><span class="en">Transport for NSW · ABS</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">결과물</span><span class="en">Output</span></dt>
+        <dd><span class="ko">DuckDB 공간 데이터베이스</span><span class="en">DuckDB spatial database</span></dd>
+      </div>
+    </dl>
+
+    <div class="kpis">
+      <div class="kpi">
+        <b>1,939</b>
+        <span><span class="ko">정제 후 레코드 (원본 1,958)</span><span class="en">records after cleaning (from 1,958)</span></span>
+      </div>
+      <div class="kpi">
+        <b>50 → 41</b>
+        <span><span class="ko">운영사 표기 통합</span><span class="en">operator names consolidated</span></span>
+      </div>
+      <div class="kpi">
+        <b>1,938 / 1</b>
+        <span><span class="ko">SA4 포함 / 최근접 배정</span><span class="en">SA4 within / nearest</span></span>
+      </div>
+      <div class="kpi">
+        <b>8.8 m</b>
+        <span><span class="ko">경계까지 최소 거리</span><span class="en">minimum distance to boundary</span></span>
+      </div>
+    </div>
+
+    <ul class="stack case-stack">
+      <li>Python</li><li>pandas</li><li>GeoPandas</li><li>Shapely</li><li>DuckDB</li><li>SQL</li>
+      <li><span class="ko">공공 API</span><span class="en">Public API</span></li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <aside class="rail">
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#source"><span class="ko">원본 상태</span><span class="en">The source</span></a></li>
+        <li><a href="#cleaning"><span class="ko">정제</span><span class="en">Cleaning</span></a></li>
+        <li><a href="#judgment"><span class="ko">판단 기준</span><span class="en">Judgment</span></a></li>
+        <li><a href="#spatial"><span class="ko">공간 결합</span><span class="en">Spatial join</span></a></li>
+        <li><a href="#database"><span class="ko">DB 설계</span><span class="en">Database</span></a></li>
+        <li><a href="#repro"><span class="ko">재현성</span><span class="en">Reproducibility</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- scope -->
+    <section id="scope" class="rv">
+      <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
+      <div class="blk">
+        <p class="note">
+          <span class="ko">제가 맡은 범위는 데이터 수집, 정제, 공간 결합, 데이터베이스 설계입니다. 외부 출처를 이용한 속성 증강은 제 담당이 아니었고, 이 페이지에 적은 건 전부 제가 직접 한 일입니다.</span>
+          <span class="en">My scope was retrieval, cleaning, spatial integration and database design. Attribute augmentation from external sources sat outside my part; everything on this page is work I did myself.</span>
+        </p>
+        <p class="ko">결과물은 NSW 전역 충전소 1,939건이 SA4 통계 지역에 배정된 상태로 들어 있는 DuckDB 데이터베이스입니다. 스키마는 DDL로 다시 만들 수 있고, 공간 질의는 Spatial 확장을 사용합니다.</p>
+        <p class="en">The output is a DuckDB database holding 1,939 NSW charging-station records, each assigned to an SA4 statistical area. The schema can be rebuilt from DDL, and spatial queries run on the Spatial extension.</p>
+      </div>
+    </section>
+
+    <!-- source -->
+    <section id="source" class="rv">
+      <div class="sec-head"><h2><span class="ko">원본 데이터 상태</span><span class="en">What the source actually contained</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>종류 컬럼에 상태가 섞여 있었습니다.</b> Charger_Type에 AC 1,427행과 DC 433행 외에, 충전기 종류가 아니라 운영 상태를 뜻하는 Upcoming 98행이 함께 들어 있었습니다. 종류와 상태를 별도 컬럼으로 분리하고, Upcoming 행에 한해 출력값으로 종류를 추정했습니다(43kW 초과는 DC). 원본 라벨은 지우지 않고 남겼습니다.</li>
+          <li class="en"><b>Status was mixed into the type column.</b> Charger_Type held 1,427 AC and 433 DC rows, plus 98 "Upcoming" rows that described status rather than charger type. I split type and status into separate columns and inferred type from the power rating for those 98 rows only (above 43 kW as DC), keeping the original labels intact.</li>
+
+          <li class="ko"><b>출력값이 자유 문자열이었습니다.</b> Charger_rating에 <code>2x350kW</code>처럼 여러 출력이 한 문자열로 들어가거나, 숫자 대신 "AC"라는 글자가 들어 있었습니다. 최고 출력만 수치로 추출하되 원본 문자열을 함께 보관해, 1,425행에서 사용 가능한 출력값을 확보했습니다.</li>
+          <li class="en"><b>Power ratings were free text.</b> Charger_rating sometimes packed several outputs into one string such as <code>2x350kW</code>, or carried the word "AC" instead of a figure. I extracted the highest output as a number while retaining the original string, leaving 1,425 rows with a usable power value.</li>
+
+          <li class="ko"><b>우편번호가 세 가지로 망가져 있었습니다.</b> 121행 공백, 10행은 주(state)명이 붙음, 25행은 주소와 불일치. 공백 중 120행은 주소에서 복구하고 주 접두어는 제거했지만, <b>불일치 25행은 고치지 않고 <code>location_conflict</code>로 표시</b>했습니다. 어느 쪽이 맞는지 판단할 근거가 없었기 때문입니다.</li>
+          <li class="en"><b>Postcodes were broken three different ways.</b> 121 blank, 10 with a state name attached, 25 disagreeing with the address. I recovered 120 of the blanks from the address and stripped the state prefixes, but <b>left the 25 conflicts uncorrected and flagged as <code>location_conflict</code></b> — there was no basis for deciding which side was right.</li>
+
+          <li class="ko"><b>빈 값은 채우지 않았습니다.</b> 역 이름이 1,438행 비어 있었지만 추정해서 채우지 않았고, 주소 733건에 들어 있던 줄바꿈만 제거했습니다.</li>
+          <li class="en"><b>Blanks were left blank.</b> Station names were missing on 1,438 rows and were not imputed; I only removed the line breaks found inside 733 addresses.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- cleaning -->
+    <section id="cleaning" class="rv">
+      <div class="sec-head"><h2><span class="ko">정제 전후</span><span class="en">Before / after cleaning</span></h2></div>
+      <div class="blk">
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">항목</span><span class="en">Measure</span></th>
+                <th style="text-align:right"><span class="ko">전</span><span class="en">Before</span></th>
+                <th style="text-align:right"><span class="ko">후</span><span class="en">After</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="ko">레코드 수</span><span class="en">Rows</span></td><td class="n">1,958</td><td class="n to">1,939</td></tr>
+              <tr><td><span class="ko">운영사 수</span><span class="en">Distinct operators</span></td><td class="n">50</td><td class="n to">41</td></tr>
+              <tr><td><span class="ko">종류 컬럼의 값 종류</span><span class="en">Values in the type column</span></td><td class="n">3</td><td class="n to">2</td></tr>
+              <tr><td><span class="ko">사용 가능한 출력값</span><span class="en">Rows with a usable power figure</span></td><td class="n">0</td><td class="n to">1,425</td></tr>
+              <tr><td><span class="ko">사용 가능한 키</span><span class="en">Rows with a usable key</span></td><td class="n">121</td><td class="n to">1,939</td></tr>
+              <tr><td><span class="ko">줄바꿈이 든 주소</span><span class="en">Addresses holding a line break</span></td><td class="n">733</td><td class="n to">0</td></tr>
+              <tr><td><span class="ko">우편번호가 있는 행</span><span class="en">Rows with a postcode</span></td><td class="n">1,837</td><td class="n to">1,939</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="viz">
+          <div class="viz-head">
+            <p class="viz-title"><span class="ko">컬럼을 나눈 결과: 충전기 종류 × 운영 상태</span><span class="en">After the split: charger type × operating status</span></p>
+            <p class="viz-sub">n = 1,939</p>
+            <div class="viz-legend">
+              <span><i style="background:var(--s1)"></i><span class="ko">운영 중</span><span class="en">existing</span></span>
+              <span><i style="background:var(--s2)"></i><span class="ko">예정</span><span class="en">upcoming</span></span>
+            </div>
+          </div>
+          <div class="bars" style="--labw:52px">
+            <div class="bar-row">
+              <div class="bar-lab">AC</div>
+              <div class="bar-track" role="img" aria-label="AC: 운영 중 1,410, 예정 4">
+                <div class="bar-seg" style="background:var(--s1);width:99.72%"></div>
+                <div class="bar-seg" style="background:var(--s2);width:0.28%"></div>
+              </div>
+              <div class="bar-val">1,414</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-lab">DC</div>
+              <div class="bar-track" style="width:37.13%" role="img" aria-label="DC: 운영 중 431, 예정 94">
+                <div class="bar-seg" style="background:var(--s1);width:82.1%"></div>
+                <div class="bar-seg" style="background:var(--s2);width:17.9%"></div>
+              </div>
+              <div class="bar-val">525</div>
+            </div>
+          </div>
+          <p class="viz-foot">
+            <span class="ko">원본에서 종류 컬럼에 섞여 있던 <b>Upcoming 98행</b>은 출력값으로 판정해 <b>AC 4행</b>과 <b>DC 94행</b>으로 나뉘었습니다. 운영 상태는 별도 컬럼으로 옮겼고, 원본 라벨은 그대로 남겨 두었습니다.</span>
+            <span class="en">The <b>98 “Upcoming” rows</b> that had been sitting in the type column resolved into <b>4 AC</b> and <b>94 DC</b> once typed by power rating. Status moved to its own column, and the original labels were kept.</span>
+          </p>
+        </div>
+
+        <p class="ko">행 수가 줄어든 건 데이터를 버려서가 아니라 중복을 합쳤기 때문입니다. 우편번호가 늘어난 것도 값을 지어낸 게 아니라 주소에서 찾아낸 결과입니다. 어떤 숫자가 어느 단계에서 나왔는지는 정제 로그에 남겼습니다.</p>
+        <p class="en">The row count fell because duplicates were merged, not because data was discarded; the postcode count rose because values were recovered from the address, not invented. Each figure is traceable to the operation that produced it through the cleaning log.</p>
+      </div>
+    </section>
+
+    <!-- judgment -->
+    <section id="judgment" class="rv">
+      <div class="sec-head"><h2><span class="ko">정제 과정의 판단 기준</span><span class="en">Judgment calls</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>중복은 근거가 있을 때만 합쳤습니다.</b> 운영사명·충전기 종류·좌표(소수점 5자리)로 37행 17그룹을 후보로 잡고, 역 이름이 <b>서로 모순되지 않을 때만</b> 병합했습니다. 빈 이름은 모순으로 보지 않았고, 이름이 서로 다른 1그룹은 합치지 않고 남겼습니다. 결과적으로 16그룹을 병합해 19행을 제거했습니다. 병합 시 플러그 수는 가장 큰 값, 주소는 가장 긴 값을 남겼고, 출력값이 있는 경우 원본 문자열과 파생값을 <b>같은 레코드에서 함께</b> 가져왔습니다.</li>
+          <li class="en"><b>Duplicates were merged only with evidence.</b> Normalised operator names, cleaned types and coordinates rounded to five decimals produced 37 candidate rows in 17 groups; a group was merged <b>only when station names did not contradict each other</b>. A blank name was not a contradiction, and the one group with two conflicting names was left unmerged — 16 groups merged, removing 19 rows. On merge I kept the largest plug count and the longest address, and where a numeric power existed, took the rating string and its derived values <b>together from the same record</b>.</li>
+
+          <li class="ko"><b>키를 직접 만들었습니다.</b> 원본 식별자가 대부분 비어 있어 키로 쓸 수 없었습니다. 위치·운영사·종류·주소 순으로 정렬한 뒤, <b>같은 입력을 다시 정제하면 같은 ID가 나오도록</b> 1,939행에 식별자를 부여했습니다. 실행할 때마다 ID가 바뀌면 이후 단계의 증거와 연결이 끊기기 때문입니다.</li>
+          <li class="en"><b>I generated the key.</b> The original identifier was blank on most rows, so it could not serve as one. I sorted by location, operator, type and address, then assigned identifiers to all 1,939 rows <b>so that cleaning the same input again reproduces the same IDs</b> — if IDs shifted between runs, every downstream link to evidence would break.</li>
+
+          <li class="ko"><b>운영사 매핑 표를 분리해 두었습니다.</b> 대소문자와 공백만 정리하면 50 → 49에 그쳤습니다. 같은 회사의 다른 표기(BP / BP Australia, Tesla / Tesla Motors)와 13자에서 잘린 이름까지 매핑해 41개로 통합했고, 이 표를 정제 코드와 <b>분리해 보관</b>해 이후 단계가 같은 이름을 쓰도록 했습니다.</li>
+          <li class="en"><b>The operator mapping lives on its own.</b> Normalising case and spacing alone only took 50 names to 49. Mapping variant spellings of the same company (BP / BP Australia, Tesla / Tesla Motors) and names truncated at 13 characters brought it to 41, and I kept that table <b>separate from the cleaning code</b> so later stages resolve to the same names.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- spatial -->
+    <section id="spatial" class="rv">
+      <div class="sec-head"><h2><span class="ko">공간 결합</span><span class="en">Spatial integration</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko">원본에 좌표의 측지계가 적혀 있지 않아, ABS 경계와 같은 <b>GDA2020(EPSG:7844)으로 가정하고, 확인한 것이 아니라 가정이라고 문서에 남겼습니다.</b></li>
+          <li class="en">The source never states the datum of its coordinates, so I <b>assumed GDA2020 (EPSG:7844) to match the ABS boundaries and recorded that as an assumption</b> — keeping what was verified separate from what was assumed.</li>
+
+          <li class="ko">경계에 걸친 점이 두 지역에 중복 배정되지 않도록 <code>intersects</code> 대신 <code>within</code>으로 먼저 배정하고, 포함되지 않은 점만 100m 이내 최근접 SA4를 찾아 <code>nearest</code>로 표시했습니다. 거리는 MGA zone 55(EPSG:7855)에서 계산했습니다.</li>
+          <li class="en">To stop a point on a shared border from being assigned twice, I used <code>within</code> rather than <code>intersects</code>, then considered only unmatched points for a nearest SA4 within 100 m, flagged as <code>nearest</code>. Distances were computed in MGA zone 55 (EPSG:7855).</li>
+
+          <li class="ko">NSW 밖으로 잘못 배정되는 경우를 잡기 위해 전국 SA4 경계를 모두 사용했습니다. 결합 결과 행 수는 1,939로 변하지 않았고, <b>1,938행이 SA4 내부</b>, 1행(EV1092)이 Sydney – Northern Beaches 경계 밖 약 1.8m로 최근접 배정됐습니다. 모든 배정 지역은 NSW 안에 있었습니다.</li>
+          <li class="en">I used the full national SA4 boundaries to catch any assignment outside NSW. The join left the row count unchanged at 1,939: <b>1,938 points fell inside an SA4 region</b>, and one (EV1092) sat about 1.8 m outside the Sydney – Northern Beaches polygon and was assigned to it as the nearest match. Every assigned region was in NSW.</li>
+
+          <li class="ko">배정이 좌표 오차에 얼마나 민감한지 확인하려고 각 점에서 배정된 지역 경계까지의 거리를 재봤습니다. <b>최소 거리가 8.8m</b>라, 2m 정도 위치가 흔들려도 배정은 바뀌지 않았습니다. 다만 이건 배정에 얼마나 여유가 있는지를 본 것이지 측지계나 좌표 오차 자체를 검증한 건 아닙니다.</li>
+          <li class="en">To gauge how sensitive the assignment is to positional error, I measured each point's distance to its assigned boundary. The <b>minimum was 8.8 m</b>, so a shift of up to two metres would not move any point out of its polygon — and I noted that this does not verify the datum or bound the coordinate error itself.</li>
+
+          <li class="ko">정제 단계에서 표시한 위치 불일치 25행은 여기서도 고치지 않았습니다. 이 행들의 SA4는 <b>저장된 좌표가 들어 있는 지역</b>입니다. 모든 행이 지역을 받았다는 뜻이고, 충전소의 실제 위치를 확인했다는 뜻은 아닙니다.</li>
+          <li class="ko" style="list-style:none;padding:0;margin-top:6px">
+            <div class="viz">
+              <div class="viz-head">
+                <p class="viz-title">공간 결합 결과: SA4 지역별 충전소</p>
+                <p class="viz-sub">상위 12개 지역 · 전체 28개 지역 · n = 1,939</p>
+                <div class="viz-legend">
+                  <span><i style="background:var(--s1)"></i>Greater Sydney</span>
+                  <span><i style="background:var(--s2)"></i>Rest of NSW</span>
+                </div>
+              </div>
+              <div class="bars">
+                <div class="bar-row"><div class="bar-lab">Sydney – Eastern Suburbs</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:100%"></div></div><div class="bar-val">219</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – City and Inner South</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:63.5%"></div></div><div class="bar-val">139</div></div>
+                <div class="bar-row"><div class="bar-lab">Hunter Valley exc Newcastle</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:58.0%"></div></div><div class="bar-val">127</div></div>
+                <div class="bar-row"><div class="bar-lab">Capital Region</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:53.0%"></div></div><div class="bar-val">116</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – Inner West</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:51.6%"></div></div><div class="bar-val">113</div></div>
+                <div class="bar-row"><div class="bar-lab">Central West</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:51.1%"></div></div><div class="bar-val">112</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – North Sydney and Hornsby</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:49.3%"></div></div><div class="bar-val">108</div></div>
+                <div class="bar-row"><div class="bar-lab">Newcastle and Lake Macquarie</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:38.8%"></div></div><div class="bar-val">85</div></div>
+                <div class="bar-row"><div class="bar-lab">Richmond – Tweed</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:34.7%"></div></div><div class="bar-val">76</div></div>
+                <div class="bar-row"><div class="bar-lab">Southern Highlands and Shoalhaven</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:33.8%"></div></div><div class="bar-val">74</div></div>
+                <div class="bar-row"><div class="bar-lab">Riverina</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:33.3%"></div></div><div class="bar-val">73</div></div>
+                <div class="bar-row"><div class="bar-lab">Murray</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:30.6%"></div></div><div class="bar-val">67</div></div>
+              </div>
+              <p class="viz-foot">
+                상위 네 자리 중 둘이 시드니지만, 전체로는 <b>Greater Sydney 958건</b>과 <b>Rest of NSW 981건</b>으로 거의 반반입니다.
+                지역 이름은 결합 전 데이터에 없던 값이고, 좌표를 행정경계에 맞춰 붙인 결과입니다.
+              </p>
+            </div>
+          </li>
+          <li class="en" style="list-style:none;padding:0;margin-top:6px">
+            <div class="viz">
+              <div class="viz-head">
+                <p class="viz-title">Spatial join output: chargers by SA4 region</p>
+                <p class="viz-sub">top 12 of 28 regions · n = 1,939</p>
+                <div class="viz-legend">
+                  <span><i style="background:var(--s1)"></i>Greater Sydney</span>
+                  <span><i style="background:var(--s2)"></i>Rest of NSW</span>
+                </div>
+              </div>
+              <div class="bars">
+                <div class="bar-row"><div class="bar-lab">Sydney – Eastern Suburbs</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:100%"></div></div><div class="bar-val">219</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – City and Inner South</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:63.5%"></div></div><div class="bar-val">139</div></div>
+                <div class="bar-row"><div class="bar-lab">Hunter Valley exc Newcastle</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:58.0%"></div></div><div class="bar-val">127</div></div>
+                <div class="bar-row"><div class="bar-lab">Capital Region</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:53.0%"></div></div><div class="bar-val">116</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – Inner West</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:51.6%"></div></div><div class="bar-val">113</div></div>
+                <div class="bar-row"><div class="bar-lab">Central West</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:51.1%"></div></div><div class="bar-val">112</div></div>
+                <div class="bar-row"><div class="bar-lab">Sydney – North Sydney and Hornsby</div><div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:49.3%"></div></div><div class="bar-val">108</div></div>
+                <div class="bar-row"><div class="bar-lab">Newcastle and Lake Macquarie</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:38.8%"></div></div><div class="bar-val">85</div></div>
+                <div class="bar-row"><div class="bar-lab">Richmond – Tweed</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:34.7%"></div></div><div class="bar-val">76</div></div>
+                <div class="bar-row"><div class="bar-lab">Southern Highlands and Shoalhaven</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:33.8%"></div></div><div class="bar-val">74</div></div>
+                <div class="bar-row"><div class="bar-lab">Riverina</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:33.3%"></div></div><div class="bar-val">73</div></div>
+                <div class="bar-row"><div class="bar-lab">Murray</div><div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:30.6%"></div></div><div class="bar-val">67</div></div>
+              </div>
+              <p class="viz-foot">
+                Two of the top four are Sydney regions, yet the overall split is near even:
+                <b>958</b> in Greater Sydney against <b>981</b> across the rest of NSW.
+                The region names did not exist in the input — they are what the join attached to each coordinate.
+              </p>
+            </div>
+          </li>
+
+          <li class="en">The 25 location conflicts flagged during cleaning were not corrected here either. Their SA4 is <b>the region containing the stored coordinates</b>, and "complete assignment" means every record received a region — not that every charger's physical location was independently verified.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- database -->
+    <section id="database" class="rv">
+      <div class="sec-head"><h2><span class="ko">데이터베이스 설계</span><span class="en">Database design</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko">운영사와 지역을 별도 테이블로 분리해 같은 정보가 행마다 반복되지 않게 했습니다. 지역은 전국 SA4 108건을 모두 보관했고(폴리곤 89건, 지오메트리 NULL 19건), 운영사 별칭 13건은 별도 테이블에 두었습니다.</li>
+          <li class="en">Operators and regions became their own tables so the same details are not repeated on every row. All 108 national SA4 records were kept (89 with polygon geometry, 19 with NULL), and the 13 operator aliases live in a separate table.</li>
+
+          <li class="ko">우편번호와 SA4 코드는 숫자처럼 보이지만 <b>VARCHAR로 저장</b>해 앞자리 0과 비숫자 코드를 지켰고, 빈 값은 0이 아니라 NULL로 두었습니다.</li>
+          <li class="en">Postcodes and SA4 codes look numeric but are <b>stored as VARCHAR</b>, preserving leading zeroes and official non-numeric codes; empty values are NULL, not zero.</li>
+
+          <li class="ko">위경도 범위, 충전기 종류·상태의 허용값, 출력의 유한성과 양수 조건, 우편번호 4자리 형식을 <b>CHECK 제약으로 스키마에 직접 넣었습니다.</b> 적재 코드가 아니라 데이터베이스가 직접 지키게 했습니다.</li>
+          <li class="en">Coordinate ranges, the allowed values for charger type and status, finite positive power figures and the four-digit postcode format are all <b>CHECK constraints in the schema itself</b> — enforced by the database, not by the loading code.</li>
+
+          <li class="ko">좌표계를 타입 주석이 아니라 <b>별도 컬럼으로 저장</b>해 데이터베이스를 다시 열었을 때도 확인할 수 있게 하고, 두 geometry 컬럼에 R-tree 인덱스를 만들었습니다.</li>
+          <li class="en">The CRS is held in <b>its own column</b> rather than a type note, so it can still be checked after the database is reopened, and both geometry columns carry R-tree indexes.</li>
+
+          <li class="ko">적재 후 검증에서 공간 조인 결과(1,938 within, 1 nearest)가 <b>데이터베이스 안에서도 그대로 재현되는지</b> 다시 확인했습니다.</li>
+          <li class="en">Post-load validation re-checks that the spatial assignment (1,938 within, one nearest) <b>reproduces inside the database</b>.</li>
+        </ul>
+
+        <div class="dgm-wrap">
+          <p class="dgm-hint">
+            <span class="ko">테이블에 마우스를 올리거나 클릭하면 연결된 관계와 설명이 나타납니다</span>
+            <span class="en">Hover or click a table to trace its relationships and read what it holds</span>
+          </p>
+
+          <div class="dgm-stage">
+            <svg class="dgm" viewBox="0 0 1060 440" role="img"
+                 aria-label="DuckDB 관계 스키마: operators, operator_aliases, regions, chargers, augmentation, augmentation_evidence, augmentation_sources, selected_evidence">
+              <defs>
+                <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path class="arrow" d="M0,1 L9,5 L0,9 z"/>
+                </marker>
+              </defs>
+
+              <!-- edges -->
+              <g class="edge" data-ends="operators chargers">
+                <path d="M170,70 H250 V210 H322" marker-end="url(#ar)"/>
+                <text x="178" y="60">operates</text>
+              </g>
+              <g class="edge" data-ends="operators operator_aliases">
+                <path d="M100,90 V182" marker-end="url(#ar)"/>
+                <text x="108" y="140">normalises</text>
+              </g>
+              <g class="edge" data-ends="regions chargers">
+                <path d="M160,350 H400 V232" marker-end="url(#ar)"/>
+                <text x="168" y="341">assigned to</text>
+              </g>
+              <g class="edge" data-ends="chargers augmentation">
+                <path d="M400,190 V70 H582" marker-end="url(#ar)"/>
+                <text x="410" y="60">has summary</text>
+              </g>
+              <g class="edge" data-ends="chargers augmentation_evidence">
+                <path d="M470,210 H552" marker-end="url(#ar)"/>
+                <text x="474" y="201">has candidates</text>
+              </g>
+              <g class="edge" data-ends="augmentation_sources augmentation_evidence">
+                <path d="M670,330 V232" marker-end="url(#ar)"/>
+                <text x="678" y="288">supplies</text>
+              </g>
+              <g class="edge" data-ends="augmentation_evidence selected_evidence">
+                <path d="M785,210 H818 V138 H842" marker-end="url(#ar)"/>
+                <text x="790" y="201">supports</text>
+              </g>
+              <g class="edge" data-ends="augmentation selected_evidence">
+                <path d="M755,70 H940 V110" marker-end="url(#ar)"/>
+                <text x="765" y="60">selects</text>
+              </g>
+
+              <!-- nodes -->
+              <g class="node" data-node="operators" tabindex="0" role="button" aria-label="operators">
+                <rect x="30" y="50" width="140" height="40"/>
+                <text x="100" y="71">operators</text>
+              </g>
+              <g class="node" data-node="operator_aliases" tabindex="0" role="button" aria-label="operator_aliases">
+                <rect x="12" y="182" width="190" height="40"/>
+                <text x="107" y="203">operator_aliases</text>
+              </g>
+              <g class="node" data-node="regions" tabindex="0" role="button" aria-label="regions">
+                <rect x="30" y="330" width="130" height="40"/>
+                <text x="95" y="351">regions</text>
+              </g>
+              <g class="node" data-node="chargers" tabindex="0" role="button" aria-label="chargers">
+                <rect x="322" y="190" width="148" height="42"/>
+                <text x="396" y="212">chargers</text>
+              </g>
+              <g class="node" data-node="augmentation" tabindex="0" role="button" aria-label="augmentation">
+                <rect x="582" y="50" width="173" height="40"/>
+                <text x="668" y="71">augmentation</text>
+              </g>
+              <g class="node" data-node="augmentation_evidence" tabindex="0" role="button" aria-label="augmentation_evidence">
+                <rect x="552" y="190" width="233" height="42"/>
+                <text x="668" y="212">augmentation_evidence</text>
+              </g>
+              <g class="node" data-node="augmentation_sources" tabindex="0" role="button" aria-label="augmentation_sources">
+                <rect x="558" y="330" width="224" height="40"/>
+                <text x="670" y="351">augmentation_sources</text>
+              </g>
+              <g class="node" data-node="selected_evidence" tabindex="0" role="button" aria-label="selected_evidence">
+                <rect x="842" y="110" width="196" height="40"/>
+                <text x="940" y="131">selected_evidence</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="dgm-info" aria-live="polite">
+            <p class="idle-card idle">
+              <span class="ko">테이블을 선택하면 보관하는 내용과 제약이 표시됩니다.</span>
+              <span class="en">Select a table to see what it holds and the constraints on it.</span>
+            </p>
+
+            <div data-for="operators" hidden>
+              <h4>operators</h4>
+              <p class="ko">정제를 거친 운영사 이름 41개를 보관합니다. 운영사 정보가 충전소 행마다 반복되지 않도록 분리한 테이블입니다.</p>
+              <p class="en">Holds the 41 cleaned operator names, kept separate so operator details are not repeated on every charger row.</p>
+              <span class="grain">PRIMARY KEY operator_name · 41 rows</span>
+            </div>
+
+            <div data-for="operator_aliases" hidden>
+              <h4>operator_aliases</h4>
+              <p class="ko">원본의 서로 다른 표기 13건을 정제된 이름에 연결합니다. 전체 운영사 목록이 아니라 <b>정제 과정에서 실제로 매핑된 이름만</b> 보관합니다. 매핑을 코드가 아닌 테이블에 둔 덕분에 이후 단계도 같은 이름을 사용합니다.</p>
+              <p class="en">Links 13 original spellings to their cleaned names. It is not a full operator list — only the names actually mapped during cleaning. Keeping the mapping in a table rather than in code means later stages resolve to the same names.</p>
+              <span class="grain">PRIMARY KEY raw_operator → operators · 13 rows</span>
+            </div>
+
+            <div data-for="regions" hidden>
+              <h4>regions</h4>
+              <p class="ko">공식 SA4 통계 지역을 코드 단위로 한 번씩 저장합니다. NSW 밖 오배정을 검증하기 위해 전국 108건을 모두 보관했고, 이 중 89건은 폴리곤, 19건은 지오메트리가 NULL입니다.</p>
+              <p class="en">Stores each official SA4 statistical area once, by code. All 108 national records were retained so assignments outside NSW could be checked — 89 with polygon geometry, 19 with NULL.</p>
+              <span class="grain">PRIMARY KEY sa4_code · CHECK geometry_crs = 'EPSG:7844' · 108 rows</span>
+            </div>
+
+            <div data-for="chargers" hidden>
+              <h4>chargers</h4>
+              <p class="ko">한 사이트 · 운영사 · 충전기 종류당 1행입니다. 플러그 하나가 아니라 <b>한 운영사가 한 장소에서 제공하는 한 종류</b>가 기준이며, 예정(upcoming) 행도 함께 보관합니다.</p>
+              <p class="en">One row per site, operator and charger type — the grain is <b>one type offered by one operator at one site</b>, not an individual plug. Upcoming rows are kept.</p>
+              <p class="ko">허용값과 범위를 적재 코드가 아니라 스키마에서 지키도록 CHECK 제약으로 넣었습니다.</p>
+              <p class="en">Allowed values and ranges are enforced by the schema through CHECK constraints rather than by the loading code.</p>
+              <span class="grain">CHECK charger_type ∈ (AC, DC, Unknown) · charger_status ∈ (existing, upcoming) · sa4_match ∈ (within, nearest) · postcode ~ [0-9]{4} · 1,939 rows</span>
+            </div>
+
+            <div data-for="augmentation" hidden>
+              <h4>augmentation</h4>
+              <p class="ko">증강 대상인 기존 DC 충전소 431건을 <b>조회용으로 요약한</b> 테이블입니다. 매칭 상태와 유효 증강 여부를 한 행으로 보여줍니다.</p>
+              <p class="en">A <b>query summary</b> over the 431 existing DC charger records eligible for augmentation, giving match status and whether a valid augmentation exists in one row.</p>
+              <p class="ko">요약이 증거와 어긋나지 않도록, 매칭 여부와 상태값이 서로 모순될 수 없게 제약을 걸었습니다.</p>
+              <p class="en">Constraints keep the summary from contradicting the evidence: the matched flag and the status value cannot disagree.</p>
+              <span class="grain">CHECK is_matched = (match_status = 'accepted') · 431 rows</span>
+            </div>
+
+            <div data-for="augmentation_evidence" hidden>
+              <h4>augmentation_evidence</h4>
+              <p class="ko">후보 값 하나당 1행으로, 그 값의 <b>출처와 판정 결과</b>를 함께 보관합니다. 채택된 값뿐 아니라 보류·거절된 값도 남아 있어, 왜 그렇게 결정했는지 되짚을 수 있습니다.</p>
+              <p class="en">One row per candidate value, recorded together with <b>its source and the decision made about it</b>. Held and rejected values remain alongside accepted ones, so any decision can be traced back.</p>
+              <span class="grain">UNIQUE (evidence_id, charger_id, attribute)</span>
+            </div>
+
+            <div data-for="augmentation_sources" hidden>
+              <h4>augmentation_sources</h4>
+              <p class="ko">증거가 어디에서 왔는지 출처 목록을 따로 보관합니다. 증거 행이 출처 이름을 문자열로 반복해서 들고 있지 않도록 분리했습니다.</p>
+              <p class="en">Keeps the list of where evidence came from, separated so evidence rows do not repeat source names as free text.</p>
+              <span class="grain">PRIMARY KEY source</span>
+            </div>
+
+            <div data-for="selected_evidence" hidden>
+              <h4>selected_evidence</h4>
+              <p class="ko">승인된 충전소 · 속성 · 증거를 연결하는 테이블이며, <b>커버리지 계산의 기준</b>입니다. 요약만 믿으면 실제 증거와 수치가 어긋날 수 있어, 적재 시점에 이 연결을 기준으로 커버리지를 다시 계산해 요약값과 대조합니다.</p>
+              <p class="en">Links an accepted charger, attribute and evidence record, and is the <b>source of truth for the coverage count</b>. Trusting the summary alone would let the number drift from the evidence, so at load time coverage is recalculated from these links and checked against the summary.</p>
+              <p class="ko">선택된 증거 행은 같은 충전소와 같은 속성을 가리키는 증거만 참조할 수 있습니다.</p>
+              <p class="en">A selected row can only point to an evidence row for the same charger and the same attribute.</p>
+              <span class="grain">PRIMARY KEY (charger_id, attribute, evidence_id)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- repro -->
+    <section id="repro" class="rv">
+      <div class="sec-head"><h2><span class="ko">재현성</span><span class="en">Reproducibility</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko">파일마다 URL, 출처 엔드포인트, 수집 시각, 크기, <b>SHA-256 체크섬</b>을 기록했습니다. 다시 실행하면 로컬 파일의 크기·체크섬·파일명을 기록과 대조해, 일치하면 원래 수집 시각을 지킨 채 재사용하고 <b>불일치하면 덮어쓰지 않고 멈춥니다.</b> 다만 이 방식은 로컬 사본이 기록과 맞는지만 봅니다. 원격 파일이 그사이 바뀌었는지는 알 수 없습니다.</li>
+          <li class="en">For every file I record the URL, source endpoint, retrieval time, size and a <b>SHA-256 checksum</b>. A later run compares the local file's size, checksum and filename against that record: on a match it reuses the file and preserves the original retrieval time; on a mismatch it <b>stops rather than overwriting</b>. As documented, this verifies the local copy against its recorded metadata — it does not detect changes to the remote file.</li>
+
+          <li class="ko">수집은 data.gov.au CKAN API로 대상 CSV를 찾아 내려받고, ABS는 배포 페이지를 파싱해 셰이프파일 아카이브를 자동으로 받아 풀도록 했습니다. 로그인이나 API 키는 필요 없습니다.</li>
+          <li class="en">Retrieval locates the target CSV through the data.gov.au CKAN API and parses the ABS download page to fetch and extract the shapefile archive automatically. Neither requires a login or an API key.</li>
+
+          <li class="ko">수집·검증·적재 스크립트와 <b>단위 테스트 6종</b>으로 구성했고, macOS arm64 / Python 3.12 클린 환경에서 전체 흐름이 통과하는 것을 확인했습니다. 다른 운영체제까지는 확인하지 못했습니다.</li>
+          <li class="en">The package comprises acquisition, validation and loading scripts with <b>six unit-test modules</b>, and the whole flow passes in a clean macOS arm64 / Python 3.12 environment — which, as the report states, does not establish compatibility across every operating system.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="case-foot">
+      <a class="btn" href="../index.html">←&nbsp;<span class="ko">전체 프로젝트</span><span class="en">All projects</span></a>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>

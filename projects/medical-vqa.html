@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>의료 영상 질의응답 연합학습 — 이수빈</title>
+<meta name="description" content="연합학습이 의료 VQA 답변 품질에 미치는 영향을 비교한 연구. 올라간 점수를 분해해 어디서 왔는지 확인하고, 모든 결과를 다시 채점할 수 있게 만들었습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-back" aria-hidden="true">←</span>
+      <span class="brand-name"><span class="ko">이수빈</span><span class="en">Suebin Lee</span></span>
+      <span class="brand-alt"><span class="ko">전체 프로젝트</span><span class="en">All projects</span></span>
+    </a>
+    <div class="utils">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang-set="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<header class="case-head">
+  <div class="wrap">
+    <p class="case-eyebrow">
+      <span class="ko">케이스 스터디</span><span class="en">Case study</span>
+      <span class="sep">/</span>
+      <span>2026.08 – 10</span>
+      <span class="sep">/</span>
+      <span class="ko">진행 중</span><span class="en">in progress</span>
+    </p>
+    <h1>
+      <span class="ko">의료 영상 질의응답 연합학습 파이프라인</span>
+      <span class="en">Medical VQA Federated Learning Pipeline</span>
+    </h1>
+    <p class="case-lede">
+      <span class="ko">환자 데이터를 병원 밖으로 내보내지 않고 의료 영상 질의응답 모델을 학습시킬 때, 답변 품질이 어떻게 달라지는지 비교했습니다. 숫자가 올라간 조건에서 그 이유를 네 갈래로 분해해 확인했습니다.</span>
+      <span class="en">Comparing how answer quality changes when a medical visual question answering model is trained without patient data leaving the hospital. The centre of this project was taking the one condition where the score went up and breaking down where that gain actually came from.</span>
+    </p>
+
+    <dl class="case-meta">
+      <div>
+        <dt><span class="ko">담당</span><span class="en">My scope</span></dt>
+        <dd><span class="ko">연합학습 파이프라인 개발 · 실험 이력 관리 · 결과 검증</span><span class="en">Federated pipeline, experiment provenance, result verification</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">기간</span><span class="en">Period</span></dt>
+        <dd>2026.08 – 10</dd>
+      </div>
+      <div>
+        <dt><span class="ko">환경</span><span class="en">Stack</span></dt>
+        <dd>Python · PyTorch · Flower</dd>
+      </div>
+      <div>
+        <dt><span class="ko">데이터</span><span class="en">Dataset</span></dt>
+        <dd>VQA-RAD</dd>
+      </div>
+    </dl>
+
+    <div class="kpis">
+      <div class="kpi"><b>51</b><span><span class="ko">실행</span><span class="en">runs</span></span></div>
+      <div class="kpi"><b>99</b><span><span class="ko">저장한 모델 전부 재채점</span><span class="en">model exports, all rescored</span></span></div>
+      <div class="kpi"><b>216</b><span><span class="ko">모델당 예측 재현</span><span class="en">predictions replayed per export</span></span></div>
+      <div class="kpi"><b>3</b><span><span class="ko">난수 시드 반복</span><span class="en">seeds repeated</span></span></div>
+    </div>
+
+    <ul class="stack case-stack">
+      <li>Python</li><li>PyTorch</li><li>Flower</li><li>Federated Learning</li><li>Medical VQA</li><li>SHA-256</li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <aside class="rail">
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#split"><span class="ko">데이터 분할 기준</span><span class="en">Data splits</span></a></li>
+        <li><a href="#design"><span class="ko">비교 설계</span><span class="en">Comparison design</span></a></li>
+        <li><a href="#result"><span class="ko">결과</span><span class="en">Results</span></a></li>
+        <li><a href="#decompose"><span class="ko">점수 차이 분해</span><span class="en">Decomposing the gain</span></a></li>
+        <li><a href="#repro"><span class="ko">재현성</span><span class="en">Reproducibility</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- scope -->
+    <section id="scope" class="rv">
+      <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
+      <div class="blk">
+        <p class="ko">연합학습 파이프라인 개발과 실험 이력 관리, 결과 검증을 맡았습니다. 저장소 커밋 41건 가운데 28건이 제 작업입니다.</p>
+        <p class="en">I worked on the federated pipeline, experiment provenance and result verification — 28 of the repository's 41 commits are mine.</p>
+        <p class="note">
+          <span class="ko">이 프로젝트에서 가장 많이 한 일은 <b>점수가 맞는지 확인하는 일</b>이었습니다. 연합학습은 서버가 클라이언트의 가중치를 덮어쓰거나 다른 클라이언트의 상태를 복원하면, 틀린 방법에 그럴듯한 점수가 붙습니다. 실행이 성공했다는 메시지만으로는 그걸 알 수 없습니다.</span>
+          <span class="en">Most of my time here went into <b>checking that a score belonged to the method it was filed under</b>. In federated training a server update can overwrite a local head or restore another client's state, producing a plausible score for the wrong method — and a “run succeeded” message will not tell you that.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- split -->
+    <section id="split" class="rv">
+      <div class="sec-head"><h2><span class="ko">데이터 분할 기준</span><span class="en">Splitting images, not questions</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>한 이미지에 여러 질문이 달려 있습니다.</b> 질문 단위로 학습·검증·평가를 나누면 같은 X-ray가 세 묶음에 동시에 들어갑니다. 모델이 평가 때 처음 보는 영상이어야 하는데 이미 학습에서 본 것이 됩니다. 그래서 질문이 아니라 <b>이미지 단위로</b> 나눴습니다.</li>
+          <li class="en"><b>Each image carries several questions.</b> Splitting by question puts the same X-ray into training, validation and test at once, so an image the model is meant to be seeing for the first time has already been trained on. The split is therefore <b>by image</b>, not by question.</li>
+
+          <li class="ko"><b>원본 데이터를 먼저 점검했습니다.</b> 질문·답변 쌍 2,248건 가운데 완전히 같은 중복 4건을 찾아 제거했고, 어떤 질문도 참조하지 않는 이미지 1장을 제외했습니다. 남은 2,244건과 314장으로 분할을 구성했습니다.</li>
+          <li class="en"><b>The source was audited first.</b> Four exact duplicate question–answer instances were found among 2,248 pairs and removed, along with one image no question referenced — leaving 2,244 pairs across 314 images to partition.</li>
+
+          <li class="ko"><b>분할이 지켜지는지 검사로 확인했습니다.</b> 질문 ID가 모두 고유한지, 세 묶음 사이에 이미지가 겹치지 않는지, 학습 이미지 하나가 정확히 한 클라이언트에만 배정됐는지를 확인했습니다.</li>
+          <li class="en"><b>Checks confirmed the split holds:</b> question IDs unique, no image shared between the three sets, and exactly one client assignment per training image.</li>
+
+          <li class="ko"><b>평가용 데이터는 쓰지 않았습니다.</b> 비교는 검증 데이터로만 했고, 평가 데이터는 최종 평가 규칙이 정해질 때까지 예측도 채점도 하지 않은 채로 두었습니다.</li>
+          <li class="en"><b>Test data stayed untouched.</b> All comparisons ran on validation; test was neither predicted nor scored, pending an agreed final evaluation protocol.</li>
+        </ul>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">묶음</span><span class="en">Split</span></th>
+                <th style="text-align:right"><span class="ko">이미지</span><span class="en">Images</span></th>
+                <th style="text-align:right"><span class="ko">질문</span><span class="en">Questions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="ko">학습</span><span class="en">Train</span></td><td class="n to">251</td><td class="n to">1,787</td></tr>
+              <tr><td><span class="ko">검증</span><span class="en">Validation</span></td><td class="n">31</td><td class="n">216</td></tr>
+              <tr><td><span class="ko">평가 (미사용)</span><span class="en">Test (unused)</span></td><td class="n">32</td><td class="n">241</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- design -->
+    <section id="design" class="rv">
+      <div class="sec-head"><h2><span class="ko">비교 설계</span><span class="en">Comparison design</span></h2></div>
+      <div class="blk">
+        <p class="ko">모델은 닫힌 질문(예/아니오 같은 고정 답변)과 열린 질문을 각각 다른 출력부로 처리합니다. 연합학습에서 이 출력부를 어디까지 공유하느냐에 따라 결과가 달라지는지를 보려고, 공유 범위만 다른 조건을 나란히 두었습니다.</p>
+        <p class="en">The model answers closed questions (fixed answers such as yes/no) and open questions through separate heads. To see whether how much of that is shared changes the outcome, the conditions differ only in sharing policy.</p>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="text-align:right"><span class="ko">조건</span><span class="en">Method</span></th>
+                <th><span class="ko">공유 범위</span><span class="en">What is shared</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="n to">A</td><td><span class="ko">연합학습 없이 한곳에서 전부 학습 (기준선)</span><span class="en">Centralised training on all data (baseline)</span></td></tr>
+              <tr><td class="n to">B</td><td><span class="ko">인코더와 두 출력부를 모두 공유</span><span class="en">Encoder and both heads shared</span></td></tr>
+              <tr><td class="n to">C</td><td><span class="ko">열린 질문 출력부만 각 기관에 남김</span><span class="en">Open head kept local to each client</span></td></tr>
+              <tr><td class="n to">L</td><td><span class="ko">두 출력부를 모두 각 기관에 남김</span><span class="en">Both heads kept local</span></td></tr>
+              <tr><td class="n to">R</td><td><span class="ko">닫힌 질문 출력부만 각 기관에 남김</span><span class="en">Closed head kept local</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <ul class="bul">
+          <li class="ko"><b>L과 R은 비교를 위해 추가한 조건입니다.</b> C가 B보다 나아 보일 때, 그게 "열린 질문 출력부를 남긴 것" 때문인지 아니면 "뭐라도 남기면 나아지는 것"인지 구분할 수 없습니다. 둘 다 남긴 조건(L)과 반대쪽만 남긴 조건(R)을 같이 돌려야 답이 나옵니다.</li>
+          <li class="en"><b>L and R exist to make C interpretable.</b> If C beats B, that alone cannot tell you whether keeping the <em>open</em> head local mattered or whether keeping <em>anything</em> local would do. Running both-local (L) and the opposite-only case (R) is what separates them.</li>
+
+          <li class="ko"><b>조건 사이에 다른 변수가 끼지 않게 맞췄습니다.</b> 같은 시드에서는 모든 방법이 같은 초기 가중치에서 출발하고, 같은 데이터 로더와 학습 루프, 같은 채점기를 씁니다. 기준선 A의 3에포크는 연합학습 3라운드와 질문 노출 횟수를 맞춰서 정했습니다.</li>
+          <li class="en"><b>Nothing else was allowed to vary.</b> Within a seed every method starts from the same initial checkpoint and uses the same loader, training loop and scorer. The baseline's three epochs match the three question exposures of three-round federated training.</li>
+
+          <li class="ko"><b>맞추지 못한 차이는 적어 두었습니다.</b> 연합학습은 라운드마다 옵티마이저가 초기화되지만 기준선 A는 에포크 사이에 상태를 유지합니다. 질문 노출 횟수를 맞췄다고 해서 이 차이가 없어진 것은 아니라서, 해결됐다고 쓰지 않고 남아 있는 차이로 적었습니다.</li>
+          <li class="en"><b>What could not be matched was written down.</b> Federated optimisers reset each round while the centralised baseline carries state across epochs. Matching question exposure does not erase that, so it is recorded as a remaining difference rather than a resolved one.</li>
+
+          <li class="ko"><b>선택적 공유가 통신량을 줄여 주지는 않습니다.</b> 일부만 집계에 쓰더라도 전송은 여전히 모든 파라미터를 싣고 갑니다. 이 점을 성과로 적지 않았습니다.</li>
+          <li class="en"><b>Selective aggregation is not a communication saving.</b> Transport still carries every parameter group even when only some are aggregated, so it was not claimed as a benefit.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- result -->
+    <section id="result" class="rv">
+      <div class="sec-head"><h2><span class="ko">결과</span><span class="en">Results</span></h2></div>
+      <div class="blk">
+        <p class="ko">시드 3개를 반복한 평균입니다. C가 B보다 나은지는 <b>데이터가 어떻게 나뉘어 있느냐에 따라 부호가 바뀌었습니다.</b> 기관마다 영상 부위가 치우친 non-IID 조건에서는 오히려 C가 낮았습니다.</p>
+        <p class="en">Means across three repeated seeds. Whether C beats B <b>changes sign with how the data is distributed</b>: under non-IID clients, where each institution's images skew to different body regions, C came out lower.</p>
+
+        <div class="viz">
+          <div class="viz-head">
+            <p class="viz-title"><span class="ko">C − B 열린 질문 F1 차이</span><span class="en">C − B difference in open-question F1</span></p>
+            <p class="viz-sub"><span class="ko">시드 3개 평균 · 단위 %p</span><span class="en">mean of 3 seeds · percentage points</span></p>
+            <div class="viz-legend">
+              <span><i style="background:var(--pos)"></i><span class="ko">C가 높음</span><span class="en">C higher</span></span>
+              <span><i style="background:var(--neg)"></i><span class="ko">B가 높음</span><span class="en">B higher</span></span>
+            </div>
+          </div>
+          <div class="bars">
+            <div class="dv-row">
+              <div class="dv-lab"><span class="ko">IID · 3라운드</span><span class="en">IID · 3 rounds</span></div>
+              <div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:19.6%"></div></div>
+              <div class="dv-val p">+2.22</div>
+            </div>
+            <div class="dv-row">
+              <div class="dv-lab"><span class="ko">IID · 6라운드</span><span class="en">IID · 6 rounds</span></div>
+              <div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:13.1%"></div></div>
+              <div class="dv-val p">+1.48</div>
+            </div>
+            <div class="dv-row">
+              <div class="dv-lab"><span class="ko">non-IID · 3라운드</span><span class="en">non-IID · 3 rounds</span></div>
+              <div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--neg);right:50%;width:24.4%"></div></div>
+              <div class="dv-val n">−2.76</div>
+            </div>
+            <div class="dv-row">
+              <div class="dv-lab"><span class="ko">non-IID · 6라운드</span><span class="en">non-IID · 6 rounds</span></div>
+              <div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--neg);right:50%;width:17.6%"></div></div>
+              <div class="dv-val n">−1.99</div>
+            </div>
+          </div>
+          <div class="dv-scale"><div></div><div><span>−5.66</span><span>0</span><span>+5.66</span></div><div></div></div>
+          <p class="viz-foot">
+            <span class="ko">같은 방법이 조건에 따라 유리하기도 불리하기도 합니다. 6라운드에서는 시드별로 부호가 갈려서, 평균이 양수라도 일관된 효과라고 보기 어렵습니다. 신뢰구간은 계산하지 않았고 유의성 검정도 아닙니다.</span>
+            <span class="en">The same method helps in one setting and hurts in another. At six rounds the sign varied across seeds, so a positive mean is not a consistent effect. No confidence intervals were computed and these are not significance tests.</span>
+          </p>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">조건</span><span class="en">Setting</span></th>
+                <th style="text-align:right"><span class="ko">방법</span><span class="en">Method</span></th>
+                <th style="text-align:right"><span class="ko">닫힌 질문 정확도</span><span class="en">Closed acc.</span></th>
+                <th style="text-align:right"><span class="ko">열린 질문 EM</span><span class="en">Open EM</span></th>
+                <th style="text-align:right"><span class="ko">열린 질문 F1</span><span class="en">Open F1</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="ko">한곳 학습</span><span class="en">Centralised</span></td><td class="n to">A</td><td class="n">54.68 ± 3.08</td><td class="n">10.46 ± 4.08</td><td class="n">15.00 ± 4.66</td></tr>
+              <tr><td>IID</td><td class="n">B</td><td class="n">47.37 ± 4.88</td><td class="n">6.21 ± 0.57</td><td class="n">6.85 ± 0.31</td></tr>
+              <tr><td>IID</td><td class="n">C</td><td class="n">50.29 ± 2.68</td><td class="n">6.37 ± 0.98</td><td class="n">9.08 ± 0.99</td></tr>
+              <tr><td>IID</td><td class="n">L</td><td class="n">49.85 ± 5.23</td><td class="n">6.21 ± 0.28</td><td class="n">8.82 ± 0.36</td></tr>
+              <tr><td>IID</td><td class="n">R</td><td class="n">46.93 ± 1.52</td><td class="n">5.88 ± 0.98</td><td class="n">7.85 ± 1.30</td></tr>
+              <tr><td>non-IID</td><td class="n">B</td><td class="n">50.58 ± 2.21</td><td class="n">7.19 ± 2.04</td><td class="n">10.44 ± 2.10</td></tr>
+              <tr><td>non-IID</td><td class="n">C</td><td class="n">48.83 ± 1.83</td><td class="n">5.39 ± 0.49</td><td class="n">7.68 ± 1.24</td></tr>
+              <tr><td>non-IID</td><td class="n">L</td><td class="n">47.81 ± 3.31</td><td class="n">5.72 ± 0.75</td><td class="n">8.30 ± 1.21</td></tr>
+              <tr><td>non-IID</td><td class="n">R</td><td class="n">48.68 ± 2.01</td><td class="n">7.52 ± 1.50</td><td class="n">10.48 ± 1.48</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="ko">한곳에서 학습한 A가 세 지표 모두에서 가장 높았습니다. 연합학습이 더 낫다는 결과가 아니라, <b>공유 범위를 바꾸면 결과가 조건에 따라 달라진다</b>는 것이 이 비교가 보여주는 내용입니다. IID에서 C가 L을 앞선 폭은 0.26%p였고 시드별 방향도 엇갈렸습니다.</p>
+        <p class="en">Centralised A scored highest on all three metrics. The finding is not that federated training wins, but that <b>changing the sharing policy produces condition-dependent results</b>. Under IID, C led L by 0.26 points with seeds pointing in different directions.</p>
+      </div>
+    </section>
+
+    <!-- decompose -->
+    <section id="decompose" class="rv">
+      <div class="sec-head"><h2><span class="ko">점수 차이 분해</span><span class="en">Breaking down the gain</span></h2></div>
+      <div class="blk">
+        <p class="ko">IID에서 C가 B보다 F1이 2.22%p 높았습니다. 여기서 멈추면 "열린 질문 출력부를 각 기관에 남기면 좋다"로 읽힙니다. 그런데 채점 방식을 보면 <b>검증 질문 102개 중 73개는 정답이 모델이 고를 수 있는 답변 목록 밖에 있습니다.</b> 이 질문들은 정확히 맞출 수가 없고, 단어가 일부 겹치는 만큼만 점수를 받습니다.</p>
+        <p class="en">Under IID, C scored 2.22 points higher than B. Stopping there reads as “keeping the open head local helps.” But <b>73 of the 102 validation questions have a gold answer outside the list the model can choose from</b> — they cannot be answered exactly, and earn credit only for partial word overlap.</p>
+        <p class="ko">그래서 차이를 네 칸으로 나눠 봤습니다. 정답이 목록 안인지 밖인지, 그리고 정확히 맞췄는지 단어만 겹쳤는지입니다.</p>
+        <p class="en">So the difference was split four ways: whether the gold answer was inside or outside the list, and whether the match was exact or partial overlap.</p>
+
+        <div class="viz">
+          <div class="viz-head">
+            <p class="viz-title"><span class="ko">C − B F1 차이를 네 칸으로 분해</span><span class="en">The C − B F1 difference, split four ways</span></p>
+            <p class="viz-sub"><span class="ko">시드 3개 평균 · 3라운드 · 단위 %p · 분모는 102문항 유지</span><span class="en">mean of 3 seeds · 3 rounds · percentage points · full 102-question denominator</span></p>
+            <div class="viz-legend">
+              <span><i style="background:var(--pos)"></i><span class="ko">C가 높음</span><span class="en">C higher</span></span>
+              <span><i style="background:var(--neg)"></i><span class="ko">B가 높음</span><span class="en">B higher</span></span>
+            </div>
+          </div>
+
+          <div class="viz-split">
+            <div>
+              <h5>IID</h5>
+              <div class="bars">
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 안 · 정확히 맞춤</span><span class="en">inside list · exact</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:1.6%"></div></div><div class="dv-val p">+0.16</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 안 · 부분 일치</span><span class="en">inside list · partial</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:0.5%"></div></div><div class="dv-val p">+0.05</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 밖 · 정확히 맞춤</span><span class="en">outside list · exact</span></div><div class="dv-plot"><div class="dv-axis"></div></div><div class="dv-val" style="color:var(--muted)">0.00</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 밖 · 부분 일치</span><span class="en">outside list · partial</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:20.1%"></div></div><div class="dv-val p">+2.01</div></div>
+                <div class="dv-row total"><div class="dv-lab"><span class="ko">합계</span><span class="en">total</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:22.2%"></div></div><div class="dv-val p">+2.22</div></div>
+              </div>
+            </div>
+
+            <div>
+              <h5>non-IID</h5>
+              <div class="bars">
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 안 · 정확히 맞춤</span><span class="en">inside list · exact</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--neg);right:50%;width:18.0%"></div></div><div class="dv-val n">−1.80</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 안 · 부분 일치</span><span class="en">inside list · partial</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--pos);left:50%;width:0.5%"></div></div><div class="dv-val p">+0.05</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 밖 · 정확히 맞춤</span><span class="en">outside list · exact</span></div><div class="dv-plot"><div class="dv-axis"></div></div><div class="dv-val" style="color:var(--muted)">0.00</div></div>
+                <div class="dv-row"><div class="dv-lab"><span class="ko">목록 밖 · 부분 일치</span><span class="en">outside list · partial</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--neg);right:50%;width:10.2%"></div></div><div class="dv-val n">−1.02</div></div>
+                <div class="dv-row total"><div class="dv-lab"><span class="ko">합계</span><span class="en">total</span></div><div class="dv-plot"><div class="dv-axis"></div><div class="dv-bar" style="background:var(--neg);right:50%;width:27.6%"></div></div><div class="dv-val n">−2.76</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dv-scale"><div></div><div><span>−10</span><span>0</span><span>+10</span></div><div></div></div>
+
+          <p class="viz-foot">
+            <span class="ko">IID에서 늘어난 2.22%p 가운데 <b>2.01%p, 약 90%가 "목록 밖 · 부분 일치"</b>에서 나왔습니다. 정답을 맞춰서 올라간 점수가 아니라, 맞출 수 없는 질문에서 단어가 더 겹쳐서 올라간 점수입니다. 네 칸의 합은 반올림 전 기준으로 합계와 일치합니다.</span>
+            <span class="en">Of the 2.22-point IID gain, <b>2.01 points — about 90% — sit in “outside list · partial”</b>: not answers the model got right, but more word overlap on questions it could not get right. The four cells sum to the total before rounding.</span>
+          </p>
+        </div>
+
+        <p class="note">
+          <span class="ko">그래서 이 숫자를 성과로 쓰지 않았습니다. 분모에서 목록 밖 질문을 빼면 점수가 올라가 보이지만, 그건 모델이 못 맞추는 질문을 평가에서 빼는 셈입니다. <b>102문항을 모두 채점에 남긴 채 차이를 분해해서</b> 어디서 온 점수인지 보고했습니다. 단어가 겹친다고 의학적으로 맞는 답이라는 뜻은 아닙니다.</span>
+          <span class="en">That is why the number was not reported as a win. Dropping the out-of-list questions from the denominator would raise the score, but it would do so by deleting the questions the model cannot answer. <b>All 102 questions stayed in scoring</b> and the difference was decomposed instead. Word overlap is not evidence of clinical correctness.</span>
+        </p>
+
+        <ul class="bul">
+          <li class="ko"><b>학습을 더 돌려도 해결되지 않는 문제입니다.</b> 목록에 없는 답은 학습 시간을 늘린다고 생기지 않습니다. 별도로 생성 방식 시험을 64개 예시로 돌려 봤지만, 목록 밖 73개 질문에서 정확히 맞춘 경우는 없었습니다. 이 결과도 본 실험에 섞지 않고 따로 적었습니다.</li>
+          <li class="en"><b>More training does not fix this.</b> An answer absent from the list cannot be produced by training longer. A separate 64-example generative pilot was run, and it produced no exact matches on those 73 questions — a result kept separate from the main experiments rather than folded into them.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- repro -->
+    <section id="repro" class="rv">
+      <div class="sec-head"><h2><span class="ko">재현성</span><span class="en">Reproducibility</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>저장한 모델을 전부 다시 채점했습니다.</b> 51번의 실행에서 모델 99개가 나왔고, 모델마다 검증 질문 216개 예측을 다시 돌려 점수가 같은지 확인했습니다. 비교 항목 180건을 짝지어 대조하고 모델 9개는 직접 다시 실행했습니다.</li>
+          <li class="en"><b>Every export was rescored.</b> The 99 models produced by 51 runs were saved, and each was replayed over all 216 validation questions to confirm the scores still matched. 180 paired comparison entries were reconciled and nine models were re-run directly.</li>
+
+          <li class="ko"><b>파일 이름은 증거로 치지 않았습니다.</b> 예전 실행 하나는 파일명이 맞는데도 예측 해시가 일치하지 않았고, 일부 초기 가중치는 남아 있지 않았습니다. 이후로는 설정·가중치·예측·점수를 서로 연결해 기록하고, 기존 기록을 덮어쓰지 않게 했습니다. 되찾지 못한 파일은 <b>복원하지 않고 "확인 불가"로 남겼습니다.</b></li>
+          <li class="en"><b>Filenames were not accepted as evidence.</b> One earlier run had the right filename but a prediction hash that did not match, and some initial checkpoints no longer existed. Records now link settings, weights, predictions and scores without overwriting earlier ones, and files that could not be recovered are <b>left marked unavailable rather than reconstructed.</b></li>
+
+          <li class="ko"><b>서버가 보낸 값을 직접 꺼내 확인했습니다.</b> 집계가 제대로 됐는지, 각 클라이언트가 받은 가중치가 맞는지를 텐서 단위로 비교했습니다. 라운드가 넘어갈 때 각 기관의 출력부가 그대로 이어지는지도 "복원됨" 표시를 믿지 않고 값으로 확인했습니다. 이 검사에 실패한 실행은 비교 표에서 제외했습니다.</li>
+          <li class="en"><b>Values the server sent were checked tensor by tensor</b> — whether aggregation was computed correctly and whether each client received the weights it should have. Continuity of each client's local head across rounds was verified from the values rather than from a “restored” flag, and runs that failed these checks were excluded from the comparison table.</li>
+
+          <li class="ko"><b>같은 예측인데 파이썬 버전에 따라 점수가 달랐습니다.</b> 3.9에서 다시 채점해 보니 소수점 아래가 미세하게 어긋났습니다. 그래서 재채점은 3.12로 버전을 고정했습니다.</li>
+          <li class="en"><b>A floating-point mismatch surfaced across Python versions.</b> Rescoring under 3.9 produced slightly different values, so strict rescoring is pinned to 3.12.</li>
+
+          <li class="ko"><b>확인하지 못한 범위는 적어 두었습니다.</b> 지금까지의 검사는 모두 같은 컴퓨터에서 한 것이라, 다른 환경에서의 독립 재현을 증명하지는 않습니다.</li>
+          <li class="en"><b>The unverified scope is stated.</b> All of these checks ran on the same machine, so they do not establish independent reproduction elsewhere.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="case-foot">
+      <a class="btn" href="../index.html">←&nbsp;<span class="ko">전체 프로젝트</span><span class="en">All projects</span></a>
+      <a class="btn" href="fpsl-bench.html"><span class="ko">다음: FPSL-Bench</span><span class="en">Next: FPSL-Bench</span>&nbsp;→</a>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>

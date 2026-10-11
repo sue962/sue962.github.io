@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FPSL-Bench 평가 벤치마크 — 이수빈</title>
+<meta name="description" content="실험마다 달라지던 평가 기준과 결과 형식을 하나로 고정한 LLM 개인화 연구 벤치마크. 5개 평가 축, 자동 검사 9종, 산출물 스키마와 체크섬 관리.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-back" aria-hidden="true">←</span>
+      <span class="brand-name"><span class="ko">이수빈</span><span class="en">Suebin Lee</span></span>
+      <span class="brand-alt"><span class="ko">전체 프로젝트</span><span class="en">All projects</span></span>
+    </a>
+    <div class="utils">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang-set="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<header class="case-head">
+  <div class="wrap">
+    <p class="case-eyebrow">
+      <span class="ko">케이스 스터디</span><span class="en">Case study</span>
+      <span class="sep">/</span>
+      <span>2026.02 – 06</span>
+      <span class="sep">/</span>
+      <span>FPSL-Bench</span>
+    </p>
+    <h1>
+      <span class="ko">LLM 개인화 연구 평가 벤치마크</span>
+      <span class="en">Evaluation Benchmark for Personalized LLM Research</span>
+    </h1>
+    <p class="case-lede">
+      <span class="ko">연합학습으로 개인 문체를 학습시키는 연구에서, 실험을 돌릴 때마다 결과 파일의 구조와 측정 기준이 조금씩 달랐습니다. 무엇을 재고 어떤 형식으로 남길지를 먼저 정한 뒤, 그 약속을 코드가 검사하게 했습니다.</span>
+      <span class="en">In a study teaching models to write in a personal voice through federated learning, every run produced slightly differently shaped results measured on slightly different terms. I fixed what was being measured and what the output had to look like, then made code enforce both.</span>
+    </p>
+
+    <dl class="case-meta">
+      <div>
+        <dt><span class="ko">담당</span><span class="en">My scope</span></dt>
+        <dd><span class="ko">평가 벤치마크 구현 · 자동 검증 파이프라인 · 산출물 표준화</span><span class="en">Benchmark implementation, automated verification, artifact standardization</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">기간</span><span class="en">Period</span></dt>
+        <dd>2026.02 – 06</dd>
+      </div>
+      <div>
+        <dt><span class="ko">환경</span><span class="en">Stack</span></dt>
+        <dd>Python · JSON Schema · YAML</dd>
+      </div>
+      <div>
+        <dt><span class="ko">결과물</span><span class="en">Output</span></dt>
+        <dd><span class="ko">FPSL-Bench v0.2 · 연구의 표준 평가 방식</span><span class="en">FPSL-Bench v0.2 — the study's standard evaluation</span></dd>
+      </div>
+    </dl>
+
+    <div class="kpis">
+      <div class="kpi"><b>5</b><span><span class="ko">평가 축</span><span class="en">evaluation axes</span></span></div>
+      <div class="kpi"><b>34</b><span><span class="ko">축에 배정된 지표</span><span class="en">metrics assigned to an axis</span></span></div>
+      <div class="kpi"><b>9</b><span><span class="ko">자동 검사</span><span class="en">automated checks</span></span></div>
+      <div class="kpi"><b>8</b><span><span class="ko">산출물 스키마</span><span class="en">artifact schemas</span></span></div>
+    </div>
+
+    <ul class="stack case-stack">
+      <li>Python</li><li>JSON Schema</li><li>YAML</li><li>LLM Evaluation</li><li>Federated Learning</li><li>SHA-256</li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <aside class="rail">
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#problem"><span class="ko">기존 방식의 문제</span><span class="en">The problem</span></a></li>
+        <li><a href="#axes"><span class="ko">평가 축</span><span class="en">Evaluation axes</span></a></li>
+        <li><a href="#checks"><span class="ko">자동 검사</span><span class="en">Automated checks</span></a></li>
+        <li><a href="#artifacts"><span class="ko">산출물 표준화</span><span class="en">Artifacts</span></a></li>
+        <li><a href="#repro"><span class="ko">재현성</span><span class="en">Reproducibility</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- scope -->
+    <section id="scope" class="rv">
+      <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
+      <div class="blk">
+        <p class="ko">저자 50명의 글을 클라이언트로 나눠 연합학습으로 개인 문체를 학습시키고, 학습한 모델이 그 사람처럼 쓰는지 재는 연구입니다. 저는 평가 벤치마크 구현과 자동 검증 파이프라인, 산출물 표준화를 맡았습니다.</p>
+        <p class="en">The study splits the writing of 50 authors across clients, trains a personal voice through federated learning, and measures whether the trained model writes like that person. I built the evaluation benchmark, the automated verification pipeline and the artifact standardization.</p>
+        <p class="note">
+          <span class="ko">모델을 더 잘 학습시키는 일이 아니라, 학습 결과를 <b>믿을 수 있게 재는 일</b>이 제 몫이었습니다. 제가 만든 FPSL-Bench는 이후 연구의 표준 평가 방식으로 쓰였습니다.</span>
+          <span class="en">My part was not making the model train better but <b>making its results measurable with confidence</b>. The FPSL-Bench I built became the study's standard evaluation.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- problem -->
+    <section id="problem" class="rv">
+      <div class="sec-head"><h2><span class="ko">기존 평가 방식의 문제</span><span class="en">Every run produced a different shape</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>같은 수치가 다른 이름으로 저장됐습니다.</b> 실험을 돌릴 때마다 결과 파일의 컬럼 이름과 구조가 조금씩 달라서, 두 실험을 나란히 놓고 비교하려면 매번 사람이 맞춰야 했습니다.</li>
+          <li class="en"><b>The same number was stored under different names.</b> Column names and structures drifted between runs, so comparing two experiments meant reconciling them by hand every time.</li>
+
+          <li class="ko"><b>지표 하나가 어떤 질문에 답하는 건지 불분명했습니다.</b> 유사도 지표 하나가 "저자의 평소 문체와 맞는가"와 "이 테스트 예시의 정답과 가까운가"를 동시에 뜻하는 것처럼 쓰였습니다. 두 질문은 답이 서로 다를 수 있는데도 한 숫자로 보고됐습니다.</li>
+          <li class="en"><b>It was unclear which question a metric answered.</b> One similarity score was used to mean both “does this match the author's usual voice?” and “is this close to the held-out target for this example?” — two questions whose answers can diverge, reported as one number.</li>
+
+          <li class="ko"><b>데이터 누수 확인이 사람 손에 달려 있었습니다.</b> 학습·검증·평가 데이터가 섞이지 않았는지, 프롬프트가 참조하는 원문이 학습에 들어가지 않았는지를 매번 눈으로 확인하고 있었습니다.</li>
+          <li class="en"><b>Leakage checking rested on a person remembering to do it.</b> Whether train, validation and test had stayed separate, and whether source texts referenced by prompts had leaked into training, was verified by eye each time.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- axes -->
+    <section id="axes" class="rv">
+      <div class="sec-head"><h2><span class="ko">평가 축 설계</span><span class="en">Splitting it into five questions</span></h2></div>
+      <div class="blk">
+        <p class="ko">측정하고 싶은 것을 다섯 개의 질문으로 나누고, <b>지표 하나는 반드시 질문 하나에만 속하도록</b> 정했습니다. 한 지표가 두 질문을 겸하면 점수가 올라갔을 때 무엇이 좋아진 것인지 설명할 수 없기 때문입니다. 34개 지표를 전부 축 하나에 배정하고, 그 배정표를 코드가 읽는 스키마 파일로 만들었습니다.</p>
+        <p class="en">I split what we wanted to measure into five questions, with the rule that <b>a metric belongs to exactly one of them</b>. A metric serving two questions makes a rising score impossible to explain. All 34 metrics were assigned to a single axis, and that assignment lives in a schema file the code reads.</p>
+
+        <div class="dgm-wrap">
+          <p class="dgm-hint">
+            <span class="ko">축을 클릭하면 그 축이 답하는 질문과 지표가 나타납니다</span>
+            <span class="en">Click an axis to see the question it answers and the metrics under it</span>
+          </p>
+
+          <div class="dgm-stage">
+            <svg class="dgm" viewBox="0 0 1000 440" role="img"
+                 aria-label="모델 출력이 다섯 개 평가 축을 거쳐 표준 산출물로 기록되는 구조">
+              <defs>
+                <marker id="arF" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path class="arrow" d="M0,1 L9,5 L0,9 z"/>
+                </marker>
+              </defs>
+
+              <g class="edge" data-ends="output A"><path d="M186,212 H250 V50 H322" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="output B"><path d="M186,212 H250 V130 H322" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="output C"><path d="M186,212 H250 V210 H322" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="output D"><path d="M186,212 H250 V290 H322" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="output E"><path d="M186,212 H250 V370 H322" marker-end="url(#arF)"/></g>
+
+              <g class="edge" data-ends="A record"><path d="M670,50 H716 V204 H750" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="B record"><path d="M670,130 H716 V206 H750" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="C record"><path d="M670,210 H750" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="D record"><path d="M670,290 H716 V218 H750" marker-end="url(#arF)"/></g>
+              <g class="edge" data-ends="E record"><path d="M670,370 H716 V220 H750" marker-end="url(#arF)"/></g>
+
+              <g class="node" data-node="output" tabindex="0" role="button" aria-label="모델 출력">
+                <rect x="24" y="190" width="162" height="44"/>
+                <text class="ko" x="105" y="212">모델 출력</text>
+                <text class="en" x="105" y="212">Model output</text>
+              </g>
+
+              <g class="node" data-node="A" tabindex="0" role="button" aria-label="A 과거 글과의 일치">
+                <rect x="322" y="30" width="348" height="40"/>
+                <text class="ko" x="496" y="51">A · 과거 글과의 일치</text>
+                <text class="en" x="496" y="51">A · History alignment</text>
+              </g>
+              <g class="node" data-node="B" tabindex="0" role="button" aria-label="B 정답 예시와의 유사도">
+                <rect x="322" y="110" width="348" height="40"/>
+                <text class="ko" x="496" y="131">B · 정답 예시와의 유사도</text>
+                <text class="en" x="496" y="131">B · Target similarity</text>
+              </g>
+              <g class="node" data-node="C" tabindex="0" role="button" aria-label="C 저자 간 구분 가능성">
+                <rect x="322" y="190" width="348" height="40"/>
+                <text class="ko" x="496" y="211">C · 저자 간 구분 가능성</text>
+                <text class="en" x="496" y="211">C · Group separability</text>
+              </g>
+              <g class="node" data-node="D" tabindex="0" role="button" aria-label="D 어시스턴트 말투로의 이동">
+                <rect x="322" y="270" width="348" height="40"/>
+                <text class="ko" x="496" y="291">D · 어시스턴트 말투로의 이동</text>
+                <text class="en" x="496" y="291">D · Assistantness drift</text>
+              </g>
+              <g class="node" data-node="E" tabindex="0" role="button" aria-label="E 유용성 사실성 품질">
+                <rect x="322" y="350" width="348" height="40"/>
+                <text class="ko" x="496" y="371">E · 유용성 · 사실성 · 품질</text>
+                <text class="en" x="496" y="371">E · Utility &amp; quality</text>
+              </g>
+
+              <g class="node" data-node="record" tabindex="0" role="button" aria-label="표준 산출물">
+                <rect x="750" y="188" width="226" height="48"/>
+                <text class="ko" x="863" y="206">표준 산출물</text>
+                <text class="ko" x="863" y="222" style="font-size:10.5px;fill:var(--muted)">per_example_metrics.jsonl</text>
+                <text class="en" x="863" y="206">Standard artifact</text>
+                <text class="en" x="863" y="222" style="font-size:10.5px;fill:var(--muted)">per_example_metrics.jsonl</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="dgm-info" aria-live="polite">
+            <p class="idle-card idle">
+              <span class="ko">축을 선택하면 그 축이 답하는 질문과 지표가 표시됩니다.</span>
+              <span class="en">Select an axis to see the question it answers and its metrics.</span>
+            </p>
+
+            <div data-for="output" hidden>
+              <h4><span class="ko">모델 출력</span><span class="en">Model output</span></h4>
+              <p class="ko">학습한 모델이 평가 프롬프트에 답해 쓴 글입니다. 이 글 하나가 다섯 질문 모두를 거칩니다. 평가 프롬프트 23개와 공개 원문 10개는 v0.1에서 고정해 두고 이후 버전에서도 바꾸지 않았습니다.</p>
+              <p class="en">What the trained model wrote in response to an evaluation prompt. Each piece of writing passes through all five questions. The 23 evaluation prompts and 10 public source texts were frozen in v0.1 and left untouched in later versions.</p>
+              <span class="grain">50 authors · 23 prompts · 10 source texts · non-IID Gini 0.11 / 0.20 / 0.43</span>
+            </div>
+
+            <div data-for="A" hidden>
+              <h4>A · <span class="ko">과거 글과의 일치</span><span class="en">History alignment</span></h4>
+              <p class="ko"><b>이 모델이 그 저자가 평소 쓰던 방식으로 쓰고 있는가?</b> 정답 글 하나와 비교하는 것이 아니라, 저자가 그동안 쓴 글 전체와 견줍니다.</p>
+              <p class="en"><b>Is the model writing the way this author habitually writes?</b> Judged against the author's whole body of past writing rather than against one correct answer.</p>
+              <p class="ko">출력을 저자의 과거 글 중심점과 견준 유사도, 저자 50명 가운데 맞는 저자가 몇 번째로 가까운지의 순위, 맞는 저자와 나머지 저자 사이의 간격을 지표로 뒀습니다. 순위와 간격을 함께 보는 이유는, 모두와 비슷해져서 유사도가 올라가는 경우를 걸러내기 위해서입니다.</p>
+              <p class="en">Metrics include similarity to the centroid of the author's history, where the correct author ranks among all 50 by distance, and the margin between the correct author and the rest. Rank and margin are read together to catch a score that rises because the output has become similar to everyone.</p>
+              <span class="grain">hist_align_* · 9 metrics</span>
+            </div>
+
+            <div data-for="B" hidden>
+              <h4>B · <span class="ko">정답 예시와의 유사도</span><span class="en">Target similarity</span></h4>
+              <p class="ko"><b>이 테스트 예시 하나에 대해, 저자가 실제로 쓴 정답 글과 얼마나 가까운가?</b> A와 달리 특정 예시에만 걸린 질문입니다.</p>
+              <p class="en"><b>For this one test example, how close is the output to what the author actually wrote?</b> Unlike A, the question is tied to a single example.</p>
+              <p class="ko">A와 B를 나눠 둔 이유는 두 답이 어긋날 수 있기 때문입니다. 평소 문체는 잘 따라가면서 이번 예시의 정답과는 멀 수 있고, 그 반대도 가능합니다. 한 숫자로 합치면 어느 쪽인지 알 수 없습니다.</p>
+              <p class="en">A and B are separated because they can disagree: an output can track the author's usual voice while sitting far from this particular target, or the reverse. Collapsed into one number, there is no telling which.</p>
+              <span class="grain">target_sim_* · 7 metrics</span>
+            </div>
+
+            <div data-for="C" hidden>
+              <h4>C · <span class="ko">저자 간 구분 가능성</span><span class="en">Group separability</span></h4>
+              <p class="ko"><b>학습이 끝난 뒤에도 저자들이 서로 구분되는가?</b> 연합학습은 여러 사람의 데이터를 합치기 때문에, 모든 저자의 문체가 평균으로 수렴해 버릴 수 있습니다. 이것이 이 연구에서 다루는 문체 동질화 현상입니다.</p>
+              <p class="en"><b>Are authors still distinguishable once training is done?</b> Federated learning pools data across people, so every voice can converge toward an average — the style homogenization this study is about.</p>
+              <p class="ko">개별 저자 점수만 보면 동질화는 보이지 않습니다. 저자들 사이의 거리를 따로 재야 드러납니다.</p>
+              <p class="en">Per-author scores alone will not reveal homogenization; it only shows up when the distance between authors is measured on its own.</p>
+              <span class="grain">group_sep_* · 8 metrics</span>
+            </div>
+
+            <div data-for="D" hidden>
+              <h4>D · <span class="ko">어시스턴트 말투로의 이동</span><span class="en">Assistantness drift</span></h4>
+              <p class="ko"><b>개인 문체 대신 기본 어시스턴트 말투로 흘러갔는가?</b> 모델이 원래 가지고 있던 정중하고 균일한 말투로 되돌아가는 경향을 따로 잽니다. 다른 축과 섞지 않고 떼어 놓았습니다.</p>
+              <p class="en"><b>Has the output slid back into the default assistant register?</b> Measured separately from the others, this tracks the model drifting toward the polite, uniform voice it started with.</p>
+              <p class="ko">C와 비슷해 보이지만 다릅니다. C는 저자들이 서로 구분되는지를 보고, D는 어느 한 방향(어시스턴트 말투)으로 쏠렸는지를 봅니다. 평가 프롬프트에는 이 쏠림을 유도하는 조건을 따로 표시해 두고 결과를 나눠 봤습니다.</p>
+              <p class="en">Close to C but not the same: C asks whether authors differ from each other, D asks whether they have all moved in one particular direction. Prompts that invite that drift are tagged in the suite so results can be broken out by it.</p>
+              <span class="grain">assist_* · 4 metrics</span>
+            </div>
+
+            <div data-for="E" hidden>
+              <h4>E · <span class="ko">유용성 · 사실성 · 품질</span><span class="en">Utility, faithfulness &amp; quality</span></h4>
+              <p class="ko"><b>문체를 지켰다 해도, 그 글이 쓸모 있고 말이 되는가?</b> 정체성만 보면 놓치는 부분입니다. 문체 점수를 올리려고 문장이 망가지거나 원문에 없는 내용이 들어가는 경우를 잡습니다.</p>
+              <p class="en"><b>Even with the voice preserved, is the writing still useful and coherent?</b> Identity metrics alone miss this — it catches output that degenerates, or adds content the source never had, while style scores climb.</p>
+              <span class="grain">faith_* · qual_* · mauve · 6 metrics</span>
+            </div>
+
+            <div data-for="record" hidden>
+              <h4><span class="ko">표준 산출물</span><span class="en">Standard artifact</span></h4>
+              <p class="ko">다섯 축에서 나온 지표가 예시 단위로 한 파일에 기록됩니다. 이름과 자료형, 어느 축에 속하는지가 스키마에 정해져 있어, 다른 실험의 결과와 그대로 겹쳐 볼 수 있습니다.</p>
+              <p class="en">Metrics from all five axes are written per example into one file. Names, types and the axis each belongs to are fixed by schema, so results from different runs line up directly.</p>
+              <p class="ko">산출물은 모두 8종이고 각각 JSON Schema가 있습니다. 실행이 끝나면 검사 스크립트가 결과 파일을 스키마와 대조합니다.</p>
+              <p class="en">There are eight artifact types, each with its own JSON Schema, and a validation script checks every output file against them once a run finishes.</p>
+              <span class="grain">generations · per_example_metrics · summary_metrics · breakdown ×3 · training_budget · quality_filter_report</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- checks -->
+    <section id="checks" class="rv">
+      <div class="sec-head"><h2><span class="ko">자동 검사 9종</span><span class="en">Moving the checks into code</span></h2></div>
+      <div class="blk">
+        <p class="ko">매번 눈으로 확인하던 항목을 검사 스크립트로 만들고, 한 번에 돌리는 통합 검사기로 묶었습니다. 모두 9종입니다.</p>
+        <p class="en">What had been verified by eye became scripts, gathered under one runner. Nine checks in all.</p>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th style="text-align:right">#</th>
+                <th><span class="ko">검사</span><span class="en">Check</span></th>
+                <th><span class="ko">보는 것</span><span class="en">What it looks for</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="n">1</td><td><span class="ko">파일 무결성</span><span class="en">Manifest integrity</span></td><td><span class="ko">기록된 체크섬과 실제 파일이 일치하는지</span><span class="en">Recorded checksums match the files on disk</span></td></tr>
+              <tr><td class="n">2</td><td><span class="ko">데이터 누수</span><span class="en">Leakage</span></td><td><span class="ko">학습·검증·평가 데이터가 겹치지 않는지, 프롬프트가 참조하는 원문이 학습에 들어가지 않았는지</span><span class="en">Train, validation and test do not overlap; source texts referenced by prompts never entered training</span></td></tr>
+              <tr><td class="n">3</td><td><span class="ko">프롬프트 균형</span><span class="en">Prompt coverage</span></td><td><span class="ko">작업 유형·문체 조건·장르·유도 조건별로 프롬프트가 쏠려 있지 않은지</span><span class="en">Prompts are not skewed across task family, style spec, genre and trigger</span></td></tr>
+              <tr><td class="n">4</td><td><span class="ko">원문 균형</span><span class="en">Source balance</span></td><td><span class="ko">주제와 길이가 한쪽으로 몰리지 않았는지, 역할별로 다 들어 있는지</span><span class="en">Topic and length spread, and whether every role is represented</span></td></tr>
+              <tr><td class="n">5</td><td><span class="ko">스키마 유효성</span><span class="en">Schemas</span></td><td><span class="ko">스키마 파일 자체가 올바른지</span><span class="en">The schema files are themselves valid</span></td></tr>
+              <tr><td class="n">6</td><td><span class="ko">산출물 대조</span><span class="en">Artifacts</span></td><td><span class="ko">실행 결과 파일이 정해진 스키마를 따르는지</span><span class="en">Output files from a run conform to their schemas</span></td></tr>
+              <tr><td class="n">7</td><td><span class="ko">토큰 예산</span><span class="en">Token budget</span></td><td><span class="ko">클라이언트별 토큰 배분이 기록된 값과 맞는지</span><span class="en">Per-client token allocation matches what was recorded</span></td></tr>
+              <tr><td class="n">8</td><td><span class="ko">분할 일관성</span><span class="en">Split consistency</span></td><td><span class="ko">데이터 분할이 선언된 대로 유지되는지</span><span class="en">Splits still hold as declared</span></td></tr>
+              <tr><td class="n">9</td><td><span class="ko">히스토리 뱅크 누수</span><span class="en">History bank leakage</span></td><td><span class="ko">저자 과거 글 모음에 평가용 글이 섞여 있지 않은지</span><span class="en">No evaluation text has slipped into the author history bank</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="note">
+          <span class="ko">누수 검사는 하위 항목 5개 중 3개가 통과하고 2개는 서버 데이터가 있어야 돌릴 수 있어 건너뛰었습니다. 이 경우 결과를 그냥 "통과"로 적지 않고 <b>건너뛴 항목이 있는 통과</b>로 따로 표시하고, 무엇을 왜 못 돌렸는지 보고서에 남겼습니다. 검사를 안 한 것과 통과한 것은 다릅니다.</span>
+          <span class="en">In the leakage check, three of five sub-checks passed and two could not run without server-side data. Rather than recording that as a pass, the report says <b>passed with skips</b> and names what could not be run and why. Not having checked is not the same as having passed.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- artifacts -->
+    <section id="artifacts" class="rv">
+      <div class="sec-head"><h2><span class="ko">산출물 표준화</span><span class="en">Standardizing the artifacts</span></h2></div>
+      <div class="blk">
+        <div class="diff">
+          <p class="diff-q"><span class="ko">결과 파일의 형식</span><span class="en">The shape of a result file</span></p>
+          <div class="diff-pair">
+            <div class="diff-side">
+              <span class="diff-tag"><span class="ko">전</span><span class="en">Before</span></span>
+              <code>실험마다 컬럼 이름·구조가 다름
+지표가 어느 질문에 속하는지 불명확
+비교하려면 사람이 매번 맞춤</code>
+            </div>
+            <div class="diff-side to">
+              <span class="diff-tag"><span class="ko">후</span><span class="en">After</span></span>
+              <code>8종 산출물 × JSON Schema
+지표 34개 → 축 1개에 배정 (스키마에 명시)
+validate_artifacts.py 가 실행 후 대조</code>
+            </div>
+          </div>
+          <p class="diff-why">
+            <span class="ko">산출물 8종에 각각 JSON Schema를 두고, 실행이 끝나면 결과 파일이 스키마를 따르는지 검사하도록 했습니다. 지표가 어느 축에 속하는지도 사람이 기억하는 대신 스키마에 적어 두고 코드가 읽게 했습니다.</span>
+            <span class="en">Each of the eight artifact types has a JSON Schema, and a run ends by checking its output against them. Which axis a metric belongs to is written in the schema and read by code, rather than remembered by a person.</span>
+          </p>
+        </div>
+
+        <ul class="bul">
+          <li class="ko"><b>v0.1을 동결하고 건드리지 않았습니다.</b> 클라이언트 구성, non-IID 배분 3종, 평가 프롬프트 23개, 공개 원문 10개, 디코딩 설정은 v0.1에서 고정했습니다. v0.2는 그 위에 메타데이터와 검사 도구를 얹은 것이고, 원본 파일은 수정하지 않습니다.</li>
+          <li class="en"><b>v0.1 was frozen and left alone.</b> The client manifest, three non-IID allocations, 23 evaluation prompts, 10 public source texts and the decoding settings were fixed in v0.1. v0.2 layers metadata and tooling on top without modifying any of those files.</li>
+
+          <li class="ko"><b>난수 시드와 설정을 따로 기록했습니다.</b> 실행에 쓰인 모든 시드를 한 파일에 모으고, 비교 대상 방법들이 같은 연산 자원을 쓰도록 설정 스냅샷을 남겼습니다. 조건이 달랐던 비교는 나중에 되짚을 수 있어야 합니다.</li>
+          <li class="en"><b>Seeds and configurations are recorded separately.</b> Every seed used in a run is collected in one file, and a config snapshot records that compared methods were given the same compute. A comparison run under uneven conditions has to be traceable later.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- repro -->
+    <section id="repro" class="rv">
+      <div class="sec-head"><h2><span class="ko">재현성</span><span class="en">Reproducibility</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>v0.2를 v0.1에서 다시 만들 수 있게 했습니다.</b> 재구성 스크립트가 동결된 v0.1 파일을 읽어 v0.2 변환을 다시 적용하고, 그 결과를 현재 v0.2 파일과 비교합니다. <b>덮어쓰지 않고 비교만 합니다.</b> 둘이 같으면 벤치마크를 결정적으로 재구성할 수 있다는 뜻입니다.</li>
+          <li class="en"><b>v0.2 can be rebuilt from v0.1.</b> The rebuild script reads the frozen v0.1 files, reapplies the v0.2 transformation and compares the result with the current v0.2 files — <b>comparing, never overwriting</b>. Matching output means the benchmark reconstructs deterministically.</li>
+
+          <li class="ko"><b>파일 50개의 SHA-256 체크섬을 관리합니다.</b> 중요한 파일 전부의 체크섬을 한 목록에 두고, 표준 명령으로 검증할 수 있게 했습니다. 누군가 파일을 고치면 무결성 검사에서 바로 드러납니다.</li>
+          <li class="en"><b>SHA-256 checksums cover 50 files.</b> Every critical file's checksum sits in one manifest, verifiable with a standard command, so any edit surfaces immediately in the integrity check.</li>
+
+          <li class="ko"><b>버전과 변경 이력을 남겼습니다.</b> 버전 파일과 변경 기록을 두어, 어떤 실험 결과가 벤치마크의 어느 버전에서 나온 것인지 뒤에 확인할 수 있게 했습니다.</li>
+          <li class="en"><b>Version and change history are kept</b>, so any result can later be traced to the benchmark version that produced it.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="case-foot">
+      <a class="btn" href="../index.html">←&nbsp;<span class="ko">전체 프로젝트</span><span class="en">All projects</span></a>
+      <a class="btn" href="athlete-db.html"><span class="ko">다음: 선수 · 선발전 데이터베이스</span><span class="en">Next: Athlete &amp; trials database</span>&nbsp;→</a>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>

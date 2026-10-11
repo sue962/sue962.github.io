@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>다국어 복약지시 안전 검증 · MedBridge</title>
+<meta name="description" content="LLM이 번역한 복약지시를 역번역과 모호성 점검으로 다시 확인하고, 위험하면 재번역하는 파이프라인. 복약지시 30건과 12가지 오해 패턴으로 비교했습니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap bar-inner">
+    <a class="brand" href="../index.html">
+      <span class="brand-back" aria-hidden="true">←</span>
+      <span class="brand-name"><span class="ko">이수빈</span><span class="en">Suebin Lee</span></span>
+      <span class="brand-alt"><span class="ko">전체 프로젝트</span><span class="en">All projects</span></span>
+    </a>
+    <div class="utils">
+      <div class="seg" role="group" aria-label="Language">
+        <button type="button" data-lang-set="ko" aria-pressed="true">KO</button>
+        <button type="button" data-lang-set="en" aria-pressed="false">EN</button>
+      </div>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle theme">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<header class="case-head">
+  <div class="wrap">
+    <p class="case-eyebrow">
+      <span class="ko">케이스 스터디</span><span class="en">Case study</span>
+      <span class="sep">/</span>
+      <span>2026.03 – 07</span>
+      <span class="sep">/</span>
+      <span>MedBridge</span>
+    </p>
+    <h1>
+      <span class="ko">다국어 복약지시 안전 검증 파이프라인</span>
+      <span class="en">Safety-Verified Multilingual Medication Instructions</span>
+    </h1>
+    <p class="case-lede">
+      <span class="ko">영어 복약지시를 다른 언어로 옮기면 번역은 매끄러운데, ‘필요할 때 드세요’처럼 복용 간격과 상한이 사라집니다. 번역 결과를 그대로 환자에게 주지 않고, 역번역과 모호성 점검을 거쳐 위험하면 다시 번역하도록 만들었습니다.</span>
+      <span class="en">Translate an English medication instruction and the output reads fluently while the dosing interval and the ceiling quietly disappear into “take as needed.” Instead of handing that to a patient, the pipeline back-translates, scores the ambiguity, and re-translates when the risk is too high.</span>
+    </p>
+
+    <dl class="case-meta">
+      <div>
+        <dt><span class="ko">담당</span><span class="en">My scope</span></dt>
+        <dd><span class="ko">팀장 · 처리 흐름 공동 설계 · 데이터셋 구축 · 결과 검증</span><span class="en">Team lead · pipeline co-design · dataset · evaluation</span></dd>
+      </div>
+      <div>
+        <dt><span class="ko">기간</span><span class="en">Period</span></dt>
+        <dd>2026.03 – 07</dd>
+      </div>
+      <div>
+        <dt><span class="ko">환경</span><span class="en">Stack</span></dt>
+        <dd>Python · LLM · RAG</dd>
+      </div>
+      <div>
+        <dt><span class="ko">결과</span><span class="en">Outcome</span></dt>
+        <dd><span class="ko">Coding Fest 2026 쇼케이스 발표 대상</span><span class="en">Coding Fest 2026 showcase — selected for presentation</span></dd>
+      </div>
+    </dl>
+
+    <div class="kpis">
+      <div class="kpi"><b>30</b><span><span class="ko">실제 복약지시 (openFDA · TGA)</span><span class="en">real instructions (openFDA · TGA)</span></span></div>
+      <div class="kpi"><b>12</b><span><span class="ko">직접 만든 오해 패턴</span><span class="en">misreading patterns, hand-built</span></span></div>
+      <div class="kpi"><b>17 → 30</b><span><span class="ko">모호성 해소 건수 (30건 중)</span><span class="en">ambiguity resolved, of 30</span></span></div>
+      <div class="kpi"><b>10</b><span><span class="ko">재번역 발동</span><span class="en">re-translations triggered</span></span></div>
+    </div>
+
+    <ul class="stack case-stack">
+      <li>Python</li><li>LLM</li><li>RAG</li><li>Back-translation</li><li>openFDA API</li><li>TGA</li><li>Prompt design</li>
+    </ul>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="grid">
+
+  <aside class="rail">
+    <nav aria-label="Sections">
+      <ul>
+        <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#problem"><span class="ko">문제</span><span class="en">The problem</span></a></li>
+        <li><a href="#pipeline"><span class="ko">처리 흐름</span><span class="en">Pipeline</span></a></li>
+        <li><a href="#patterns"><span class="ko">오해 패턴</span><span class="en">Patterns</span></a></li>
+        <li><a href="#result"><span class="ko">비교 결과</span><span class="en">Results</span></a></li>
+        <li><a href="#limit"><span class="ko">한계</span><span class="en">Limits</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+
+    <!-- scope -->
+    <section id="scope" class="rv">
+      <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
+      <div class="blk">
+        <p class="ko">영어가 모국어가 아닌 환자가 복약지시를 오해하는 문제를 다뤘습니다. 저는 팀장으로 처리 흐름을 공동 설계하고, 평가용 데이터셋과 오해 패턴을 만들고, 결과를 항목별로 집계했습니다.</p>
+        <p class="en">The project addresses patients who misread medication instructions in a language that is not their first. As team lead I co-designed the pipeline, built the evaluation dataset and the pattern set, and scored the results by category.</p>
+        <p class="note">
+          <span class="ko">번역 품질을 올리는 프로젝트가 아닙니다. <b>번역이 잘됐는지를 무엇으로 확인할 것인가</b>를 정하는 프로젝트였습니다. 매끄럽게 읽히는 문장이 안전한 문장은 아니기 때문입니다.</span>
+          <span class="en">This was not a project about making translation better. It was about deciding <b>what counts as evidence that a translation is safe</b> — because a sentence that reads smoothly is not the same as a sentence that is safe.</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- problem -->
+    <section id="problem" class="rv">
+      <div class="sec-head"><h2><span class="ko">매끄러운데 위험한 번역</span><span class="en">Fluent and unsafe</span></h2></div>
+      <div class="blk">
+        <p class="ko">LLM 번역은 문장이 자연스러워서 틀린 곳을 눈으로 찾기 어렵습니다. 사라지는 건 문장이 아니라 <b>조건</b>입니다. 복용 간격, 하루 상한, 언제 먹는지가 빠져도 번역문만 보면 멀쩡해 보입니다.</p>
+        <p class="en">LLM translations read naturally enough that errors are hard to spot by eye. What disappears is not a sentence but a <b>condition</b> — the interval, the daily ceiling, the timing — and the output still looks fine on its own.</p>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">원문</span><span class="en">Source</span></th>
+                <th><span class="ko">일반 번역</span><span class="en">Plain translation</span></th>
+                <th><span class="ko">MedBridge</span><span class="en">MedBridge</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="ko">필요시 4~6시간마다</span><span class="en">as needed every 4–6 hours</span></td>
+                <td><span class="ko">필요할 때마다 2정 <b style="color:var(--neg)">(상한·간격 없음)</b></span><span class="en">2 tablets whenever needed <b style="color:var(--neg)">— no ceiling or interval</b></span></td>
+                <td><span class="ko">2정, <b>최소 4시간 간격</b>, 하루 최대량 초과 금지</span><span class="en">2 tablets, <b>at least 4 hours apart</b>, do not exceed the daily maximum</span></td>
+              </tr>
+              <tr>
+                <td><span class="ko">1정에 반응 없으면 2정 가능</span><span class="en">may take 2 if 1 is ineffective</span></td>
+                <td><span class="ko">안 들으면 2정 <b style="color:var(--neg)">(항상 2정으로 오해)</b></span><span class="en">take 2 if it doesn't work <b style="color:var(--neg)">— read as always 2</b></span></td>
+                <td><span class="ko"><b>1정이 안 들을 때만</b> 최대 2정 (평소 1정)</span><span class="en">up to 2 <b>only when 1 is ineffective</b> (normally 1)</span></td>
+              </tr>
+              <tr>
+                <td><span class="ko">캡슐을 통째로 삼킬 것</span><span class="en">swallow the capsule whole</span></td>
+                <td><span class="ko">통째로 삼키세요</span><span class="en">swallow it whole</span></td>
+                <td><span class="ko">물과 함께 통째로, <b>씹거나 부수지 말 것</b></span><span class="en">whole, with water — <b>do not chew or crush</b></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- pipeline -->
+    <section id="pipeline" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 흐름</span><span class="en">Pipeline</span></h2></div>
+      <div class="blk">
+        <p class="ko">번역 한 번으로 끝내지 않고, 결과를 다시 확인하는 단계를 넣었습니다. 위험도가 기준을 넘으면 그 자리에서 다시 번역합니다.</p>
+        <p class="en">Rather than translating once and stopping, the flow adds steps that check the result, and re-translates on the spot when the risk score crosses the threshold.</p>
+
+        <div class="viz">
+          <div class="viz-head">
+            <p class="viz-title"><span class="ko">6단계 처리 흐름</span><span class="en">Six-stage flow</span></p>
+            <p class="viz-sub"><span class="ko">4단계에서 위험하면 2단계로 되돌아갑니다</span><span class="en">stage 4 sends it back to stage 2 when risky</span></p>
+          </div>
+          <svg class="fig-svg" viewBox="0 0 660 190" role="img"
+               aria-label="맥락 검색, 번역, 역번역, 모호성 점검, 재번역 루프, 출력으로 이어지는 6단계 흐름">
+            <defs>
+              <marker id="arM" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <path class="ar-hi" d="M0,1 L9,5 L0,9 z"/>
+              </marker>
+            </defs>
+            <rect class="b" x="14" y="52" width="92" height="40"/><text class="t" x="60" y="66">1 · RAG</text><text class="cap" x="60" y="82">약품 맥락 검색</text>
+            <path class="ln-hi" d="M106,72 H126" marker-end="url(#arM)"/>
+            <rect class="b-hi" x="132" y="52" width="92" height="40"/><text class="t-hi" x="178" y="66">2 · 번역</text><text class="cap" x="178" y="82">목표 언어</text>
+            <path class="ln-hi" d="M224,72 H244" marker-end="url(#arM)"/>
+            <rect class="b" x="250" y="52" width="100" height="40"/><text class="t" x="300" y="66">3 · 역번역</text><text class="cap" x="300" y="82">의미 보존 확인</text>
+            <path class="ln-hi" d="M350,72 H370" marker-end="url(#arM)"/>
+            <rect class="b-hi" x="376" y="52" width="104" height="40"/><text class="t-hi" x="428" y="66">4 · 모호성 점검</text><text class="cap" x="428" y="82">12개 패턴</text>
+            <path class="ln-hi" d="M480,72 H500" marker-end="url(#arM)"/>
+            <rect class="b" x="506" y="52" width="92" height="40"/><text class="t" x="552" y="66">6 · 출력</text><text class="cap" x="552" y="82">번역 + 위험 표시</text>
+
+            <path class="ln-hi" d="M428,92 V134 H178 V96" marker-end="url(#arM)" stroke-dasharray="4 3"/>
+            <text class="cap-hi" x="303" y="150">5 · 기준 초과 시 재번역 (30건 중 10건 발동)</text>
+            <text class="cap" x="552" y="28">최종</text>
+          </svg>
+          <p class="viz-foot">
+            <span class="ko">맥락 검색에는 호주 TGA와 미국 openFDA의 공식 약품 정보를 사용했습니다. 역번역은 번역문을 다시 영어로 되돌려, 원문의 의미가 남아 있는지 비교하는 단계입니다.</span>
+            <span class="en">Context retrieval draws on official drug information from Australia's TGA and the US openFDA. Back-translation returns the output to English so the original meaning can be compared against it.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- patterns -->
+    <section id="patterns" class="rv">
+      <div class="sec-head"><h2><span class="ko">오해 패턴 12가지</span><span class="en">Twelve misreading patterns</span></h2></div>
+      <div class="blk">
+        <p class="ko">"번역이 애매하다"는 말로는 자동으로 걸러낼 수 없습니다. 실제 복약 오류에서 반복되는 유형을 12가지로 정리하고, 각 유형마다 무엇을 채워 넣어야 하는지를 정했습니다. 이 목록이 4단계 점검의 기준입니다.</p>
+        <p class="en">“The translation is vague” cannot be checked automatically. I catalogued twelve patterns that recur in real medication errors and defined, for each, what has to be made explicit. That list is what stage 4 checks against.</p>
+
+        <div class="tbl-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th><span class="ko">패턴</span><span class="en">Pattern</span></th>
+                <th><span class="ko">빠지는 것</span><span class="en">What goes missing</span></th>
+                <th><span class="ko">채워 넣는 방식</span><span class="en">How it is resolved</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono">as needed</td>
+                <td><span class="ko">상한과 간격</span><span class="en">ceiling and interval</span></td>
+                <td><span class="ko">최대 용량 + 최소 간격 명시</span><span class="en">state the maximum dose and minimum gap</span></td>
+              </tr>
+              <tr>
+                <td class="mono">twice daily</td>
+                <td><span class="ko">1회 용량과 횟수의 구분</span><span class="en">dose per take vs. times per day</span></td>
+                <td><span class="ko">1회 용량 × 횟수로 분리</span><span class="en">split into dose × frequency</span></td>
+              </tr>
+              <tr>
+                <td class="mono">with food</td>
+                <td><span class="ko">식사 기준 시점</span><span class="en">when, relative to the meal</span></td>
+                <td><span class="ko">식전 · 식중 · 식후 중 하나로 명시</span><span class="en">name it: before, during or after</span></td>
+              </tr>
+              <tr>
+                <td class="mono">do not exceed</td>
+                <td><span class="ko">상한 자체</span><span class="en">the ceiling itself</span></td>
+                <td><span class="ko">상한을 유지하고 강조</span><span class="en">keep the limit and foreground it</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="ko" style="margin-top:12px">위 네 가지는 예시이고, 조건부 용량과 빈도 범위 등을 포함해 모두 12가지입니다.</p>
+        <p class="en" style="margin-top:12px">These four are examples; the full set of twelve also covers conditional dosing, frequency ranges and others.</p>
+      </div>
+    </section>
+
+    <!-- result -->
+    <section id="result" class="rv">
+      <div class="sec-head"><h2><span class="ko">비교 결과</span><span class="en">Results</span></h2></div>
+      <div class="blk">
+        <p class="ko">openFDA와 TGA에서 수집한 실제 복약지시 30건을 모호함 · 안전필수 · 명확 세 유형으로 나누고, 일반 번역과 MedBridge의 출력을 항목별로 비교했습니다.</p>
+        <p class="en">Thirty real instructions collected from openFDA and the TGA were classified as ambiguous, safety-critical or clear, then plain translation and MedBridge output were compared item by item.</p>
+
+        <div class="viz">
+          <div class="viz-head">
+            <p class="viz-title"><span class="ko">일반 번역 대비 MedBridge</span><span class="en">MedBridge against plain translation</span></p>
+            <p class="viz-sub">n = 30</p>
+            <div class="viz-legend">
+              <span><i style="background:var(--s2)"></i><span class="ko">일반 번역</span><span class="en">plain</span></span>
+              <span><i style="background:var(--s1)"></i>MedBridge</span>
+            </div>
+          </div>
+          <div class="bars" style="--labw:148px">
+            <div class="bar-row">
+              <div class="bar-lab"><span class="ko">모호성 해소</span><span class="en">ambiguity resolved</span></div>
+              <div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:56.7%"></div></div>
+              <div class="bar-val">17</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-lab"></div>
+              <div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:100%"></div></div>
+              <div class="bar-val">30</div>
+            </div>
+            <div class="bar-row" style="margin-top:8px">
+              <div class="bar-lab"><span class="ko">의미 보존 평균</span><span class="en">meaning preserved</span></div>
+              <div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:92.4%"></div></div>
+              <div class="bar-val">.924</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-lab"></div>
+              <div class="bar-track"><div class="bar-seg" style="background:var(--s1);width:96.1%"></div></div>
+              <div class="bar-val">.961</div>
+            </div>
+            <div class="bar-row" style="margin-top:8px">
+              <div class="bar-lab"><span class="ko">환각 발생</span><span class="en">hallucinations</span></div>
+              <div class="bar-track"><div class="bar-seg" style="background:var(--s2);width:3.3%"></div></div>
+              <div class="bar-val">1</div>
+            </div>
+            <div class="bar-row">
+              <div class="bar-lab"></div>
+              <div class="bar-track"></div>
+              <div class="bar-val">0</div>
+            </div>
+          </div>
+          <p class="viz-foot">
+            <span class="ko">모호성 해소는 30건 중 <b>17건에서 30건</b>으로 늘었고, 환각은 1건에서 0건이 됐습니다. 의미 보존은 역번역을 원문과 비교해 매긴 점수입니다. 30건 중 <b>10건에서 재번역이 발동</b>했습니다.</span>
+            <span class="en">Ambiguity was resolved in <b>17 of 30 cases, rising to 30</b>, and the single hallucination went to none. Meaning preservation is scored by comparing the back-translation with the source. <b>Ten of the thirty</b> triggered a re-translation.</span>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- limit -->
+    <section id="limit" class="rv">
+      <div class="sec-head"><h2><span class="ko">한계</span><span class="en">Limits</span></h2></div>
+      <div class="blk">
+        <ul class="bul">
+          <li class="ko"><b>30건짜리 케이스 스터디입니다.</b> 대규모 벤치마크가 아니라, 실제 지시문 30건을 두 방식으로 각각 번역해 비교하고, 안전성 관점에서 주석을 단 결과입니다. 이 숫자로 실제 사용의 안전성을 보장할 수는 없습니다.</li>
+          <li class="en"><b>This is a 30-item case study.</b> Not a large-scale benchmark — the outputs of two methods on thirty real instructions, annotated for safety. These figures cannot establish that the system is safe in use.</li>
+
+          <li class="ko"><b>평가에 사람이 들어갑니다.</b> 정답 번역은 해당 언어를 모국어로 쓰는 팀원이 검증했습니다. 덕분에 판정은 믿을 만하지만, 완전 자동 독립 평가는 다음 단계로 남았습니다.</li>
+          <li class="en"><b>A human sits in the evaluation.</b> Reference translations were verified by native speakers on the team, which makes the judgements dependable but leaves fully automated independent evaluation to a later stage.</li>
+
+          <li class="ko"><b>두 개 언어만 다뤘습니다.</b> 팀원이 한국어와 중국어 원어민이라 정답을 직접 확인할 수 있는 범위에서 멈췄습니다. 처리 흐름 자체는 언어에 묶여 있지 않지만, 다른 언어로 넓히려면 그 언어를 검증할 사람이 필요합니다.</li>
+          <li class="en"><b>Only two languages were covered.</b> We stopped where team members could verify the reference themselves, in Korean and Chinese. The flow itself is not language-bound, but extending it needs someone who can check that language.</li>
+
+          <li class="ko"><b>단어가 겹친다고 안전한 건 아닙니다.</b> 의미 보존 점수는 역번역과 원문의 일치 정도일 뿐, 의학적으로 올바른 지시라는 뜻은 아닙니다. 지표가 무엇을 재고 무엇을 재지 않는지를 분명히 적어 두었습니다.</li>
+          <li class="en"><b>Overlap is not safety.</b> The meaning-preservation score measures agreement between the back-translation and the source, not medical correctness — and the write-up states what each metric does and does not measure.</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="case-foot">
+      <a class="btn" href="../index.html">←&nbsp;<span class="ko">전체 프로젝트</span><span class="en">All projects</span></a>
+      <a class="btn" href="fpsl-bench.html"><span class="ko">다음: FPSL-Bench</span><span class="en">Next: FPSL-Bench</span>&nbsp;→</a>
+    </div>
+  </main>
+</div>
+</div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>
