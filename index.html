@@ -51,8 +51,8 @@
         <span><span class="ko">과학기술정보통신부</span><span class="en">Minister of Science and ICT</span></span>
       </div>
       <div>
-        <b><span class="ko">실무 경력 3년 4개월</span><span class="en">3 yrs 4 mos experience</span></b>
-        <span><span class="ko">풀스택 · 연구개발</span><span class="en">Full-stack · R&amp;D</span></span>
+        <b><span class="ko">개발 · 연구 · 교육 실무 경험</span><span class="en">Industry, research &amp; teaching</span></b>
+        <span>Full-Stack · Data · R&amp;D</span>
       </div>
       <div>
         <b><span class="ko">CS 석사 2027.02</span><span class="en">M.S. Feb 2027</span></b>
@@ -95,6 +95,7 @@
       </div>
 
       <!-- P1 -->
+      <!-- 1. EV 충전 인프라 -->
       <article class="rec">
         <div class="rec-title">
           <h3><a href="projects/ev-charging.html"><span class="ko">전기차 충전 인프라 데이터 파이프라인 · 공간 데이터베이스</span><span class="en">EV Charging Infrastructure Data Pipeline &amp; Spatial Database</span></a></h3>
@@ -130,157 +131,7 @@
           </div>
         </div>
       </article>
-
-      <!-- P2 -->
-      <article class="rec">
-        <div class="rec-title">
-          <h3><a href="projects/athlete-db.html"><span class="ko">선수 · 선발전 관리 데이터베이스와 조회 시스템</span><span class="en">Athlete &amp; Trials Database and Query Layer</span></a></h3>
-          <span class="rec-when">2026.02 – 06</span>
-        </div>
-        <p class="rec-lede">
-          <span class="ko">저장 구조뿐 아니라 조회 결과까지 같은 기준으로 맞춘 PostgreSQL 데이터베이스.</span>
-          <span class="en">A PostgreSQL database where the storage schema and the query results answer to the same rules.</span>
-        </p>
-        <div class="rec-cols">
-          <dl class="meta">
-            <div>
-              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
-              <dd>The University of Sydney</dd>
-            </div>
-            <div>
-              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
-              <dd><span class="ko">데이터 모델 검토 · DDL/DML · SQL 저장 함수</span><span class="en">Data model review · DDL/DML · stored functions</span></dd>
-            </div>
-          </dl>
-          <div class="rec-body">
-            <p class="ko">선수와 경기, 심판, 여행 지원금을 관리하는 데이터베이스를 설계했습니다. 성적을 경기가 아닌 참가 기록에 두고 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했으며, 여권번호에는 UNIQUE 제약을 적용해 내부 식별자와 구분했습니다. 이후 Python에서 PostgreSQL 저장 함수를 호출하도록 구성하면서, NULL 처리와 경기 완료 판단 날짜 기준, 반환 자료형이 화면까지 일관되게 전달되도록 로직을 수정했습니다.</p>
-            <p class="en">Designed a database covering athletes, trials, officials and travel stipends. Results live on the participation record rather than the trial, with athlete ID and trial ID forming a composite primary key, and a UNIQUE constraint on passport numbers keeping them distinct from internal identifiers. When wiring Python to the PostgreSQL stored functions, I reworked NULL handling, the date rule for completed trials, and return types so the same values reached the screen.</p>
-            <ul class="facts">
-              <li class="fact"><b>14</b><span><span class="ko">설계한 테이블</span><span class="en">tables designed</span></span></li>
-              <li class="fact"><b>13</b><span><span class="ko">스키마 검토에서 찾은 문제</span><span class="en">issues found in schema review</span></span></li>
-              <li class="fact"><b>5</b><span><span class="ko">조회 · 갱신 기능</span><span class="en">query &amp; update functions</span></span></li>
-            </ul>
-            <ul class="stack">
-              <li>PostgreSQL</li><li>Python</li><li>PL/pgSQL</li><li>ERD</li><li>DDL / DML</li>
-            </ul>
-            <p><a class="more" href="projects/athlete-db.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
-          </div>
-        </div>
-      </article>
-
-
-      <!-- MedBridge -->
-      <article class="rec">
-        <div class="rec-title">
-          <h3><a href="projects/medbridge.html"><span class="ko">다국어 복약지시 안전 검증 파이프라인 (MedBridge)</span><span class="en">Safety-Verified Multilingual Medication Instructions (MedBridge)</span></a></h3>
-          <span class="rec-when">2026.03 – 07</span>
-        </div>
-        <p class="rec-lede">
-          <span class="ko">LLM 번역을 그대로 쓰지 않고 역번역과 모호성 점검으로 다시 확인한 뒤, 위험하면 재번역하는 파이프라인.</span>
-          <span class="en">A pipeline that never ships an LLM translation as-is: it back-translates, scores the ambiguity, and re-translates when the risk is too high.</span>
-        </p>
-        <div class="rec-cols">
-          <dl class="meta">
-            <div>
-              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
-              <dd>The University of Sydney</dd>
-            </div>
-            <div>
-              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
-              <dd><span class="ko">팀장 · 처리 흐름 공동 설계 · 데이터셋 · 결과 검증</span><span class="en">Team lead · pipeline co-design · dataset · evaluation</span></dd>
-            </div>
-          </dl>
-          <div class="rec-body">
-            <p class="ko">영어 복약지시를 다른 언어로 옮기면 문장은 매끄러운데 복용 간격과 하루 상한 같은 조건이 사라집니다. 호주 TGA와 미국 openFDA에서 모은 실제 지시문 30건으로, 실제 복약 오류에서 추린 12가지 오해 패턴을 기준 삼아 일반 번역과 비교했습니다. 모호성 해소는 17건에서 30건으로 늘었고, 30건 중 10건에서 재번역이 발동했습니다.</p>
-            <p class="en">Translate an English medication instruction and the sentence reads smoothly while conditions such as the dosing interval and daily ceiling quietly vanish. Using 30 real instructions from Australia's TGA and the US openFDA, and twelve misreading patterns drawn from actual medication errors, I compared the pipeline against plain translation: ambiguity resolved rose from 17 cases to 30, and ten of the thirty triggered a re-translation.</p>
-            <ul class="facts">
-              <li class="fact"><b>30</b><span><span class="ko">실제 복약지시</span><span class="en">real instructions</span></span></li>
-              <li class="fact"><b>12</b><span><span class="ko">직접 만든 오해 패턴</span><span class="en">patterns, hand-built</span></span></li>
-              <li class="fact"><b>17 → 30</b><span><span class="ko">모호성 해소</span><span class="en">ambiguity resolved</span></span></li>
-            </ul>
-            <ul class="stack">
-              <li>Python</li><li>LLM</li><li>RAG</li><li>Back-translation</li><li>openFDA API</li>
-            </ul>
-            <p><a class="more" href="projects/medbridge.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
-          </div>
-        </div>
-      </article>
-
-      <!-- P3 -->
-      <article class="rec">
-        <div class="rec-title">
-          <h3><a href="projects/fpsl-bench.html"><span class="ko">LLM 개인화 연구 평가 벤치마크 (FPSL-Bench)</span><span class="en">Evaluation Benchmark for Personalized LLM Research (FPSL-Bench)</span></a></h3>
-          <span class="rec-when">2026.02 – 06</span>
-        </div>
-        <p class="rec-lede">
-          <span class="ko">실험마다 산출물 구조가 달라지는 문제를 없애기 위해 만든, 연구의 표준 평가 체계.</span>
-          <span class="en">Built to stop every experiment from producing a differently shaped artifact — and adopted as the study's standard evaluation.</span>
-        </p>
-        <div class="rec-cols">
-          <dl class="meta">
-            <div>
-              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
-              <dd>The University of Sydney</dd>
-            </div>
-            <div>
-              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
-              <dd><span class="ko">평가 벤치마크 구현 · 자동 검증 파이프라인</span><span class="en">Benchmark implementation · automated verification</span></dd>
-            </div>
-          </dl>
-          <div class="rec-body">
-            <p class="ko">5축 평가 기준에 맞춰 Python 평가 모듈을 개발하고, 데이터 누수 여부와 프롬프트 구성, 소스 균형을 자동으로 점검하는 검증 절차를 구현했습니다. 결과 형식은 JSON 스키마로 통일하고 SHA-256 체크섬으로 파일 무결성을 확인하도록 구성했습니다. 제가 구축한 FPSL-Bench는 연구의 표준 평가 방식으로 사용됐습니다.</p>
-            <p class="en">Developed a Python evaluation module against five assessment axes, with checks that automatically flag data leakage, prompt composition and source imbalance. Outputs were standardized on a JSON schema, with SHA-256 checksums verifying file integrity. The resulting FPSL-Bench became the study's standard evaluation method.</p>
-            <ul class="facts">
-              <li class="fact"><b>5 / 34</b><span><span class="ko">평가 축 / 배정된 지표</span><span class="en">axes / metrics assigned</span></span></li>
-              <li class="fact"><b>9</b><span><span class="ko">자동 검사</span><span class="en">automated checks</span></span></li>
-              <li class="fact"><b>8</b><span><span class="ko">산출물 스키마</span><span class="en">artifact schemas</span></span></li>
-            </ul>
-            <ul class="stack">
-              <li>Python</li><li>JSON Schema</li><li>YAML</li><li>LLM Evaluation</li><li>Federated Learning</li>
-            </ul>
-            <p><a class="more" href="projects/fpsl-bench.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
-          </div>
-        </div>
-      </article>
-
-      <!-- P4 -->
-      <article class="rec">
-        <div class="rec-title">
-          <h3><a href="projects/medical-vqa.html"><span class="ko">의료 영상 질의응답 연합학습 파이프라인</span><span class="en">Medical VQA Federated Learning Pipeline</span></a></h3>
-          <span class="rec-when">2026.08 – 10</span>
-        </div>
-        <p class="rec-lede">
-          <span class="ko">누가 다시 돌려도 같은 결과가 나오도록, 데이터 분할부터 재채점까지 이력을 연결한 졸업 연구.</span>
-          <span class="en">Capstone research wiring provenance from data splits through to re-scoring, so anyone re-running it gets the same numbers.</span>
-        </p>
-        <div class="rec-cols">
-          <dl class="meta">
-            <div>
-              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
-              <dd>The University of Sydney</dd>
-            </div>
-            <div>
-              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
-              <dd><span class="ko">파이프라인 개발 · 실험 데이터 이력 관리</span><span class="en">Pipeline development · experiment provenance</span></dd>
-            </div>
-          </dl>
-          <div class="rec-body">
-            <p class="ko">답변 유형별로 모델 공유 범위를 달리하는 연합학습 실험 파이프라인을 구축했습니다. 이미지 단위로 학습·검증·평가 데이터를 분리해 누수를 막고, 실험 설정과 모델 가중치, 예측 결과의 이력을 연결했습니다. SHA-256으로 파일 무결성을 검증하고 공통 평가기를 이용한 재채점을 자동화해, 독립적인 검토가 가능하도록 실행 경로를 남겼습니다.</p>
-            <p class="en">Built a federated learning pipeline that varies how much of the model is shared by answer type. Splitting train, validation and test data at the image level prevents leakage, and run settings, model weights and predictions are linked as one record. SHA-256 verifies file integrity, and re-scoring through a shared evaluator is automated, leaving an execution trail an independent reviewer can follow.</p>
-            <ul class="facts">
-              <li class="fact"><b>51 / 99</b><span><span class="ko">실행 / 저장 모델 전부 재채점</span><span class="en">runs / exports all rescored</span></span></li>
-              <li class="fact"><b>2,244</b><span><span class="ko">질문·답변 (중복 4건 제거)</span><span class="en">Q&amp;A pairs (4 duplicates removed)</span></span></li>
-              <li class="fact"><b>IID / non-IID</b><span><span class="ko">분포별 부호 역전 확인</span><span class="en">effect flips sign by partition</span></span></li>
-            </ul>
-            <ul class="stack">
-              <li>Python</li><li>PyTorch</li><li>VQA-RAD</li><li>SLAKE</li><li>Federated Learning</li>
-            </ul>
-            <p><a class="more" href="projects/medical-vqa.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
-          </div>
-        </div>
-      </article>
-
-      <!-- P5 -->
+      <!-- 2. 증명수학 학습자료 자동화 -->
       <article class="rec">
         <div class="rec-title">
           <h3><a href="projects/proofmath.html"><span class="ko">맞춤 학습자료 자동화 시스템 (오답노트 · 수능흐름파악)</span><span class="en">Automated Personalized Study-Material System</span></a></h3>
@@ -318,9 +169,115 @@
           </div>
         </div>
       </article>
-
-
-      <!-- 디지털 피노타이핑 -->
+      <!-- 3. FPSL-Bench -->
+      <article class="rec">
+        <div class="rec-title">
+          <h3><a href="projects/fpsl-bench.html"><span class="ko">LLM 개인화 연구 평가 벤치마크 (FPSL-Bench)</span><span class="en">Evaluation Benchmark for Personalized LLM Research (FPSL-Bench)</span></a></h3>
+          <span class="rec-when">2026.02 – 06</span>
+        </div>
+        <p class="rec-lede">
+          <span class="ko">실험마다 산출물 구조가 달라지는 문제를 없애기 위해 만든, 연구의 표준 평가 체계.</span>
+          <span class="en">Built to stop every experiment from producing a differently shaped artifact — and adopted as the study's standard evaluation.</span>
+        </p>
+        <div class="rec-cols">
+          <dl class="meta">
+            <div>
+              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
+              <dd>The University of Sydney</dd>
+            </div>
+            <div>
+              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
+              <dd><span class="ko">평가 벤치마크 구현 · 자동 검증 파이프라인</span><span class="en">Benchmark implementation · automated verification</span></dd>
+            </div>
+          </dl>
+          <div class="rec-body">
+            <p class="ko">5축 평가 기준에 맞춰 Python 평가 모듈을 개발하고, 데이터 누수 여부와 프롬프트 구성, 소스 균형을 자동으로 점검하는 검증 절차를 구현했습니다. 결과 형식은 JSON 스키마로 통일하고 SHA-256 체크섬으로 파일 무결성을 확인하도록 구성했습니다. 제가 구축한 FPSL-Bench는 연구의 표준 평가 방식으로 사용됐습니다.</p>
+            <p class="en">Developed a Python evaluation module against five assessment axes, with checks that automatically flag data leakage, prompt composition and source imbalance. Outputs were standardized on a JSON schema, with SHA-256 checksums verifying file integrity. The resulting FPSL-Bench became the study's standard evaluation method.</p>
+            <ul class="facts">
+              <li class="fact"><b>5 / 34</b><span><span class="ko">평가 축 / 배정된 지표</span><span class="en">axes / metrics assigned</span></span></li>
+              <li class="fact"><b>9</b><span><span class="ko">자동 검사</span><span class="en">automated checks</span></span></li>
+              <li class="fact"><b>8</b><span><span class="ko">산출물 스키마</span><span class="en">artifact schemas</span></span></li>
+            </ul>
+            <ul class="stack">
+              <li>Python</li><li>JSON Schema</li><li>YAML</li><li>LLM Evaluation</li><li>Federated Learning</li>
+            </ul>
+            <p><a class="more" href="projects/fpsl-bench.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
+          </div>
+        </div>
+      </article>
+      <!-- 4. MedBridge -->
+      <article class="rec">
+        <div class="rec-title">
+          <h3><a href="projects/medbridge.html"><span class="ko">다국어 복약지시 안전 검증 파이프라인 (MedBridge)</span><span class="en">Safety-Verified Multilingual Medication Instructions (MedBridge)</span></a></h3>
+          <span class="rec-when">2026.03 – 07</span>
+        </div>
+        <p class="rec-lede">
+          <span class="ko">LLM 번역을 그대로 쓰지 않고 역번역과 모호성 점검으로 다시 확인한 뒤, 위험하면 재번역하는 파이프라인.</span>
+          <span class="en">A pipeline that never ships an LLM translation as-is: it back-translates, scores the ambiguity, and re-translates when the risk is too high.</span>
+        </p>
+        <div class="rec-cols">
+          <dl class="meta">
+            <div>
+              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
+              <dd>The University of Sydney</dd>
+            </div>
+            <div>
+              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
+              <dd><span class="ko">팀장 · 처리 흐름 공동 설계 · 데이터셋 · 결과 검증</span><span class="en">Team lead · pipeline co-design · dataset · evaluation</span></dd>
+            </div>
+          </dl>
+          <div class="rec-body">
+            <p class="ko">영어 복약지시를 다른 언어로 옮기면 문장은 매끄러운데 복용 간격과 하루 상한 같은 조건이 사라집니다. 호주 TGA와 미국 openFDA에서 모은 실제 지시문 30건으로, 실제 복약 오류에서 추린 12가지 오해 패턴을 기준 삼아 일반 번역과 비교했습니다. 모호성 해소는 17건에서 30건으로 늘었고, 30건 중 10건에서 재번역이 발동했습니다.</p>
+            <p class="en">Translate an English medication instruction and the sentence reads smoothly while conditions such as the dosing interval and daily ceiling quietly vanish. Using 30 real instructions from Australia's TGA and the US openFDA, and twelve misreading patterns drawn from actual medication errors, I compared the pipeline against plain translation: ambiguity resolved rose from 17 cases to 30, and ten of the thirty triggered a re-translation.</p>
+            <ul class="facts">
+              <li class="fact"><b>30</b><span><span class="ko">실제 복약지시</span><span class="en">real instructions</span></span></li>
+              <li class="fact"><b>12</b><span><span class="ko">직접 만든 오해 패턴</span><span class="en">patterns, hand-built</span></span></li>
+              <li class="fact"><b>17 → 30</b><span><span class="ko">모호성 해소</span><span class="en">ambiguity resolved</span></span></li>
+            </ul>
+            <ul class="stack">
+              <li>Python</li><li>LLM</li><li>RAG</li><li>Back-translation</li><li>openFDA API</li>
+            </ul>
+            <p><a class="more" href="projects/medbridge.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
+          </div>
+        </div>
+      </article>
+      <!-- 5. 의료 영상 VQA -->
+      <article class="rec">
+        <div class="rec-title">
+          <h3><a href="projects/medical-vqa.html"><span class="ko">의료 영상 질의응답 연합학습 파이프라인</span><span class="en">Medical VQA Federated Learning Pipeline</span></a></h3>
+          <span class="rec-when">2026.08 – 10</span>
+        </div>
+        <p class="rec-lede">
+          <span class="ko">누가 다시 돌려도 같은 결과가 나오도록, 데이터 분할부터 재채점까지 이력을 연결한 졸업 연구.</span>
+          <span class="en">Capstone research wiring provenance from data splits through to re-scoring, so anyone re-running it gets the same numbers.</span>
+        </p>
+        <div class="rec-cols">
+          <dl class="meta">
+            <div>
+              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
+              <dd>The University of Sydney</dd>
+            </div>
+            <div>
+              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
+              <dd><span class="ko">파이프라인 개발 · 실험 데이터 이력 관리</span><span class="en">Pipeline development · experiment provenance</span></dd>
+            </div>
+          </dl>
+          <div class="rec-body">
+            <p class="ko">답변 유형별로 모델 공유 범위를 달리하는 연합학습 실험 파이프라인을 구축했습니다. 이미지 단위로 학습·검증·평가 데이터를 분리해 누수를 막고, 실험 설정과 모델 가중치, 예측 결과의 이력을 연결했습니다. SHA-256으로 파일 무결성을 검증하고 공통 평가기를 이용한 재채점을 자동화해, 독립적인 검토가 가능하도록 실행 경로를 남겼습니다.</p>
+            <p class="en">Built a federated learning pipeline that varies how much of the model is shared by answer type. Splitting train, validation and test data at the image level prevents leakage, and run settings, model weights and predictions are linked as one record. SHA-256 verifies file integrity, and re-scoring through a shared evaluator is automated, leaving an execution trail an independent reviewer can follow.</p>
+            <ul class="facts">
+              <li class="fact"><b>51 / 99</b><span><span class="ko">실행 / 저장 모델 전부 재채점</span><span class="en">runs / exports all rescored</span></span></li>
+              <li class="fact"><b>2,244</b><span><span class="ko">질문·답변 (중복 4건 제거)</span><span class="en">Q&amp;A pairs (4 duplicates removed)</span></span></li>
+              <li class="fact"><b>IID / non-IID</b><span><span class="ko">분포별 부호 역전 확인</span><span class="en">effect flips sign by partition</span></span></li>
+            </ul>
+            <ul class="stack">
+              <li>Python</li><li>PyTorch</li><li>VQA-RAD</li><li>SLAKE</li><li>Federated Learning</li>
+            </ul>
+            <p><a class="more" href="projects/medical-vqa.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
+          </div>
+        </div>
+      </article>
+      <!-- 6. 디지털 피노타이핑 -->
       <article class="rec">
         <div class="rec-title">
           <h3><a href="projects/phenotyping.html"><span class="ko">디지털 피노타이핑 연구 데이터 수집 시스템</span><span class="en">Digital Phenotyping Research Data System</span></a></h3>
@@ -356,8 +313,43 @@
           </div>
         </div>
       </article>
-
-      <!-- P6 -->
+      <!-- 7. 선수 · 선발전 DB -->
+      <article class="rec">
+        <div class="rec-title">
+          <h3><a href="projects/athlete-db.html"><span class="ko">선수 · 선발전 관리 데이터베이스와 조회 시스템</span><span class="en">Athlete &amp; Trials Database and Query Layer</span></a></h3>
+          <span class="rec-when">2026.02 – 06</span>
+        </div>
+        <p class="rec-lede">
+          <span class="ko">저장 구조뿐 아니라 조회 결과까지 같은 기준으로 맞춘 PostgreSQL 데이터베이스.</span>
+          <span class="en">A PostgreSQL database where the storage schema and the query results answer to the same rules.</span>
+        </p>
+        <div class="rec-cols">
+          <dl class="meta">
+            <div>
+              <dt><span class="ko">소속</span><span class="en">Affiliation</span></dt>
+              <dd>The University of Sydney</dd>
+            </div>
+            <div>
+              <dt><span class="ko">역할</span><span class="en">Role</span></dt>
+              <dd><span class="ko">데이터 모델 검토 · DDL/DML · SQL 저장 함수</span><span class="en">Data model review · DDL/DML · stored functions</span></dd>
+            </div>
+          </dl>
+          <div class="rec-body">
+            <p class="ko">선수와 경기, 심판, 여행 지원금을 관리하는 데이터베이스를 설계했습니다. 성적을 경기가 아닌 참가 기록에 두고 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했으며, 여권번호에는 UNIQUE 제약을 적용해 내부 식별자와 구분했습니다. 이후 Python에서 PostgreSQL 저장 함수를 호출하도록 구성하면서, NULL 처리와 경기 완료 판단 날짜 기준, 반환 자료형이 화면까지 일관되게 전달되도록 로직을 수정했습니다.</p>
+            <p class="en">Designed a database covering athletes, trials, officials and travel stipends. Results live on the participation record rather than the trial, with athlete ID and trial ID forming a composite primary key, and a UNIQUE constraint on passport numbers keeping them distinct from internal identifiers. When wiring Python to the PostgreSQL stored functions, I reworked NULL handling, the date rule for completed trials, and return types so the same values reached the screen.</p>
+            <ul class="facts">
+              <li class="fact"><b>14</b><span><span class="ko">설계한 테이블</span><span class="en">tables designed</span></span></li>
+              <li class="fact"><b>13</b><span><span class="ko">스키마 검토에서 찾은 문제</span><span class="en">issues found in schema review</span></span></li>
+              <li class="fact"><b>5</b><span><span class="ko">조회 · 갱신 기능</span><span class="en">query &amp; update functions</span></span></li>
+            </ul>
+            <ul class="stack">
+              <li>PostgreSQL</li><li>Python</li><li>PL/pgSQL</li><li>ERD</li><li>DDL / DML</li>
+            </ul>
+            <p><a class="more" href="projects/athlete-db.html"><span class="ko">케이스 스터디</span><span class="en">Case study</span></a></p>
+          </div>
+        </div>
+      </article>
+      <!-- 8. 덕타버스 -->
       <article class="rec">
         <div class="rec-title">
           <h3><a href="projects/duktaverse.html"><span class="ko">실시간 비대면 공연 플랫폼 ‘덕타버스’</span><span class="en">Duktaverse — Real-Time Virtual Performance Platform</span></a></h3>

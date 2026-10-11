@@ -45,7 +45,7 @@
       <span class="en">Athlete &amp; Trials Database and Query Layer</span>
     </h1>
     <p class="case-lede">
-      <span class="ko">선수와 선발전, 심판, 지원금을 관리하는 데이터베이스를 설계하고 그 위에 조회·갱신 기능을 올렸습니다. 처음 받은 설계 초안은 AI가 만든 것이었습니다. 그대로 쓰지 않고 요구사항과 한 줄씩 대조하는 작업부터 했습니다.</span>
+      <span class="ko">선수와 선발전, 심판, 지원금을 관리하는 데이터베이스 설계에 참여하고, 그 위에 조회·갱신 기능을 구현했습니다. 처음 받은 설계 초안은 AI가 만든 것이었습니다. 그대로 쓰지 않고 요구사항과 한 줄씩 대조하는 작업부터 했습니다.</span>
       <span class="en">Designing a database for athletes, trials, officials and stipends, then building the query and update layer on top. The starting point was an AI-generated draft design — which I checked against the requirements line by line instead of taking it as given.</span>
     </p>
 
@@ -111,7 +111,7 @@
     <section id="scope" class="rv">
       <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
       <div class="blk">
-        <p class="ko">선수, 선발전, 심판, 장비, 의료 패키지, 여행 지원금을 다루는 데이터베이스입니다. 저는 데이터 모델 검토와 DDL·DML 작성, SQL 저장 함수, 그리고 Python 조회 계층을 맡았습니다.</p>
+        <p class="ko">선수, 선발전, 심판, 장비, 의료 패키지, 여행 지원금을 다루는 데이터베이스입니다. 설계는 팀에서 함께 했고, 제가 맡은 부분은 데이터 모델 검토와 DDL·DML 작성, PostgreSQL 저장 함수, 그리고 Python 조회 계층입니다.</p>
         <p class="en">A database covering athletes, trials, officials, equipment, medical packages and travel stipends. I worked on the data model review, the DDL and DML, the SQL stored functions, and the Python query layer.</p>
         <p class="note">
           <span class="ko">이 프로젝트에서는 새로 만드는 일보다 <b>이미 있는 정의를 요구사항과 맞춰보는 데</b> 시간을 더 썼습니다. 설계 초안도, 넘겨받은 스키마도 그대로 쓰지 않고 먼저 검증했습니다.</span>
@@ -204,13 +204,13 @@
       <div class="sec-head"><h2><span class="ko">설계 결정</span><span class="en">Design decisions</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko"><b>성적은 경기가 아니라 참가 기록에 두었습니다.</b> 선수와 경기를 다대다 연결 테이블로 구성하고 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했습니다. 성적은 특정 선수가 그 경기에서 낸 결과이므로, 두 식별자가 함께 있어야 식별됩니다.</li>
+          <li class="ko"><b>성적은 경기가 아니라 참가 기록에 있습니다.</b> 선수와 경기를 다대다 연결 테이블로 두고, 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했습니다. 성적은 특정 선수가 그 경기에서 낸 결과이므로, 두 식별자가 함께 있어야 식별됩니다.</li>
           <li class="en"><b>Results live on the participation record, not the trial.</b> Athletes and trials are joined through a junction table whose primary key is the athlete ID and trial ID together — a result belongs to one athlete in one trial, so it takes both identifiers to identify it.</li>
 
-          <li class="ko"><b>우승 기록은 경기 ID를 기본키로 두었습니다.</b> 한 경기에 우승자가 두 명 등록되는 상황을 애초에 만들 수 없도록, 우승 테이블의 기본키를 경기 ID 하나로 지정했습니다. 애플리케이션 검사에 맡기지 않고 구조로 막았습니다.</li>
+          <li class="ko"><b>우승 테이블의 기본키는 경기 ID 하나입니다.</b> 한 경기에 우승자가 두 명 등록되는 상황을 애초에 만들 수 없게 하려고 이렇게 두었습니다. 애플리케이션 검사에 맡기지 않고 구조로 막았습니다.</li>
           <li class="en"><b>The wins table is keyed on the trial alone.</b> Making the trial ID the primary key means two winners for one trial cannot be recorded in the first place — the rule is enforced by structure rather than by an application check.</li>
 
-          <li class="ko"><b>여행 지원금은 약한 엔터티로 두고 최종 금액을 생성 열로 만들었습니다.</b> 선수 ID와 계약일을 복합 기본키로 두어 같은 선수의 계약을 날짜별로 구분하고, 기본 지원금·보너스·숙박비를 각각 저장했습니다. 최종 지급액은 저장하는 대신 <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>로 계산되게 해, 원본 금액이 바뀌었는데 최종액만 남아 생기는 불일치를 없앴습니다.</li>
+          <li class="ko"><b>여행 지원금은 약한 엔터티이고, 최종 금액은 생성 열입니다.</b> 선수 ID와 계약일을 복합 기본키로 두어 같은 선수의 계약을 날짜별로 구분하고, 기본 지원금·보너스·숙박비를 각각 저장했습니다. 최종 지급액은 저장하는 대신 <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>로 계산되게 해, 원본 금액이 바뀌었는데 최종액만 남아 생기는 불일치를 없앴습니다.</li>
           <li class="en"><b>The travel stipend is a weak entity with a generated total.</b> Athlete ID plus signing date forms the composite key, separating one athlete's contracts by date, and base, bonus and housing amounts are each stored. The final figure is not stored but computed as <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>, so it can never drift from the components it is derived from.</li>
 
           <li class="ko"><b>여권번호에는 UNIQUE 제약을 적용했습니다.</b> 내부 식별자인 선수 ID를 기본키로 두되, 외부 식별자인 여권번호는 중복될 수 없는 값이므로 별도 제약으로 구분했습니다.</li>
