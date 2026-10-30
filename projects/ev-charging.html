@@ -45,7 +45,7 @@
       <span class="en">EV Charging Infrastructure Data Pipeline &amp; Spatial Database</span>
     </h1>
     <p class="case-lede">
-      <span class="ko">NSW 교통부의 충전소 데이터와 호주 통계청의 행정경계 데이터를 하나의 공간 데이터베이스로 합쳤습니다. 합치는 작업 자체보다, 각 컬럼이 실제로 무엇을 담고 있는지 확인하는 데 시간이 더 들었습니다.</span>
+      <span class="ko">NSW 교통부의 충전소 데이터와 호주 통계청의 행정경계 데이터를 합쳤습니다. 충전기 종류와 운영 상태가 같은 컬럼에 들어 있는 등 원본의 문제를 확인하고, 정제한 데이터를 DuckDB에 저장했습니다.</span>
       <span class="en">Merging NSW Transport's charger dataset with ABS administrative boundaries into one spatial database. Most of the work was not the merge — it was establishing what each column actually contained.</span>
     </p>
 
@@ -118,7 +118,7 @@
       <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
       <div class="blk">
         <p class="note">
-          <span class="ko">제가 맡은 범위는 데이터 수집, 정제, 공간 결합, 데이터베이스 설계입니다. 외부 출처를 이용한 속성 증강은 제 담당이 아니었고, 이 페이지에 적은 건 전부 제가 직접 한 일입니다.</span>
+          <span class="ko">데이터 수집, 정제, 공간 결합, 데이터베이스 설계를 맡았습니다. 이 페이지에는 제가 수행한 작업을 정리했습니다. 외부 출처를 이용한 속성 증강은 담당 범위에 포함되지 않습니다.</span>
           <span class="en">My scope was retrieval, cleaning, spatial integration and database design. Attribute augmentation from external sources sat outside my part; everything on this page is work I did myself.</span>
         </p>
         <p class="ko">결과물은 NSW 전역 충전소 1,939건이 SA4 통계 지역에 배정된 상태로 들어 있는 DuckDB 데이터베이스입니다. 스키마는 DDL로 다시 만들 수 있고, 공간 질의는 Spatial 확장을 사용합니다.</p>
@@ -137,7 +137,7 @@
           <li class="ko"><b>출력값이 자유 문자열이었습니다.</b> Charger_rating에 <code>2x350kW</code>처럼 여러 출력이 한 문자열로 들어가거나, 숫자 대신 "AC"라는 글자가 들어 있었습니다. 최고 출력만 수치로 추출하되 원본 문자열을 함께 보관해, 1,425행에서 사용 가능한 출력값을 확보했습니다.</li>
           <li class="en"><b>Power ratings were free text.</b> Charger_rating sometimes packed several outputs into one string such as <code>2x350kW</code>, or carried the word "AC" instead of a figure. I extracted the highest output as a number while retaining the original string, leaving 1,425 rows with a usable power value.</li>
 
-          <li class="ko"><b>우편번호가 세 가지로 망가져 있었습니다.</b> 121행 공백, 10행은 주(state)명이 붙음, 25행은 주소와 불일치. 공백 중 120행은 주소에서 복구하고 주 접두어는 제거했지만, <b>불일치 25행은 고치지 않고 <code>location_conflict</code>로 표시</b>했습니다. 어느 쪽이 맞는지 판단할 근거가 없었기 때문입니다.</li>
+          <li class="ko"><b>우편번호에 공백과 표기 오류가 있었습니다.</b> 121행은 비어 있고, 10행에는 주(state) 이름이 붙어 있었으며, 25행은 주소와 일치하지 않았습니다. 공백 중 120행은 주소에서 복구하고 주 접두어는 제거했습니다. 주소와 불일치한 25행은 어느 값이 맞는지 확인할 수 없어 <code>location_conflict</code>로 표시했습니다.</li>
           <li class="en"><b>Postcodes were broken three different ways.</b> 121 blank, 10 with a state name attached, 25 disagreeing with the address. I recovered 120 of the blanks from the address and stripped the state prefixes, but <b>left the 25 conflicts uncorrected and flagged as <code>location_conflict</code></b> — there was no basis for deciding which side was right.</li>
 
           <li class="ko"><b>빈 값은 채우지 않았습니다.</b> 역 이름이 1,438행 비어 있었지만 추정해서 채우지 않았고, 주소 733건에 들어 있던 줄바꿈만 제거했습니다.</li>
@@ -203,7 +203,7 @@
           </p>
         </div>
 
-        <p class="ko">행 수가 줄어든 건 데이터를 버려서가 아니라 중복을 합쳤기 때문입니다. 우편번호가 늘어난 것도 값을 지어낸 게 아니라 주소에서 찾아낸 결과입니다. 어떤 숫자가 어느 단계에서 나왔는지는 정제 로그에 남겼습니다.</p>
+        <p class="ko">레코드 수는 중복 병합으로 줄었고, 우편번호가 있는 행은 주소에서 값을 복구하면서 늘었습니다. 각 단계에서 변경된 내용과 건수를 정제 로그에 기록했습니다.</p>
         <p class="en">The row count fell because duplicates were merged, not because data was discarded; the postcode count rose because values were recovered from the address, not invented. Each figure is traceable to the operation that produced it through the cleaning log.</p>
       </div>
     </section>
@@ -213,10 +213,10 @@
       <div class="sec-head"><h2><span class="ko">정제 과정의 판단 기준</span><span class="en">Judgment calls</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko"><b>중복은 근거가 있을 때만 합쳤습니다.</b> 운영사명·충전기 종류·좌표(소수점 5자리)로 37행 17그룹을 후보로 잡고, 역 이름이 <b>서로 모순되지 않을 때만</b> 병합했습니다. 빈 이름은 모순으로 보지 않았고, 이름이 서로 다른 1그룹은 합치지 않고 남겼습니다. 결과적으로 16그룹을 병합해 19행을 제거했습니다. 병합 시 플러그 수는 가장 큰 값, 주소는 가장 긴 값을 남겼고, 출력값이 있는 경우 원본 문자열과 파생값을 <b>같은 레코드에서 함께</b> 가져왔습니다.</li>
+          <li class="ko"><b>중복은 근거가 있을 때만 합쳤습니다.</b> 운영사명, 충전기 종류, 좌표(소수점 5자리)로 37행 17그룹을 후보로 잡고, 역 이름이 <b>서로 모순되지 않을 때만</b> 병합했습니다. 빈 이름은 모순으로 보지 않았고, 이름이 서로 다른 1그룹은 합치지 않고 남겼습니다. 결과적으로 16그룹을 병합해 19행을 제거했습니다. 병합 시 플러그 수는 가장 큰 값, 주소는 가장 긴 값을 남겼고, 출력값이 있는 경우 원본 문자열과 파생값을 <b>같은 레코드에서 함께</b> 가져왔습니다.</li>
           <li class="en"><b>Duplicates were merged only with evidence.</b> Normalised operator names, cleaned types and coordinates rounded to five decimals produced 37 candidate rows in 17 groups; a group was merged <b>only when station names did not contradict each other</b>. A blank name was not a contradiction, and the one group with two conflicting names was left unmerged — 16 groups merged, removing 19 rows. On merge I kept the largest plug count and the longest address, and where a numeric power existed, took the rating string and its derived values <b>together from the same record</b>.</li>
 
-          <li class="ko"><b>키를 직접 만들었습니다.</b> 원본 식별자가 대부분 비어 있어 키로 쓸 수 없었습니다. 위치·운영사·종류·주소 순으로 정렬한 뒤, <b>같은 입력을 다시 정제하면 같은 ID가 나오도록</b> 1,939행에 식별자를 부여했습니다. 실행할 때마다 ID가 바뀌면 이후 단계의 증거와 연결이 끊기기 때문입니다.</li>
+          <li class="ko"><b>비어 있던 식별자를 새로 부여했습니다.</b> 위치, 운영사, 충전기 종류, 주소 순으로 정렬한 뒤 1,939행에 ID를 부여했습니다. 같은 입력을 다시 정제했을 때 같은 ID가 생성되도록 해, 후속 작업에서도 같은 레코드를 참조할 수 있게 했습니다.</li>
           <li class="en"><b>I generated the key.</b> The original identifier was blank on most rows, so it could not serve as one. I sorted by location, operator, type and address, then assigned identifiers to all 1,939 rows <b>so that cleaning the same input again reproduces the same IDs</b> — if IDs shifted between runs, every downstream link to evidence would break.</li>
 
           <li class="ko"><b>운영사 매핑 표를 분리해 두었습니다.</b> 대소문자와 공백만 정리하면 50 → 49에 그쳤습니다. 같은 회사의 다른 표기(BP / BP Australia, Tesla / Tesla Motors)와 13자에서 잘린 이름까지 매핑해 41개로 통합했고, 이 표를 정제 코드와 <b>분리해 보관</b>해 이후 단계가 같은 이름을 쓰도록 했습니다.</li>
@@ -230,7 +230,7 @@
       <div class="sec-head"><h2><span class="ko">공간 결합</span><span class="en">Spatial integration</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko">원본에 좌표의 측지계가 적혀 있지 않아, ABS 경계와 같은 <b>GDA2020(EPSG:7844)으로 가정하고, 확인한 것이 아니라 가정이라고 문서에 남겼습니다.</b></li>
+          <li class="ko">원본에 좌표의 측지계가 명시돼 있지 않아 ABS 경계와 같은 GDA2020(EPSG:7844)을 가정했습니다. 확인된 정보가 아니라는 점을 문서에 명시했습니다.</li>
           <li class="en">The source never states the datum of its coordinates, so I <b>assumed GDA2020 (EPSG:7844) to match the ABS boundaries and recorded that as an assumption</b> — keeping what was verified separate from what was assumed.</li>
 
           <li class="ko">경계에 걸친 점이 두 지역에 중복 배정되지 않도록 <code>intersects</code> 대신 <code>within</code>으로 먼저 배정하고, 포함되지 않은 점만 100m 이내 최근접 SA4를 찾아 <code>nearest</code>로 표시했습니다. 거리는 MGA zone 55(EPSG:7855)에서 계산했습니다.</li>
@@ -239,10 +239,10 @@
           <li class="ko">NSW 밖으로 잘못 배정되는 경우를 잡기 위해 전국 SA4 경계를 모두 사용했습니다. 결합 결과 행 수는 1,939로 변하지 않았고, <b>1,938행이 SA4 내부</b>, 1행(EV1092)이 Sydney – Northern Beaches 경계 밖 약 1.8m로 최근접 배정됐습니다. 모든 배정 지역은 NSW 안에 있었습니다.</li>
           <li class="en">I used the full national SA4 boundaries to catch any assignment outside NSW. The join left the row count unchanged at 1,939: <b>1,938 points fell inside an SA4 region</b>, and one (EV1092) sat about 1.8 m outside the Sydney – Northern Beaches polygon and was assigned to it as the nearest match. Every assigned region was in NSW.</li>
 
-          <li class="ko">배정이 좌표 오차에 얼마나 민감한지 확인하려고, <b>경계 안에 들어온 1,938개 점</b>에서 각자 배정된 지역 경계까지의 거리를 재봤습니다. 그중 <b>가장 가까운 점이 8.8m</b>라, 2m 정도 위치가 흔들려도 배정은 바뀌지 않았습니다. 다만 이건 배정에 얼마나 여유가 있는지를 본 것이지 측지계나 좌표 오차 자체를 검증한 건 아닙니다.</li>
+          <li class="ko">경계 내부로 배정된 1,938개 점에서 각 지역 경계까지의 거리를 계산했습니다. 최소 거리는 8.8m로, 이 점들은 2m 정도 이동해도 같은 지역 안에 남습니다. 다만 이 계산으로 원본 좌표나 측지계의 정확성을 확인한 것은 아닙니다.</li>
           <li class="en">To gauge how sensitive the assignment is to positional error, I measured the distance from each of the <b>1,938 points that fell inside</b> a region to that region's boundary. The closest sat <b>8.8 m</b> away, so a shift of up to two metres would not move any of them out of its polygon — and I noted that this does not verify the datum or bound the coordinate error itself.</li>
 
-          <li class="ko">정제 단계에서 표시한 위치 불일치 25행은 여기서도 고치지 않았습니다. 이 행들의 SA4는 <b>저장된 좌표가 들어 있는 지역</b>입니다. 모든 행이 지역을 받았다는 뜻이고, 충전소의 실제 위치를 확인했다는 뜻은 아닙니다.</li>
+          <li class="ko">정제 단계에서 표시한 위치 불일치 25행은 수정하지 않았습니다. 이 행들의 SA4는 저장된 좌표를 기준으로 배정한 결과이며, 실제 충전소 위치는 확인하지 못했습니다.</li>
           <li class="ko" style="list-style:none;padding:0;margin-top:6px">
             <div class="viz">
               <div class="viz-head">
@@ -318,10 +318,10 @@
           <li class="ko">운영사와 지역을 별도 테이블로 분리해 같은 정보가 행마다 반복되지 않게 했습니다. 지역은 전국 SA4 108건을 모두 보관했고(폴리곤 89건, 지오메트리 NULL 19건), 운영사 별칭 13건은 별도 테이블에 두었습니다.</li>
           <li class="en">Operators and regions became their own tables so the same details are not repeated on every row. All 108 national SA4 records were kept (89 with polygon geometry, 19 with NULL), and the 13 operator aliases live in a separate table.</li>
 
-          <li class="ko">우편번호와 SA4 코드는 숫자처럼 보이지만 <b>VARCHAR로 저장</b>해 앞자리 0과 비숫자 코드를 지켰고, 빈 값은 0이 아니라 NULL로 두었습니다.</li>
+          <li class="ko">우편번호와 SA4 코드는 <code>VARCHAR</code>로 저장해 앞자리 0과 숫자가 아닌 문자를 유지했습니다. 빈 값은 <code>NULL</code>로 저장했습니다.</li>
           <li class="en">Postcodes and SA4 codes look numeric but are <b>stored as VARCHAR</b>, preserving leading zeroes and official non-numeric codes; empty values are NULL, not zero.</li>
 
-          <li class="ko">위경도 범위, 충전기 종류·상태의 허용값, 출력의 유한성과 양수 조건, 우편번호 4자리 형식을 <b>CHECK 제약으로 스키마에 직접 넣었습니다.</b> 적재 코드가 아니라 데이터베이스가 직접 지키게 했습니다.</li>
+          <li class="ko">위경도 범위, 충전기 종류와 상태의 허용값, 출력의 유한성과 양수 조건, 우편번호 4자리 형식을 <code>CHECK</code> 제약으로 설정했습니다. 조건에 맞지 않는 값은 데이터베이스에 저장되지 않도록 했습니다.</li>
           <li class="en">Coordinate ranges, the allowed values for charger type and status, finite positive power figures and the four-digit postcode format are all <b>CHECK constraints in the schema itself</b> — enforced by the database, not by the loading code.</li>
 
           <li class="ko">좌표계를 타입 주석이 아니라 <b>별도 컬럼으로 저장</b>해 데이터베이스를 다시 열었을 때도 확인할 수 있게 하고, 두 geometry 컬럼에 R-tree 인덱스를 만들었습니다.</li>
@@ -445,9 +445,9 @@
 
             <div data-for="chargers" hidden>
               <h4>chargers</h4>
-              <p class="ko">한 사이트 · 운영사 · 충전기 종류당 1행입니다. 플러그 하나가 아니라 <b>한 운영사가 한 장소에서 제공하는 한 종류</b>가 기준이며, 예정(upcoming) 행도 함께 보관합니다.</p>
+              <p class="ko">장소, 운영사, 충전기 종류의 조합마다 1행을 저장합니다. 같은 장소에 있는 같은 운영사의 동일한 종류 충전기를 한 레코드로 관리하며, 설치 예정(upcoming)인 경우도 포함합니다.</p>
               <p class="en">One row per site, operator and charger type — the grain is <b>one type offered by one operator at one site</b>, not an individual plug. Upcoming rows are kept.</p>
-              <p class="ko">허용값과 범위를 적재 코드가 아니라 스키마에서 지키도록 CHECK 제약으로 넣었습니다.</p>
+              <p class="ko">허용값과 범위를 <code>CHECK</code> 제약으로 설정해, 조건에 맞지 않는 값의 저장을 막았습니다.</p>
               <p class="en">Allowed values and ranges are enforced by the schema through CHECK constraints rather than by the loading code.</p>
               <span class="grain">CHECK charger_type ∈ (AC, DC, Unknown) · charger_status ∈ (existing, upcoming) · sa4_match ∈ (within, nearest) · postcode ~ [0-9]{4} · 1,939 rows</span>
             </div>
@@ -463,21 +463,21 @@
 
             <div data-for="augmentation_evidence" hidden>
               <h4>augmentation_evidence</h4>
-              <p class="ko">후보 값 하나당 1행으로, 그 값의 <b>출처와 판정 결과</b>를 함께 보관합니다. 채택된 값뿐 아니라 보류·거절된 값도 남아 있어, 왜 그렇게 결정했는지 되짚을 수 있습니다.</p>
+              <p class="ko">후보 값 하나당 1행으로, 그 값의 <b>출처와 판정 결과</b>를 함께 보관합니다. 채택된 값뿐 아니라 보류하거나 거절한 값도 남아 있어, 왜 그렇게 결정했는지 되짚을 수 있습니다.</p>
               <p class="en">One row per candidate value, recorded together with <b>its source and the decision made about it</b>. Held and rejected values remain alongside accepted ones, so any decision can be traced back.</p>
               <span class="grain">UNIQUE (evidence_id, charger_id, attribute)</span>
             </div>
 
             <div data-for="augmentation_sources" hidden>
               <h4>augmentation_sources</h4>
-              <p class="ko">증거가 어디에서 왔는지 출처 목록을 따로 보관합니다. 증거 행이 출처 이름을 문자열로 반복해서 들고 있지 않도록 분리했습니다.</p>
+              <p class="ko">증거 데이터의 출처를 별도 테이블에 저장했습니다. 각 증거 행에서는 출처 ID를 참조하도록 해 출처 이름이 반복되지 않게 했습니다.</p>
               <p class="en">Keeps the list of where evidence came from, separated so evidence rows do not repeat source names as free text.</p>
               <span class="grain">PRIMARY KEY source</span>
             </div>
 
             <div data-for="selected_evidence" hidden>
               <h4>selected_evidence</h4>
-              <p class="ko">승인된 충전소 · 속성 · 증거를 연결하는 테이블이며, <b>커버리지 계산의 기준</b>입니다. 요약만 믿으면 실제 증거와 수치가 어긋날 수 있어, 적재 시점에 이 연결을 기준으로 커버리지를 다시 계산해 요약값과 대조합니다.</p>
+              <p class="ko">승인된 충전소와 속성, 증거를 연결하는 테이블입니다. 적재 시 이 연결을 기준으로 커버리지를 다시 계산하고 요약 테이블의 값과 대조합니다.</p>
               <p class="en">Links an accepted charger, attribute and evidence record, and is the <b>source of truth for the coverage count</b>. Trusting the summary alone would let the number drift from the evidence, so at load time coverage is recalculated from these links and checked against the summary.</p>
               <p class="ko">선택된 증거 행은 같은 충전소와 같은 속성을 가리키는 증거만 참조할 수 있습니다.</p>
               <p class="en">A selected row can only point to an evidence row for the same charger and the same attribute.</p>
@@ -493,13 +493,13 @@
       <div class="sec-head"><h2><span class="ko">재현성</span><span class="en">Reproducibility</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko">파일마다 URL, 출처 엔드포인트, 수집 시각, 크기, <b>SHA-256 체크섬</b>을 기록했습니다. 다시 실행하면 로컬 파일의 크기·체크섬·파일명을 기록과 대조해, 일치하면 원래 수집 시각을 지킨 채 재사용하고 <b>불일치하면 덮어쓰지 않고 멈춥니다.</b> 다만 이 방식은 로컬 사본이 기록과 맞는지만 봅니다. 원격 파일이 그사이 바뀌었는지는 알 수 없습니다.</li>
+          <li class="ko">파일별로 URL, 출처 엔드포인트, 수집 시각, 크기, SHA-256 체크섬을 기록했습니다. 다시 실행할 때 로컬 파일의 크기와 체크섬, 파일명을 대조합니다. 일치하면 기존 수집 시각을 유지해 재사용하고, 불일치하면 실행을 중단합니다. 원격 파일의 변경 여부는 이 검사로 확인할 수 없습니다.</li>
           <li class="en">For every file I record the URL, source endpoint, retrieval time, size and a <b>SHA-256 checksum</b>. A later run compares the local file's size, checksum and filename against that record: on a match it reuses the file and preserves the original retrieval time; on a mismatch it <b>stops rather than overwriting</b>. As documented, this verifies the local copy against its recorded metadata — it does not detect changes to the remote file.</li>
 
           <li class="ko">수집은 data.gov.au CKAN API로 대상 CSV를 찾아 내려받고, ABS는 배포 페이지를 파싱해 셰이프파일 아카이브를 자동으로 받아 풀도록 했습니다. 로그인이나 API 키는 필요 없습니다.</li>
           <li class="en">Retrieval locates the target CSV through the data.gov.au CKAN API and parses the ABS download page to fetch and extract the shapefile archive automatically. Neither requires a login or an API key.</li>
 
-          <li class="ko">수집·검증·적재 스크립트와 <b>단위 테스트 6종</b>으로 구성했고, macOS arm64 / Python 3.12 클린 환경에서 전체 흐름이 통과하는 것을 확인했습니다. 다른 운영체제까지는 확인하지 못했습니다.</li>
+          <li class="ko">수집, 검증, 적재 스크립트와 단위 테스트 6종을 작성했습니다. macOS arm64와 Python 3.12를 새로 구성한 환경에서 전체 실행이 통과하는 것을 확인했습니다. 다른 운영체제에서는 확인하지 못했습니다.</li>
           <li class="en">The package comprises acquisition, validation and loading scripts with <b>six unit-test modules</b>, and the whole flow passes in a clean macOS arm64 / Python 3.12 environment — which, as the report states, does not establish compatibility across every operating system.</li>
         </ul>
       </div>

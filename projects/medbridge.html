@@ -45,8 +45,8 @@
       <span class="en">Safety-Verified Multilingual Medication Instructions</span>
     </h1>
     <p class="case-lede">
-      <span class="ko">영어 복약지시를 다른 언어로 옮기면 번역은 매끄러운데, ‘필요할 때 드세요’처럼 복용 간격과 상한이 사라집니다. 번역 결과를 그대로 환자에게 주지 않고, 역번역과 모호성 점검을 거쳐 위험하면 다시 번역하도록 만들었습니다.</span>
-      <span class="en">Translate an English medication instruction and the output reads fluently while the dosing interval and the ceiling quietly disappear into “take as needed.” Instead of handing that to a patient, the pipeline back-translates, scores the ambiguity, and re-translates when the risk is too high.</span>
+      <span class="ko">복약지시 번역에서 복용 간격과 하루 최대량이 누락되거나 모호해지는 문제를 다뤘습니다. 팀원들과 역번역 및 모호성 검사 절차를 설계하고, 기준에 따라 다시 번역하도록 했습니다.</span>
+      <span class="en">The project examined missing or ambiguous dosing details in translated medication instructions. With my team, I designed back-translation and ambiguity checks, with re-translation triggered by the risk threshold.</span>
     </p>
 
     <dl class="case-meta">
@@ -106,7 +106,7 @@
         <p class="ko">영어가 모국어가 아닌 환자가 복약지시를 오해하는 문제를 다뤘습니다. 저는 팀장으로 처리 흐름을 공동 설계하고, 평가용 데이터셋과 오해 패턴을 만들고, 결과를 항목별로 집계했습니다.</p>
         <p class="en">The project addresses patients who misread medication instructions in a language that is not their first. As team lead I co-designed the pipeline, built the evaluation dataset and the pattern set, and scored the results by category.</p>
         <p class="note">
-          <span class="ko">번역 품질을 올리는 프로젝트가 아닙니다. <b>번역이 잘됐는지를 무엇으로 확인할 것인가</b>를 정하는 프로젝트였습니다. 매끄럽게 읽히는 문장이 안전한 문장은 아니기 때문입니다.</span>
+          <span class="ko">복용 간격, 하루 최대량, 복용 시점 등이 번역문에 남아 있는지를 확인하는 기준을 정했습니다. 일반 번역과 MedBridge의 결과를 같은 기준으로 비교했습니다.</span>
           <span class="en">This was not a project about making translation better. It was about deciding <b>what counts as evidence that a translation is safe</b> — because a sentence that reads smoothly is not the same as a sentence that is safe.</span>
         </p>
       </div>
@@ -114,9 +114,9 @@
 
     <!-- problem -->
     <section id="problem" class="rv">
-      <div class="sec-head"><h2><span class="ko">매끄러운데 위험한 번역</span><span class="en">Fluent and unsafe</span></h2></div>
+      <div class="sec-head"><h2><span class="ko">번역에서 빠지거나 모호해진 복용 정보</span><span class="en">Fluent and unsafe</span></h2></div>
       <div class="blk">
-        <p class="ko">LLM 번역은 문장이 자연스러워서 틀린 곳을 눈으로 찾기 어렵습니다. 사라지는 건 문장이 아니라 <b>조건</b>입니다. 복용 간격, 하루 상한, 언제 먹는지가 빠져도 번역문만 보면 멀쩡해 보입니다.</p>
+        <p class="ko">문장이 자연스럽게 읽혀도 복용 간격, 하루 최대량, 복용 시점 같은 정보가 빠질 수 있습니다. 번역문을 원문과 비교하며 이러한 조건이 유지됐는지 확인했습니다.</p>
         <p class="en">LLM translations read naturally enough that errors are hard to spot by eye. What disappears is not a sentence but a <b>condition</b> — the interval, the daily ceiling, the timing — and the output still looks fine on its own.</p>
 
         <div class="tbl-wrap">
@@ -154,7 +154,7 @@
     <section id="pipeline" class="rv">
       <div class="sec-head"><h2><span class="ko">처리 흐름</span><span class="en">Pipeline</span></h2></div>
       <div class="blk">
-        <p class="ko">번역 한 번으로 끝내지 않고, 결과를 다시 확인하는 단계를 넣었습니다. 위험도가 기준을 넘으면 그 자리에서 다시 번역합니다.</p>
+        <p class="ko">번역 후 역번역과 모호성 검사를 수행합니다. 검사에서 위험도가 기준을 넘으면 다시 번역합니다.</p>
         <p class="en">Rather than translating once and stopping, the flow adds steps that check the result, and re-translates on the spot when the risk score crosses the threshold.</p>
 
         <div class="viz">
@@ -195,7 +195,7 @@
     <section id="patterns" class="rv">
       <div class="sec-head"><h2><span class="ko">오해 패턴 12가지</span><span class="en">Twelve misreading patterns</span></h2></div>
       <div class="blk">
-        <p class="ko">"번역이 애매하다"는 말로는 자동으로 걸러낼 수 없습니다. 실제 복약 오류에서 반복되는 유형을 12가지로 정리하고, 각 유형마다 무엇을 채워 넣어야 하는지를 정했습니다. 이 목록이 4단계 점검의 기준입니다.</p>
+        <p class="ko">실제 복약 오류에서 반복되는 유형을 12가지로 정리했습니다. 유형별로 확인할 정보와 명확하게 표현할 방법을 정하고, 4단계 점검의 기준으로 사용했습니다.</p>
         <p class="en">“The translation is vague” cannot be checked automatically. I catalogued twelve patterns that recur in real medication errors and defined, for each, what has to be made explicit. That list is what stage 4 checks against.</p>
 
         <div class="tbl-wrap">
@@ -240,7 +240,7 @@
     <section id="result" class="rv">
       <div class="sec-head"><h2><span class="ko">비교 결과</span><span class="en">Results</span></h2></div>
       <div class="blk">
-        <p class="ko">openFDA와 TGA에서 수집한 실제 복약지시 30건을 모호함 · 안전필수 · 명확 세 유형으로 나누고, 일반 번역과 MedBridge의 출력을 항목별로 비교했습니다.</p>
+        <p class="ko">openFDA와 TGA에서 수집한 복약지시 30건을 모호함, 안전필수, 명확의 세 유형으로 나눴습니다. 일반 번역과 MedBridge의 결과를 항목별로 비교했습니다.</p>
         <p class="en">Thirty real instructions collected from openFDA and the TGA were classified as ambiguous, safety-critical or clear, then plain translation and MedBridge output were compared item by item.</p>
 
         <div class="viz">
@@ -285,7 +285,7 @@
             </div>
           </div>
           <p class="viz-foot">
-            <span class="ko">모호성 해소는 30건 중 <b>17건에서 30건</b>으로 늘었고, 환각은 1건에서 0건이 됐습니다. 의미 보존은 역번역을 원문과 비교해 매긴 점수입니다. 30건 중 <b>10건에서 재번역이 발동</b>했습니다.</span>
+            <span class="ko">30건 평가에서 모호성 해소는 17건에서 30건으로 늘었고, 환각 발생은 1건에서 0건으로 줄었습니다. 의미 보존 점수는 역번역을 원문과 비교해 매겼습니다. 30건 중 10건은 검사 후 재번역됐습니다.</span>
             <span class="en">Ambiguity was resolved in <b>17 of 30 cases, rising to 30</b>, and the single hallucination went to none. Meaning preservation is scored by comparing the back-translation with the source. <b>Ten of the thirty</b> triggered a re-translation.</span>
           </p>
         </div>
@@ -297,16 +297,16 @@
       <div class="sec-head"><h2><span class="ko">한계</span><span class="en">Limits</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko"><b>30건짜리 케이스 스터디입니다.</b> 대규모 벤치마크가 아니라, 실제 지시문 30건을 두 방식으로 각각 번역해 비교하고, 안전성 관점에서 주석을 단 결과입니다. 이 숫자로 실제 사용의 안전성을 보장할 수는 없습니다.</li>
+          <li class="ko"><b>평가 대상은 복약지시 30건입니다.</b> 두 방식의 번역 결과를 비교하고 안전성 관련 주석을 달았습니다. 이 결과만으로 실제 복약 상황에서의 안전성을 보장할 수는 없습니다.</li>
           <li class="en"><b>This is a 30-item case study.</b> Not a large-scale benchmark — the outputs of two methods on thirty real instructions, annotated for safety. These figures cannot establish that the system is safe in use.</li>
 
-          <li class="ko"><b>평가에 사람이 들어갑니다.</b> 정답 번역은 해당 언어를 모국어로 쓰는 팀원이 검증했습니다. 덕분에 판정은 믿을 만하지만, 완전 자동 독립 평가는 다음 단계로 남았습니다.</li>
-          <li class="en"><b>A human sits in the evaluation.</b> Reference translations were verified by native speakers on the team, which makes the judgements dependable but leaves fully automated independent evaluation to a later stage.</li>
+          <li class="ko"><b>정답 번역은 원어민 팀원이 검토했습니다.</b> 사람이 판단하는 과정이 포함됐으며, 독립적인 자동 평가는 수행하지 못했습니다.</li>
+          <li class="en"><b>Native-speaking team members reviewed the reference translations.</b> The evaluation included human judgement; an independent automated evaluation was not performed.</li>
 
-          <li class="ko"><b>두 개 언어만 다뤘습니다.</b> 팀원이 한국어와 중국어 원어민이라 정답을 직접 확인할 수 있는 범위에서 멈췄습니다. 처리 흐름 자체는 언어에 묶여 있지 않지만, 다른 언어로 넓히려면 그 언어를 검증할 사람이 필요합니다.</li>
+          <li class="ko"><b>한국어와 중국어를 평가했습니다.</b> 두 언어의 원어민 팀원이 정답을 확인했습니다. 다른 언어로 확대하려면 해당 언어의 번역 결과를 검증해야 합니다.</li>
           <li class="en"><b>Only two languages were covered.</b> We stopped where team members could verify the reference themselves, in Korean and Chinese. The flow itself is not language-bound, but extending it needs someone who can check that language.</li>
 
-          <li class="ko"><b>단어가 겹친다고 안전한 건 아닙니다.</b> 의미 보존 점수는 역번역과 원문의 일치 정도일 뿐, 의학적으로 올바른 지시라는 뜻은 아닙니다. 지표가 무엇을 재고 무엇을 재지 않는지를 분명히 적어 두었습니다.</li>
+          <li class="ko"><b>의미 보존 점수와 의학적 정확성은 별도로 확인해야 합니다.</b> 역번역과 원문의 일치 정도를 측정했으며, 복약지시의 의학적 정확성까지 검증한 것은 아닙니다.</li>
           <li class="en"><b>Overlap is not safety.</b> The meaning-preservation score measures agreement between the back-translation and the source, not medical correctness — and the write-up states what each metric does and does not measure.</li>
         </ul>
       </div>

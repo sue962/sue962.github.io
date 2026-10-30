@@ -105,8 +105,8 @@
       <div class="blk">
         <p class="ko">같은 학원에서 4년 동안 수학 조교와 강사로 일했습니다. 학생이 문제집 한 권을 다 풀고 나면, 조교가 틀린 문제를 PDF에서 하나씩 잘라 오답노트를 만들거나 학생이 같은 문제집을 새로 사서 틀린 것만 다시 풀었습니다. 이 과정을 매번 반복했습니다.</p>
         <p class="en">I spent four years as a maths teaching assistant and instructor at the same academy, running into the same loop over and over. When a student finished a workbook, an assistant would clip each wrong problem out of a PDF by hand, or the student would buy the same workbook again just to redo what they had missed.</p>
-        <p class="ko">기출 문항도 마찬가지였습니다. 1994년 수능이 시작된 뒤 지금까지의 문제를 전부 모아 분석해 둔 자료가 없어서, "이 학생이 약한 단원의 기출"을 찾으려면 연도별 폴더를 열어 파일을 하나씩 확인해야 했습니다.</p>
-        <p class="en">The same went for past exam items. Nothing collected and analysed every question since the national exam began in 1994, so finding “past items from the unit this student is weak in” meant opening year folders and checking files one at a time.</p>
+        <p class="ko">기출 문항을 찾을 때도 연도별 폴더를 하나씩 열어야 했습니다. 학원에는 1994년 이후 기출을 단원별로 모아 둔 자료가 없어, 학생이 어려워하는 단원의 문제를 찾는 데 시간이 들었습니다.</p>
+        <p class="en">Past exam items were stored in year-by-year folders. The academy had no unit-based collection of papers dating back to 1994, so finding questions from a student’s weak unit meant checking files one at a time.</p>
         <p class="note">
           <span class="ko">학생과 조교, 원장님이 각각 어떤 상황에서 불편한지 보면서 필요한 기능을 정했습니다. 그 내용을 정리해 학원에 시스템 개발을 제안했고, 제안이 받아들여져 풀스택 개발자로 계약을 전환했습니다. 기획과 설계, 개발, 운영을 혼자 맡았습니다.</span>
           <span class="en">Because I knew from using the material where it jammed, I proposed building the system to the academy myself. The proposal was accepted, my contract changed to full-stack developer, and I owned it end to end.</span>
@@ -127,13 +127,13 @@
           <p class="prod-sub"><span class="ko">오답 기록 · 오답 노트 · 재오답 기록 · 재오답 노트 네 화면으로 구성</span><span class="en">Enter what a student got wrong, get their error notebook</span></p>
 
           <ul class="bul">
-            <li class="ko"><b>오려 붙이는 작업을 없앴습니다.</b> 틀린 문항을 날짜·문제집·쪽·번호로 기록해 두면 오답노트 PDF가 생성됩니다. 조교가 PDF를 편집하거나 학생이 문제집을 다시 사는 과정이 사라졌습니다.</li>
+            <li class="ko"><b>틀린 문항을 기록하면 오답노트 PDF가 생성됩니다.</b> 날짜, 문제집, 쪽, 문항 번호를 입력하면 해당 문제를 모아 출력합니다. 조교가 문제를 하나씩 잘라 붙이거나 학생이 같은 문제집을 다시 살 필요가 없어졌습니다.</li>
             <li class="en"><b>The cut-and-paste went away.</b> Record a missed item by date, workbook, page and number, and the notebook comes out as a PDF — no assistant editing PDFs, no student rebuying a workbook.</li>
 
-            <li class="ko"><b>날짜·문제집·과목별로 뽑을 수 있게 했습니다.</b> 한 주 복습용으로 묶을 때와 한 과목을 몰아서 볼 때 뽑히는 문제가 달라집니다.</li>
+            <li class="ko"><b>날짜, 문제집, 과목별로 문항을 선택할 수 있게 했습니다.</b> 한 주 동안 틀린 문제를 모으거나 특정 과목만 골라 오답노트로 만들 수 있습니다.</li>
             <li class="en"><b>You choose how it groups.</b> Notebooks can be pulled by date, by workbook or by subject — what you need for a week's review and for a whole subject are not the same thing.</li>
 
-            <li class="ko"><b>재오답을 따로 기록했습니다.</b> 오답노트를 풀고 다시 틀린 문항은 <b>재오답</b>으로 따로 기록하고, 재오답만 모은 노트를 따로 만듭니다. 설명을 듣고 다시 풀었는데도 틀렸다는 사실이 수업에서는 훨씬 중요한 신호라, 두 상태를 한 칸에 합치지 않았습니다.</li>
+            <li class="ko"><b>다시 틀린 문항은 재오답으로 구분했습니다.</b> 설명을 듣고 다시 풀어도 틀리는 문제를 확인할 수 있도록, 첫 오답과 재오답을 나눠 저장했습니다. 재오답만 모은 노트도 생성할 수 있습니다.</li>
             <li class="en"><b>Wrong once and wrong again are separate states.</b> Items missed a second time are recorded as <em>repeat errors</em> and get a notebook of their own. “Still wrong after it was explained and retried” is a far stronger teaching signal, so the two were never collapsed into one field.</li>
 
             <li class="ko"><b>자주 틀리는 문제를 분석할 수 있게 했습니다.</b> 기록이 쌓이면서 학생별로 어떤 유형에서 반복해서 막히는지 조회할 수 있습니다.</li>
@@ -150,10 +150,10 @@
           <p class="prod-sub"><span class="ko">1994년 이후 평가원 기출에서 조건에 맞는 문항만 뽑습니다</span><span class="en">Pull just the part you need from every national exam item since 1994</span></p>
 
           <ul class="bul">
-            <li class="ko"><b>기존에 없던 자료라 직접 만들었습니다.</b> 1994년 수능이 시작된 이래 모든 평가원 기출을 모아 분석한 문제집이 없었습니다. 그래서 기출을 전부 데이터로 만들고, 학생이 약한 부분만 골라 공략할 수 있게 했습니다.</li>
-            <li class="en"><b>It did not exist, so I built it.</b> No published collection analysed every item the exam board had set since 1994, so I turned the whole archive into data and made it possible to target only where a student is weak.</li>
+            <li class="ko"><b>기출 문항을 모아 데이터베이스로 만들었습니다.</b> 1994년 이후 평가원 기출을 정리해, 학생이 어려워하는 단원의 문항을 골라 학습자료로 만들 수 있게 했습니다.</li>
+            <li class="en"><b>I built a database of past exam questions.</b> I organised exam-board questions from 1994 onward so instructors could select material from the units a student needed to practise.</li>
 
-            <li class="ko"><b>과목·대단원·중단원·연도로 조회합니다.</b> 조건을 걸어 해당 문항만 모아 한 묶음으로 만듭니다. "2015년 9월 모의고사 미적분 21번과 비슷한 문제"를 사람이 폴더를 뒤져 찾던 일이 조회 한 번으로 바뀌었습니다.</li>
+            <li class="ko"><b>과목, 대단원, 중단원, 연도로 조회합니다.</b> 예를 들어 2015년 9월 모의고사 미적분 21번과 같은 단원의 문제를 찾을 때, 폴더를 하나씩 열지 않고 조건에 맞는 문항을 검색해 자료로 만들 수 있습니다.</li>
             <li class="en"><b>Filter by subject, major unit, sub-unit and year.</b> Set the criteria and the matching items collect into one set — what used to mean digging through folders for “something like question 21 of the September 2015 calculus paper” became a single query.</li>
 
             <li class="ko"><b>난이도까지 조건에 넣었습니다.</b> 같은 단원이라도 학생 수준에 맞는 문제를 골라야 해서, 난이도를 조건에 더했습니다. 처음 스키마에는 없던 컬럼입니다.</li>
@@ -173,10 +173,10 @@
           <li class="ko"><b>파일명을 식별자로 사용했습니다.</b> 문항 이미지를 <code>시험_연도_과목_번호_정답</code> 규칙으로 통일했습니다. 파일명만 읽어도 어느 시험 몇 번 문제이고 정답이 뭔지 알 수 있어서, 이미지를 열지 않고도 조회와 정답 대조가 됩니다. 1994학년도부터 2025학년도까지 32개 학년도, 5,225문항에 적용했습니다.</li>
           <li class="en"><b>The filename became the identifier.</b> Item images follow <code>exam_year_subject_number_answer</code>, so reading the name alone tells you which paper, which question and what the answer is — queries and answer-key checks work without opening a single image. Applied across 5,225 items spanning 32 academic years, 1994 to 2025.</li>
 
-          <li class="ko"><b>분류 정보는 따로 테이블에 뒀습니다.</b> 시험 구분(6월 · 9월 모의평가 · 수능), 문항 번호, 연도, 과목, 난이도, 메모를 데이터베이스에 저장했습니다. 파일명은 문항을 가리키는 키 역할만 하고, 검색에 쓰는 속성은 테이블이 가집니다.</li>
+          <li class="ko"><b>문항 분류 정보는 테이블에 저장했습니다.</b> 시험 구분(6월 모의평가, 9월 모의평가, 수능), 문항 번호, 연도, 과목, 난이도, 메모를 저장했습니다. 파일명을 키로 사용해 문항 이미지와 분류 정보를 연결했습니다.</li>
           <li class="en"><b>Classification lives in a table.</b> Exam type (June or September mock, or the national exam), question number, year, subject, difficulty and notes are stored in the database. The filename only points at an item; the attributes you search on belong to the table.</li>
 
-          <li class="ko"><b>기존에 쓰던 엑셀을 그대로 읽게 했습니다.</b> 학원에서 이미 엑셀로 문항 목록을 관리하고 있어서, 엑셀 파일을 불러오는 경로를 함께 만들었습니다. 새 도구를 쓰라고 하는 것보다 기존 자료가 그대로 들어오게 하는 편이 현실적이었습니다.</li>
+          <li class="ko"><b>학원에서 쓰던 엑셀 파일을 불러오도록 했습니다.</b> 기존에 관리하던 문항 목록을 다시 입력하지 않아도 되도록 엑셀 가져오기 기능을 만들었습니다.</li>
           <li class="en"><b>Input met people where they were.</b> The academy already kept item lists in spreadsheets, so an Excel import path was built alongside. Letting existing files flow in was more realistic than asking everyone to adopt a new tool first.</li>
         </ul>
 
@@ -212,8 +212,8 @@
           <li class="ko"><b>세로로 긴 문제는 칸을 나눠 쓰지 않게 했습니다.</b> 세로가 가로의 1.47배를 넘으면 아래 칸에 다음 문제를 넣지 않고 옆 칸으로 넘어갑니다. 그래프나 표가 붙은 문제는 길어서, 억지로 두 개를 쌓으면 잘리거나 다음 장으로 밀립니다. 비율을 재서 자리 배치를 바꾸는 쪽이 안정적이었습니다.</li>
           <li class="en"><b>Tall problems get a column to themselves.</b> Past a height-to-width ratio of 1.47 the layout skips the slot below and moves to the next column. Problems carrying a graph or table run long, and forcing two into one column clips them or pushes them onto the next page — measuring the ratio and changing the placement held up better.</li>
 
-          <li class="ko"><b>정답은 파일명에서 뽑아 답지로 만들었습니다.</b> 문항을 고를 때 정답도 같이 따라오기 때문에, 자료와 답지가 서로 어긋날 일이 없습니다.</li>
-          <li class="en"><b>The answer key is parsed from the filenames.</b> Answers travel with the items as they are selected, so the worksheet and its key cannot drift apart.</li>
+          <li class="ko"><b>파일명에 기록된 정답으로 답지를 생성했습니다.</b> 선택한 문항의 파일명에서 정답을 읽어, 문제와 같은 순서로 답지를 만들었습니다.</li>
+          <li class="en"><b>The answer key is parsed from the filenames.</b> The program reads the answer for each selected item and lists answers in the same order as the questions.</li>
         </ul>
 
         <div class="viz">
@@ -242,7 +242,7 @@
             <text class="cap" x="400" y="228"><tspan class="en">skip the slot below, go sideways</tspan></text>
           </svg>
           <p class="viz-foot">
-            <span class="ko">가로폭을 240pt로 고정해 정규화한 뒤, 세로가 가로의 1.47배를 넘으면 한 열을 통째로 씁니다. 정규화 후에도 세로가 350pt를 넘으면 세로를 320pt에 맞춰 한 번 더 줄입니다.</span>
+            <span class="ko">문항 이미지의 가로폭을 240pt로 맞춘 뒤, 세로가 가로의 1.47배를 넘으면 한 열을 사용합니다. 크기를 조정한 뒤에도 세로가 350pt를 넘으면 320pt에 맞춰 다시 줄입니다.</span>
             <span class="en">Widths are normalised to 240pt first; past a 1.47 height-to-width ratio an item takes a whole column. If height still exceeds 350pt after normalisation, it is scaled once more to fit 320pt.</span>
           </p>
         </div>
@@ -253,32 +253,32 @@
     <section id="field" class="rv">
       <div class="sec-head"><h2><span class="ko">운영하며 개선한 점</span><span class="en">Improvements from use</span></h2></div>
       <div class="blk">
-        <p class="ko">직접 수업에 쓰면서 고친 부분이 많습니다. 기능이 동작하는 것과 수업 중에 바로 쓸 수 있는 것은 달랐습니다.</p>
+        <p class="ko">프로그램을 직접 수업에 사용하면서 출력 오류, 한글 입력 상태의 단축키 문제, 파일명 중복 등을 수정했습니다.</p>
         <p class="en">Much of this was changed because I used it in class myself. A feature working and a feature being usable mid-lesson turned out to be different things.</p>
 
         <ul class="bul">
-          <li class="ko"><b>출력물을 원본 문항과 대조했습니다.</b> 자동 생성이 끝났다고 보지 않고, 나온 PDF를 원본 이미지와 맞춰 봤습니다. 번호가 밀리거나 정답이 어긋나면 분류 기준과 생성 로직을 고쳤습니다. 수업에 들고 들어가는 자료라 틀린 채로 나가면 바로 학생에게 갑니다.</li>
+          <li class="ko"><b>출력물을 원본 문항과 대조했습니다.</b> 수업 전에 생성된 PDF의 문항 번호와 정답을 확인했습니다. 번호가 밀리거나 정답이 어긋난 경우 분류 기준과 생성 코드를 수정했습니다.</li>
           <li class="en"><b>Output was checked against the original items.</b> Generation finishing was not the end — the PDF was compared back to the source images, and when numbering slipped or an answer disagreed, the classification rules and the generation logic were fixed. This material goes into a lesson, so an error reaches a student immediately.</li>
 
-          <li class="ko"><b>단축키를 한글 자판에도 걸었습니다.</b> <code>Ctrl+A</code>만 등록해 두면 한글 입력 상태에서는 아무 반응이 없습니다. 수업 중에 입력기를 바꿔 가며 쓸 수는 없어서, <code>Ctrl+ㅁ</code>처럼 한글 자판으로 눌렀을 때의 키도 같은 동작에 함께 연결했습니다.</li>
+          <li class="ko"><b>한글 입력 상태에서도 단축키가 작동하도록 수정했습니다.</b> <code>Ctrl+A</code>만 등록했을 때는 한글 입력 상태에서 반응하지 않았습니다. 수업 중 입력기를 바꾸는 불편을 줄이려고 <code>Ctrl+ㅁ</code>에도 같은 기능을 연결했습니다.</li>
           <li class="en"><b>Shortcuts were bound for the Korean keyboard too.</b> Registering only <code>Ctrl+A</code> means nothing happens while the Korean input method is active. Switching input modes mid-lesson is not realistic, so the Korean-layout equivalents such as <code>Ctrl+ㅁ</code> were bound to the same actions.</li>
 
           <li class="ko"><b>노트 하나를 네 개 PDF로 나눠 만들었습니다.</b> 표지, 문제, 답지, 생성 기록을 따로 만든 뒤 합칩니다. 수업에서는 문제만 주고 답지는 나중에 주는 경우가 많아서, 처음부터 분리해 두는 편이 편했습니다.</li>
           <li class="en"><b>One notebook is assembled from four PDFs</b> — cover, problems, answer key and a generation log — built separately and then merged. Lessons often hand out the problems first and the key later, so keeping them apart from the start was simpler.</li>
 
-          <li class="ko"><b>같은 노트를 두 번 만들지 못하게 막았습니다.</b> 생성 전에 같은 이름의 파일이 있는지 확인하고, 있으면 만들지 않고 알려 줍니다. 같은 자료를 또 받으면 학생은 이미 푼 문제를 다시 풀게 됩니다.</li>
+          <li class="ko"><b>같은 이름의 파일이 있으면 생성을 중단했습니다.</b> 생성 전에 파일명을 확인하고, 중복된 이름이면 안내 메시지를 표시했습니다.</li>
           <li class="en"><b>The same notebook cannot be generated twice.</b> Before building, it checks for a file of that name and stops with a message if one exists — otherwise a student is handed problems they have already done.</li>
 
-          <li class="ko"><b>맥에서 한글 파일명이 안 잡히는 문제를 처리했습니다.</b> macOS는 한글 파일명을 자음과 모음으로 분리해 저장합니다. 화면에 보이는 글자로 파일을 찾으면 분명히 있는데도 없다고 나옵니다. 비교 전에 파일명을 같은 방식으로 정규화해 맞췄습니다.</li>
+          <li class="ko"><b>macOS에서 한글 파일명을 찾지 못하는 오류를 수정했습니다.</b> 같은 글자라도 자음과 모음이 분리된 형태로 저장되면 파일명이 일치하지 않았습니다. 비교 전에 파일명을 같은 유니코드 형식으로 정규화했습니다.</li>
           <li class="en"><b>Korean filenames needed normalising on macOS.</b> The filesystem stores Korean names with the jamo decomposed, so searching by the characters you see on screen finds nothing even when the file is right there. Names are normalised to the same form before comparison.</li>
 
           <li class="ko"><b>빈칸이 있으면 저장을 막았습니다.</b> 입력하다 만 행이 그대로 저장되면 나중에 그 행이 왜 비어 있는지 알 수 없습니다. 저장 전에 확인하고 경고를 띄웁니다.</li>
           <li class="en"><b>Saving is blocked while a row is incomplete.</b> A half-filled row stored as-is leaves no way to tell later why it was empty, so it is checked before the write and flagged.</li>
 
-          <li class="ko"><b>출결·성적·문자 발송까지 연결했습니다.</b> 출결과 성적 기록, 학부모·학생 문자 발송을 같은 시스템에 연결했습니다. 자료 생성만 자동화하면 결국 출결은 다른 곳에 또 적게 되고, 기록이 두 군데로 갈라집니다.</li>
+          <li class="ko"><b>출결과 성적 관리, 문자 발송 기능을 추가했습니다.</b> 같은 시스템에서 출결과 성적을 기록하고 학부모와 학생에게 문자를 보낼 수 있도록 했습니다.</li>
           <li class="en"><b>Operations were wired in.</b> Attendance, grade records and SMS to students and parents run through the same system. Automating only the material would have left attendance recorded somewhere else, splitting the records in two.</li>
 
-          <li class="ko"><b>비정형 자료를 쓰면서 구조를 잡았습니다.</b> 처음에는 로컬 파일에 그냥 쌓아 두는 방식으로 시작했습니다. 쓰면서 어떤 항목이 실제로 필요한지 드러날 때마다 컬럼으로 옮기고, 조회할 수 있는 구조로 바꿔 나갔습니다.</li>
+          <li class="ko"><b>파일로 관리하던 자료를 데이터베이스로 옮겼습니다.</b> 수업에 사용하면서 필요한 분류 항목을 컬럼에 추가하고, 조건별로 조회할 수 있도록 수정했습니다.</li>
           <li class="en"><b>Structure grew out of unstructured files.</b> It began as material piled into local files; as using it revealed which attributes actually mattered, those moved into columns and the store became something that could be queried.</li>
         </ul>
       </div>
@@ -292,10 +292,10 @@
           <li class="ko"><b>학생마다 데이터베이스 파일을 따로 만들었습니다.</b> 학생 이름으로 된 파일에 그 학생의 기록을 담는 구조였습니다. 당시 규모에서는 단순하고 잘 돌아갔지만, 학생 수가 늘면 파일이 계속 늘어나고 전체를 한 번에 집계하기 어려워집니다. 지금 다시 만든다면 한 데이터베이스에 학생 식별자를 두는 쪽으로 설계하겠습니다.</li>
           <li class="en"><b>Each student got their own database file</b>, named after them. At that scale it was simple and it worked, but the file count grows with enrolment and aggregating across everyone gets awkward. Rebuilding it now, I would keep one database with a student identifier.</li>
 
-          <li class="ko"><b>문항 이미지 경로가 코드에 박혀 있었습니다.</b> 특정 컴퓨터의 폴더 경로를 그대로 쓰고 있어서, 다른 환경에서 돌리려면 코드를 고쳐야 합니다. 설정으로 빼야 할 부분이었습니다.</li>
+          <li class="ko"><b>문항 이미지 경로를 코드에 직접 적어 두었습니다.</b> 특정 컴퓨터의 폴더를 사용하므로 다른 환경에서 실행하려면 코드를 수정해야 합니다. 경로를 별도 설정으로 분리하는 작업이 필요합니다.</li>
           <li class="en"><b>The item image path was hardcoded.</b> It pointed at a folder on one specific machine, so running it elsewhere meant editing code. It belonged in configuration.</li>
 
-          <li class="ko"><b>문항의 내용 자체는 분류하지 못했습니다.</b> 시험·연도·과목·난이도 같은 메타데이터로는 찾을 수 있지만, 문제가 실제로 어떤 개념을 묻는지는 사람이 메모로 적어 넣어야 했습니다. 이미지 속 수식을 읽어 들이는 방향도 알아봤지만 운영에 넣을 만큼 정확하지는 않았습니다.</li>
+          <li class="ko"><b>문항이 묻는 개념은 사람이 입력해야 했습니다.</b> 시험, 연도, 과목, 난이도로 검색할 수 있지만 세부 개념은 메모로 직접 기록했습니다. 이미지 속 수식을 읽는 방법도 검토했으나 실제 운영에 쓰기에는 정확도가 부족했습니다.</li>
           <li class="en"><b>The content of an item was never classified.</b> Metadata such as exam, year, subject and difficulty makes items findable, but what a problem actually asks had to be typed in as a note. Reading the formulas out of the images was explored and was not accurate enough to put into production.</li>
 
           <li class="ko"><b>소단원 단위 분류는 끝내지 못했습니다.</b> 대단원과 중단원까지는 조건으로 걸 수 있지만 소단원은 분류 작업이 남았습니다. 학생이 푼 결과로 약한 부분을 인식해 다음 문제를 주는 기능까지 계획했는데 거기까지는 못 갔습니다.</li>
@@ -303,8 +303,8 @@
         </ul>
 
         <p class="note">
-          <span class="ko">자동 생성이 끝났다고 바로 쓰지 않고, <b>출력물을 원본과 대조한 뒤에</b> 수업에 들고 갔습니다. 자료를 직접 쓰는 사람이기도 해서 그 과정을 생략할 수 없었습니다.</span>
-          <span class="en">What this system taught me is that automation ends not when the program runs but <b>when someone has confirmed the output is usable</b>. Being the person who carried that material into the lesson is what made the difference visible.</span>
+          <span class="ko">직접 수업에 사용할 자료였기 때문에, 생성된 PDF는 <b>원본 문항과 대조한 뒤</b> 학생에게 배부했습니다.</span>
+          <span class="en">I used these materials in my own lessons, so I <b>checked the generated PDFs against the original questions</b> before handing them to students.</span>
         </p>
       </div>
     </section>

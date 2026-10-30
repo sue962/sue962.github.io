@@ -45,7 +45,7 @@
       <span class="en">Athlete &amp; Trials Database and Query Layer</span>
     </h1>
     <p class="case-lede">
-      <span class="ko">선수와 선발전, 심판, 지원금을 관리하는 데이터베이스 설계에 참여하고, 그 위에 조회·갱신 기능을 구현했습니다. 처음 받은 설계 초안은 AI가 만든 것이었습니다. 그대로 쓰지 않고 요구사항과 한 줄씩 대조하는 작업부터 했습니다.</span>
+      <span class="ko">선수와 선발전, 심판, 지원금을 관리하는 데이터베이스를 팀원들과 설계하고 조회 및 갱신 기능을 구현했습니다. AI가 만든 설계 초안을 요구사항과 대조해 누락된 속성과 잘못된 관계를 수정했습니다.</span>
       <span class="en">Designing a database for athletes, trials, officials and stipends, then building the query and update layer on top. The starting point was an AI-generated draft design — which I checked against the requirements line by line instead of taking it as given.</span>
     </p>
 
@@ -111,10 +111,10 @@
     <section id="scope" class="rv">
       <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
       <div class="blk">
-        <p class="ko">선수, 선발전, 심판, 장비, 의료 패키지, 여행 지원금을 다루는 데이터베이스입니다. 설계는 팀에서 함께 했고, 제가 맡은 부분은 데이터 모델 검토와 DDL·DML 작성, PostgreSQL 저장 함수, 그리고 Python 조회 계층입니다.</p>
+        <p class="ko">선수, 선발전, 심판, 장비, 의료 패키지, 여행 지원금을 다루는 데이터베이스입니다. 설계는 팀에서 함께 했고, 제가 맡은 부분은 데이터 모델 검토와 DDL과 DML 작성, PostgreSQL 저장 함수, 그리고 Python 조회 계층입니다.</p>
         <p class="en">A database covering athletes, trials, officials, equipment, medical packages and travel stipends. I worked on the data model review, the DDL and DML, the SQL stored functions, and the Python query layer.</p>
         <p class="note">
-          <span class="ko">이 프로젝트에서는 새로 만드는 일보다 <b>이미 있는 정의를 요구사항과 맞춰보는 데</b> 시간을 더 썼습니다. 설계 초안도, 넘겨받은 스키마도 그대로 쓰지 않고 먼저 검증했습니다.</span>
+          <span class="ko">설계 초안과 기존 스키마를 요구사항에 맞춰 검토했습니다. 관계와 제약을 먼저 수정한 뒤 조회 기능을 구현했습니다.</span>
           <span class="en">Most of my work here was not adding features but <b>checking whether existing definitions actually matched the requirements</b>. Neither the draft design nor the schema was taken as given.</span>
         </p>
       </div>
@@ -124,17 +124,17 @@
     <section id="audit" class="rv">
       <div class="sec-head"><h2><span class="ko">AI 설계 초안 검증</span><span class="en">Auditing the AI-generated draft</span></h2></div>
       <div class="blk">
-        <p class="ko">초기 개념 설계는 생성형 AI가 만든 ERD였습니다. 읽어보면 그럴듯했는데, 요구사항과 하나씩 대조하자 네 영역에서 문제가 나왔습니다. 각각 요구사항의 어느 문장과 어긋나는지까지 달아서 정리했습니다.</p>
+        <p class="ko">생성형 AI로 작성한 초기 ERD를 요구사항과 대조했습니다. 속성, 관계, 식별자, 제약의 네 영역에서 문제를 찾고, 각 항목에 해당하는 요구사항을 함께 정리했습니다.</p>
         <p class="en">The initial conceptual design was an ERD produced by a generative AI. It looked plausible, but checking it against the requirements surfaced problems in four areas — each written up with the specific requirement it contradicted.</p>
 
         <ul class="bul">
-          <li class="ko"><b>엔터티와 속성이 축약돼 있었습니다.</b> 선수가 Name과 Contact Details로 뭉개져 있었지만 도메인은 이름·성·휴대폰·이메일·고유 여권번호를 각각 요구했습니다. 아마추어는 소속 클럽만 있고 클럽 위치가 빠졌고, 의료 패키지에는 요구사항에 없는 PackageID와 Cost가 <b>추가로 생겨</b> 있었습니다. 장비는 제조사·모델·연식·상태 등급이 모두 누락됐습니다.</li>
+          <li class="ko"><b>필요한 속성이 빠지거나 합쳐져 있었습니다.</b> 선수의 이름, 성, 휴대폰, 이메일, 고유 여권번호가 <code>Name</code>과 <code>Contact Details</code>로 묶여 있었습니다. 아마추어의 클럽 위치와 장비의 제조사, 모델, 연식, 상태 등급도 누락됐습니다. 의료 패키지에는 요구사항에 없는 <code>PackageID</code>와 <code>Cost</code>가 추가돼 있었습니다.</li>
           <li class="en"><b>Entities and attributes were flattened.</b> The athlete was reduced to a name and contact details, where the domain called for first name, last name, mobile, email and a unique passport number separately. Amateur had a training club but no club location, and Medical Package had <b>gained</b> a PackageID and Cost the requirements never mentioned. Equipment was missing manufacturer, model, year and condition rating entirely.</li>
 
           <li class="ko"><b>관계의 다중성이 틀렸습니다.</b> 참가 관계가 1:N으로 되어 있었지만, 한 선수가 여러 경기에 나가고 한 경기에 여러 선수가 참가하므로 다대다여야 했습니다. 경기 기록(PerformanceData)도 경기가 아니라 <b>참가 관계에 두어야</b> 특정 선수의 특정 경기 결과를 표현할 수 있었습니다. 심판 관계도 한 경기에 여러 심판이 배정될 수 있는데 1:N으로 제한돼 있었고, 한 경기의 우승자는 한 명이라는 규칙은 아예 빠져 있었습니다.</li>
           <li class="en"><b>Relationship cardinalities were wrong.</b> Participation was modelled 1:N, but an athlete competes in many trials and a trial involves many athletes, so it had to be many-to-many — and performance data belongs <b>on the participation</b>, not on the trial, to express one athlete's result in one trial. Officials were likewise capped at one per trial when the domain allows several, and the rule that a trial has a single winner was missing altogether.</li>
 
-          <li class="ko"><b>식별 방식이 불완전했습니다.</b> 여행 지원금은 선수와 계약일의 조합으로 식별되는데, 초안은 계약일 자체를 빠뜨려서 식별할 근거가 없었습니다. 지원금만으로는 식별이 안 되고 선수에 기대야 하는 구조인데, 그게 초안에는 보이지 않았습니다.</li>
+          <li class="ko"><b>여행 지원금의 식별에 필요한 계약일이 빠져 있었습니다.</b> 지원금은 선수와 계약일의 조합으로 구분해야 하는데, 초안에는 계약일이 없었습니다. 선수와 계약일을 함께 식별자로 사용하도록 수정했습니다.</li>
           <li class="en"><b>Identification was incomplete.</b> A travel stipend is identified by the athlete together with the signing date, but the draft omitted the signing date entirely — leaving nothing to identify it by, and hiding the fact that its identity depends on another entity.</li>
 
           <li class="ko"><b>제약이 사라져 있었습니다.</b> 빠진 규칙은 다섯 가지입니다. 선수는 전문과 아마추어 중 하나에만 속한다, 전문 선수는 의료 패키지를 1개에서 5개까지 골라야 한다, 아마추어는 그 패키지를 쓸 수 없다, 하루에 한 경기만 참가할 수 있다, 상태가 good 이상인 장비만 쓸 수 있다. 초안에는 이 중 어느 것도 들어 있지 않았습니다.</li>
@@ -194,7 +194,7 @@
           </p>
         </div>
 
-        <p class="ko">AI가 만든 결과는 문장이 자연스럽고 형식도 맞았기 때문에, <b>빠진 것을 찾으려면 결과물이 아니라 요구사항에서 출발해야</b> 했습니다. 요구사항의 각 규칙을 체크리스트로 만들어 하나씩 대조하는 방식으로 검토했습니다.</p>
+        <p class="ko">요구사항의 규칙을 체크리스트로 정리하고 ERD에 하나씩 대응시켰습니다. 이 과정에서 누락된 속성뿐 아니라 요구사항에 없는 속성도 확인했습니다.</p>
         <p class="en">The AI output read naturally and had the right shape, which is exactly why <b>finding what was missing meant starting from the requirements, not from the output</b>. I turned each stated rule into a checklist item and worked through them one at a time.</p>
       </div>
     </section>
@@ -207,16 +207,16 @@
           <li class="ko"><b>성적은 경기가 아니라 참가 기록에 있습니다.</b> 선수와 경기를 다대다 연결 테이블로 두고, 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했습니다. 성적은 특정 선수가 그 경기에서 낸 결과이므로, 두 식별자가 함께 있어야 식별됩니다.</li>
           <li class="en"><b>Results live on the participation record, not the trial.</b> Athletes and trials are joined through a junction table whose primary key is the athlete ID and trial ID together — a result belongs to one athlete in one trial, so it takes both identifiers to identify it.</li>
 
-          <li class="ko"><b>우승 테이블의 기본키는 경기 ID 하나입니다.</b> 한 경기에 우승자가 두 명 등록되는 상황을 애초에 만들 수 없게 하려고 이렇게 두었습니다. 애플리케이션 검사에 맡기지 않고 구조로 막았습니다.</li>
+          <li class="ko"><b>우승 테이블은 경기 ID를 기본키로 사용했습니다.</b> 한 경기에 우승자가 중복 등록되지 않도록 데이터베이스에서 제한했습니다.</li>
           <li class="en"><b>The wins table is keyed on the trial alone.</b> Making the trial ID the primary key means two winners for one trial cannot be recorded in the first place — the rule is enforced by structure rather than by an application check.</li>
 
-          <li class="ko"><b>여행 지원금은 약한 엔터티이고, 최종 금액은 생성 열입니다.</b> 선수 ID와 계약일을 복합 기본키로 두어 같은 선수의 계약을 날짜별로 구분하고, 기본 지원금·보너스·숙박비를 각각 저장했습니다. 최종 지급액은 저장하는 대신 <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>로 계산되게 해, 원본 금액이 바뀌었는데 최종액만 남아 생기는 불일치를 없앴습니다.</li>
-          <li class="en"><b>The travel stipend is a weak entity with a generated total.</b> Athlete ID plus signing date forms the composite key, separating one athlete's contracts by date, and base, bonus and housing amounts are each stored. The final figure is not stored but computed as <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>, so it can never drift from the components it is derived from.</li>
+          <li class="ko"><b>여행 지원금은 선수 ID와 계약일로 구분했습니다.</b> 두 값을 복합 기본키로 두고 기본 지원금, 보너스, 숙박비를 각각 저장했습니다. 최종 지급액은 <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>로 계산하도록 해, 구성 금액이 바뀌면 함께 갱신되도록 했습니다.</li>
+          <li class="en"><b>Travel stipends use athlete ID and signing date as a composite key.</b> Base, bonus and housing amounts are stored separately. The total is calculated with <code>GENERATED ALWAYS AS (Base + Bonus - COALESCE(Housing, 0)) STORED</code>, so it updates when its component amounts change.</li>
 
           <li class="ko"><b>여권번호에는 UNIQUE 제약을 적용했습니다.</b> 내부 식별자인 선수 ID를 기본키로 두되, 외부 식별자인 여권번호는 중복될 수 없는 값이므로 별도 제약으로 구분했습니다.</li>
           <li class="en"><b>Passport numbers carry a UNIQUE constraint.</b> The athlete ID stays the internal primary key, while the passport number — an external identifier that cannot repeat — is constrained separately.</li>
 
-          <li class="ko"><b>값의 범위는 CHECK으로 제한했습니다.</b> 장비 상태는 poor · fair · good · very good · excellent 다섯 값만, 후원금 종류는 세 가지 값만 허용되도록 스키마에 직접 넣었습니다.</li>
+          <li class="ko"><b>값의 범위는 CHECK으로 제한했습니다.</b> 장비 상태는 poor, fair, good, very good, excellent의 다섯 값만, 후원금 종류는 세 가지 값만 허용되도록 스키마에 직접 넣었습니다.</li>
           <li class="en"><b>Value domains are restricted with CHECK.</b> Equipment condition accepts only poor, fair, good, very good and excellent; sponsorship payments only the three permitted types — both declared in the schema itself.</li>
 
           <li class="ko"><b>키와 외래키만으로 표현할 수 없는 규칙은 트리거로 구현했습니다.</b> "하루에 한 경기만 참가"는 참가 기록과 경기 날짜를 함께 봐야 판정할 수 있으므로, 참가 기록을 추가하거나 변경할 때 같은 날짜의 다른 경기 참가 여부를 조회하는 트리거를 작성했습니다. 전문 선수의 의료 패키지 1~5개 제한도 같은 방식으로 처리했습니다.</li>
@@ -355,7 +355,7 @@
 
             <div data-for="Athlete" hidden>
               <h4>Athlete</h4>
-              <p class="ko">선수의 기본 정보입니다. 초안에서 ‘이름’과 ‘연락처’로 뭉쳐 있던 것을 이름·성·휴대폰·이메일로 나누고, 여권번호를 별도 속성으로 두었습니다. 내부 식별자는 AthleteID이고, 외부 식별자인 여권번호는 중복될 수 없으므로 UNIQUE로 구분했습니다.</p>
+              <p class="ko">선수의 기본 정보입니다. 초안에서 ‘이름’과 ‘연락처’로 뭉쳐 있던 것을 이름, 성, 휴대폰, 이메일로 나누고, 여권번호를 별도 속성으로 두었습니다. 내부 식별자는 AthleteID이고, 외부 식별자인 여권번호는 중복될 수 없으므로 UNIQUE로 구분했습니다.</p>
               <p class="en">The athlete's core record. What the draft had flattened into “name” and “contact details” is split into first name, last name, mobile and email, with the passport number as its own attribute. AthleteID is the internal identifier; the passport number, being an external one, is constrained UNIQUE.</p>
               <span class="grain">PRIMARY KEY AthleteID · UNIQUE PassportNumber</span>
             </div>
@@ -385,21 +385,21 @@
               <h4>TravelStipend</h4>
               <p class="ko">약한 엔터티입니다. 지원금 자체의 식별자가 없고 <b>선수와 계약일의 조합</b>으로 식별되므로, 두 값을 복합 기본키로 두어 같은 선수의 계약을 날짜별로 구분했습니다. 초안은 계약일을 빠뜨려 식별 근거가 없었습니다.</p>
               <p class="en">A weak entity: a stipend has no identifier of its own and is identified by <b>the athlete together with the signing date</b>, so both form the composite key, separating one athlete's contracts by date. The draft omitted the signing date, leaving nothing to identify it by.</p>
-              <p class="ko">기본 지원금·보너스·숙박비를 각각 저장하고 최종 지급액은 저장하지 않습니다. 생성 열로 계산되게 해, 원본 금액이 바뀌었는데 최종액만 예전 값으로 남는 상황을 없앴습니다.</p>
-              <p class="en">Base, bonus and housing amounts are each stored; the final figure is not. Computing it as a generated column means it can never be left holding a stale value after its components change.</p>
+              <p class="ko">기본 지원금, 보너스, 숙박비를 각각 저장하고 최종 지급액은 생성 열로 계산합니다. 구성 금액을 수정하면 최종 지급액도 함께 갱신됩니다.</p>
+              <p class="en">Base, bonus and housing amounts are stored separately. A stored generated column calculates the total and updates it when the component amounts change.</p>
               <span class="grain">PRIMARY KEY (AthleteID, SigningDate) · FinalStipend GENERATED ALWAYS AS (Base + Bonus − COALESCE(Housing, 0)) STORED</span>
             </div>
 
             <div data-for="SponsorshipPayment" hidden>
               <h4>SponsorshipPayment</h4>
-              <p class="ko">선수가 받은 후원금 기록입니다. 종류는 기업 후원·정부 지원금·개인 기부 세 가지만 허용되도록 CHECK 제약을 걸었습니다.</p>
+              <p class="ko">선수가 받은 후원금 기록입니다. 종류는 기업 후원, 정부 지원금, 개인 기부의 세 가지만 허용되도록 CHECK 제약을 걸었습니다.</p>
               <p class="en">Sponsorship received by an athlete. A CHECK constraint limits the type to corporate sponsorship, government grants or private donations.</p>
               <span class="grain">PRIMARY KEY PaymentID · CHECK PaymentType ∈ (corporate sponsorship, government grants, private donations)</span>
             </div>
 
             <div data-for="Equipment" hidden>
               <h4>Equipment</h4>
-              <p class="ko">장비 기록입니다. 초안에는 이름과 모델만 있었지만 요구사항은 제조사·연식·기계적 상태·상태 등급까지 요구했습니다. 등급은 다섯 값만 허용하도록 제한했고, 사용 가능 여부(good 이상)를 이 값으로 판정합니다.</p>
+              <p class="ko">장비 기록입니다. 초안에는 이름과 모델만 있었지만 요구사항은 제조사, 연식, 기계적 상태, 상태 등급을 요구했습니다. 등급은 다섯 값만 허용하도록 제한했고, 사용 가능 여부(good 이상)를 이 값으로 판정합니다.</p>
               <p class="en">Equipment records. The draft carried only a name and model, where the requirements also called for manufacturer, year, mechanical condition and a condition rating. The rating is restricted to five values, and usability (good or better) is judged from it.</p>
               <p class="ko">선수가 삭제돼도 장비 기록 자체는 남아야 하므로, 외래키를 <code>ON DELETE SET NULL</code>로 두어 소유자만 비우도록 했습니다.</p>
               <p class="en">Equipment should survive the deletion of its owner, so the foreign key is <code>ON DELETE SET NULL</code> — clearing the owner rather than removing the record.</p>
@@ -410,14 +410,14 @@
               <h4>ParticipatesIn</h4>
               <p class="ko">선수와 경기를 잇는 다대다 연결 테이블이며, <b>성적이 여기에 있습니다.</b> 성적은 특정 선수가 그 경기에서 낸 결과이므로, 선수 ID와 경기 ID가 함께 있어야 식별됩니다.</p>
               <p class="en">The many-to-many junction between athletes and trials — and <b>where the result lives</b>. A result belongs to one athlete in one trial, so it takes both identifiers to identify it.</p>
-              <p class="ko">‘하루에 한 경기만 참가’ 규칙은 참가 기록과 경기 날짜를 함께 봐야 판정할 수 있어, 삽입·갱신 시 같은 날짜의 다른 경기 참가 여부를 조회하는 트리거로 구현했습니다.</p>
+              <p class="ko">‘하루에 한 경기만 참가’ 규칙은 참가 기록과 경기 날짜를 함께 봐야 판정할 수 있어, 삽입하거나 갱신할 때 같은 날짜의 다른 경기 참가 여부를 조회하는 트리거로 구현했습니다.</p>
               <p class="en">The one-event-per-day rule can only be judged by reading the participation together with the trial date, so a trigger checks for another trial on the same date on insert and update.</p>
               <span class="grain">PRIMARY KEY (AthleteID, TrialID) · TRIGGER one event per day</span>
             </div>
 
             <div data-for="Wins" hidden>
               <h4>Wins</h4>
-              <p class="ko">경기별 우승자입니다. 기본키를 <b>경기 ID 하나</b>로 두었기 때문에, 한 경기에 우승자가 두 명 등록되는 일이 구조적으로 불가능합니다. 애플리케이션 검사에 맡기지 않고 스키마에서 막았습니다.</p>
+              <p class="ko">경기별 우승자를 저장합니다. 경기 ID를 기본키로 사용해 같은 경기에 우승자가 중복 등록되지 않도록 했습니다.</p>
               <p class="en">The winner of each trial. Because the primary key is <b>the trial ID alone</b>, recording two winners for one trial is structurally impossible — blocked by the schema rather than by an application check.</p>
               <p class="ko">초안에는 이 규칙 자체가 빠져 있었습니다.</p>
               <p class="en">This rule was absent from the draft entirely.</p>
@@ -456,7 +456,7 @@
 
             <div data-for="MedicalPackage" hidden>
               <h4>MedicalPackage</h4>
-              <p class="ko">의료 패키지입니다. 요구사항은 이름과 설명만 명시했으므로 그 두 가지만 두었습니다. 초안에는 요구사항에 없는 PackageID와 Cost가 추가돼 있어 제거했습니다. <b>빠진 것만 찾으면 되는 줄 알았는데, 없던 게 생긴 경우도 있었습니다.</b></p>
+              <p class="ko">의료 패키지의 이름과 설명을 저장합니다. 초안에 추가돼 있던 <code>PackageID</code>와 <code>Cost</code>는 요구사항에 없는 속성이어서 제거했습니다.</p>
               <p class="en">Medical packages. The requirements specify only a name and a description, so only those are here. The draft had added a PackageID and a Cost that no requirement called for — <b>the audit had to catch invented fields as well as missing ones.</b></p>
               <span class="grain">PRIMARY KEY PackageName</span>
             </div>
@@ -469,7 +469,7 @@
     <section id="review" class="rv">
       <div class="sec-head"><h2><span class="ko">스키마 점검</span><span class="en">Schema review</span></h2></div>
       <div class="blk">
-        <p class="ko">조회 기능을 올리기 전에 기존 스키마와 뷰를 먼저 검토했습니다. 같은 뜻인데 두 군데서 다르게 계산되는 값은 없는지, 데이터베이스가 내준 값이 화면까지 가면서 달라지는 데는 없는지 봤습니다. 모두 13건이 나왔고 성격에 따라 세 묶음으로 나눴습니다.</p>
+        <p class="ko">조회 기능을 구현하기 전에 기존 스키마와 뷰를 검토했습니다. 같은 값의 계산 기준이 일치하는지, 조회 결과가 화면에 올바르게 표시되는지 확인했습니다. 발견한 문제 13건을 세 유형으로 나눠 정리했습니다.</p>
         <p class="en">Before building the query layer I reviewed the existing schema and views, looking for places where the same idea was computed two different ways, or where a value the database returned did not survive to the screen. Thirteen findings in total, grouped three ways.</p>
 
         <div class="tbl-wrap">
@@ -544,7 +544,7 @@ last_trial_date  … &lt; CURRENT_DATE</code>
               </div>
             </div>
             <p class="diff-why">
-              <span class="ko">빈 문자열로 대체하면 문자열을 이어붙일 때 쉼표가 연달아 남아, 값이 없다는 사실이 아니라 형식이 깨진 것처럼 보입니다. 없음을 명시적으로 표시하도록 바꿨습니다.</span>
+              <span class="ko">국적이 없는 경우 빈 문자열로 처리하면서 쉼표가 연달아 표시됐습니다. 값이 없다는 것을 알아볼 수 있도록 표시 문구를 수정했습니다.</span>
               <span class="en">Substituting an empty string leaves doubled-up commas once the parts are concatenated, so a missing value reads as broken formatting instead of absence. It now says so explicitly.</span>
             </p>
           </div>
@@ -646,11 +646,11 @@ ORDER BY
     <section id="query" class="rv">
       <div class="sec-head"><h2><span class="ko">조회 계층</span><span class="en">Query layer</span></h2></div>
       <div class="blk">
-        <p class="ko">Python에서 PostgreSQL 저장 함수를 호출해 로그인, 선수별 선발전 요약, 선발전 검색, 참가 등록, 결과 갱신 다섯 기능을 구현했습니다. 여기서도 데이터베이스가 내준 값이 코드와 화면에서 같은 뜻으로 쓰이는지를 계속 봤습니다.</p>
+        <p class="ko">Python에서 PostgreSQL 저장 함수를 호출해 로그인, 선수별 선발전 요약, 선발전 검색, 참가 등록, 결과 갱신의 다섯 기능을 구현했습니다. 조회한 값의 자료형과 화면 표시도 함께 확인했습니다.</p>
         <p class="en">Five functions call PostgreSQL stored functions from Python: login, per-athlete trial summary, trial search, registering a participation, and updating a result. The same standard applied here — whether the value the database returns keeps its meaning in the code and on screen.</p>
 
         <ul class="bul">
-          <li class="ko"><b>결과를 순서가 아니라 컬럼 이름으로 읽도록 바꿨습니다.</b> 처음에는 <code>row[0]</code>, <code>row[1]</code>처럼 위치로 읽고 있어서, 뷰의 컬럼 순서가 바뀌면 조용히 잘못된 값이 들어갑니다. 커서의 컬럼 정보를 이용해 이름으로 매핑하도록 고쳤습니다.</li>
+          <li class="ko"><b>조회 결과를 컬럼 이름으로 읽도록 수정했습니다.</b> <code>row[0]</code>, <code>row[1]</code>처럼 위치로 읽으면 뷰의 컬럼 순서가 바뀔 때 다른 값을 가져올 수 있습니다. 커서의 컬럼 정보를 이용해 이름으로 매핑하도록 변경했습니다.</li>
           <li class="en"><b>Rows are read by column name instead of position.</b> The original code indexed <code>row[0]</code>, <code>row[1]</code> and so on, which silently yields wrong values the moment a view's column order changes. It now maps results by name using the cursor's column metadata.</li>
 
           <li class="ko"><b><code>SELECT *</code>를 명시적인 컬럼 목록으로 바꿨습니다.</b> 같은 이유로, 가져오는 컬럼이 질의문에 드러나 있어야 뷰가 변경될 때 영향 범위를 알 수 있습니다.</li>
