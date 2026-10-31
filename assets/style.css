@@ -472,6 +472,10 @@ figure.fig figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);
 }
 .dgm{display:block;width:100%;min-width:760px;height:auto;font-family:var(--mono)}
 
+.dgm .stage-label text{
+  fill:var(--muted);font-size:10px;letter-spacing:.14em;text-anchor:middle;
+  text-transform:uppercase;
+}
 .dgm .node rect{
   fill:var(--paper);stroke:var(--rule);stroke-width:1.2;rx:3;
   transition:fill .2s,stroke .2s;

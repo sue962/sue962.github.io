@@ -89,6 +89,7 @@
       <ul>
         <li><a href="#why"><span class="ko">개발 배경</span><span class="en">Background</span></a></li>
         <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
+        <li><a href="#arch"><span class="ko">데이터 흐름</span><span class="en">Data flow</span></a></li>
         <li><a href="#grade"><span class="ko">성적 분석과 알림</span><span class="en">Grades &amp; alerts</span></a></li>
         <li><a href="#products"><span class="ko">개발한 프로그램</span><span class="en">Two programs</span></a></li>
         <li><a href="#data"><span class="ko">문항 데이터 구조</span><span class="en">Item data model</span></a></li>
@@ -240,16 +241,227 @@
     </section>
 
 
+
+    <!-- arch -->
+    <section id="arch" class="rv">
+      <div class="sec-head"><h2><span class="ko">데이터가 지나가는 길</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">종이와 스캔 이미지로만 있던 기록이 원장님과 강사가 보는 화면이 되기까지 거치는 단계입니다. 점수나 오답이 들어오면 집계 쪽이 같이 갱신되고, 화면은 그 값을 읽기만 합니다.</p>
+        <p class="en">What it takes for records that existed only on paper and in scans to reach the screen the director and instructors use. A new score or wrong answer updates the aggregates with it; the screen only reads them.</p>
+
+        <div class="dgm-wrap">
+          <p class="dgm-hint">
+            <span class="ko">항목에 마우스를 올리거나 클릭하면 연결된 흐름과 설명이 나타납니다</span>
+            <span class="en">Hover or click a box to trace what flows into it</span>
+          </p>
+
+          <div class="dgm-stage">
+            <svg class="dgm" viewBox="0 0 1000 320" role="img"
+                 aria-label="원천 데이터에서 표준화, 적재 테이블, 집계를 거쳐 화면에 이르는 흐름">
+              <defs>
+                <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                  <path class="arrow" d="M0,1 L9,5 L0,9 z"/>
+                </marker>
+              </defs>
+
+              <g class="stage-label">
+                <text x="90"  y="18">원천</text>
+                <text x="291" y="18">표준화</text>
+                <text x="476" y="18">적재</text>
+                <text x="677" y="18">집계</text>
+                <text x="901" y="18">화면</text>
+              </g>
+              <g class="edge" data-ends="src_img std_name"><path d="M170,77 H193 V113 H210" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="src_img std_img"><path d="M170,77 H193 V235 H210" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="src_rec t_wrong"><path d="M170,179 H292 V127 H408" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="src_rec t_score"><path d="M170,179 H292 V203 H408" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="src_att t_att"><path d="M170,281 H292 V279 H408" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="std_name t_item"><path d="M366,113 H390 V51 H408" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_item a_unit"><path d="M538,51 H562 V127 H580" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_wrong a_unit"><path d="M538,127 H580" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_score a_trend"><path d="M538,203 H562 V51 H580" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_score a_subj"><path d="M538,203 H580" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_att a_att"><path d="M538,279 H580" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="a_trend v_screen"><path d="M768,51 H792 V89 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="a_unit v_screen"><path d="M768,127 H792 V89 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="a_subj v_screen"><path d="M768,203 H792 V89 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="a_att v_screen"><path d="M768,279 H792 V89 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_item v_pdf"><path d="M538,51 H677 V189 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_wrong v_pdf"><path d="M538,127 H677 V189 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="std_img v_pdf"><path d="M366,235 H591 V189 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_score v_sms"><path d="M538,203 H677 V289 H810" marker-end="url(#ar)"/></g>
+              <g class="edge" data-ends="t_att v_sms"><path d="M538,279 H677 V289 H810" marker-end="url(#ar)"/></g>
+              <g class="node" data-node="src_img" tabindex="0" role="button" aria-label="기출 문항 이미지">
+                <rect x="10" y="56" width="160" height="42"/>
+                <text x="90" y="78">기출 문항 이미지</text>
+              </g>
+              <g class="node" data-node="src_rec" tabindex="0" role="button" aria-label="수기 점수 · 오답">
+                <rect x="10" y="158" width="160" height="42"/>
+                <text x="90" y="180">수기 점수 · 오답</text>
+              </g>
+              <g class="node" data-node="src_att" tabindex="0" role="button" aria-label="출결 · 연락처">
+                <rect x="10" y="260" width="160" height="42"/>
+                <text x="90" y="282">출결 · 연락처</text>
+              </g>
+              <g class="node" data-node="std_name" tabindex="0" role="button" aria-label="파일명 규칙">
+                <rect x="216" y="92" width="150" height="42"/>
+                <text x="291" y="114">파일명 규칙</text>
+              </g>
+              <g class="node" data-node="std_img" tabindex="0" role="button" aria-label="이미지 정규화">
+                <rect x="216" y="214" width="150" height="42"/>
+                <text x="291" y="236">이미지 정규화</text>
+              </g>
+              <g class="node" data-node="t_item" tabindex="0" role="button" aria-label="문항">
+                <rect x="414" y="30" width="124" height="42"/>
+                <text x="476" y="52">문항</text>
+              </g>
+              <g class="node" data-node="t_wrong" tabindex="0" role="button" aria-label="오답">
+                <rect x="414" y="106" width="124" height="42"/>
+                <text x="476" y="128">오답</text>
+              </g>
+              <g class="node" data-node="t_score" tabindex="0" role="button" aria-label="성적">
+                <rect x="414" y="182" width="124" height="42"/>
+                <text x="476" y="204">성적</text>
+              </g>
+              <g class="node" data-node="t_att" tabindex="0" role="button" aria-label="출결">
+                <rect x="414" y="258" width="124" height="42"/>
+                <text x="476" y="280">출결</text>
+              </g>
+              <g class="node" data-node="a_trend" tabindex="0" role="button" aria-label="성적 추이 · 경고">
+                <rect x="586" y="30" width="182" height="42"/>
+                <text x="677" y="52">성적 추이 · 경고</text>
+              </g>
+              <g class="node" data-node="a_unit" tabindex="0" role="button" aria-label="단원별 오답">
+                <rect x="586" y="106" width="182" height="42"/>
+                <text x="677" y="128">단원별 오답</text>
+              </g>
+              <g class="node" data-node="a_subj" tabindex="0" role="button" aria-label="과목별 평균">
+                <rect x="586" y="182" width="182" height="42"/>
+                <text x="677" y="204">과목별 평균</text>
+              </g>
+              <g class="node" data-node="a_att" tabindex="0" role="button" aria-label="월별 출석 인원">
+                <rect x="586" y="258" width="182" height="42"/>
+                <text x="677" y="280">월별 출석 인원</text>
+              </g>
+              <g class="node" data-node="v_screen" tabindex="0" role="button" aria-label="원장 · 강사 화면">
+                <rect x="816" y="68" width="170" height="42"/>
+                <text x="901" y="90">원장 · 강사 화면</text>
+              </g>
+              <g class="node" data-node="v_pdf" tabindex="0" role="button" aria-label="맞춤 PDF">
+                <rect x="816" y="168" width="170" height="42"/>
+                <text x="901" y="190">맞춤 PDF</text>
+              </g>
+              <g class="node" data-node="v_sms" tabindex="0" role="button" aria-label="학부모 문자">
+                <rect x="816" y="268" width="170" height="42"/>
+                <text x="901" y="290">학부모 문자</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="dgm-info" aria-live="polite">
+            <p class="idle-card idle">
+              <span class="ko">항목을 선택하면 그 자리에서 무엇을 담고 어떻게 판단하는지 표시됩니다.</span>
+              <span class="en">Select a box to see what it holds and how it is decided.</span>
+            </p>
+
+            <div data-for="src_img" hidden>
+              <h4>기출 문항 이미지</h4>
+              <p class="ko">1994학년도 이후 평가원 기출을 스캔한 이미지입니다. 파일명과 크기, 비율이 제각각이라 그대로는 찾을 수도 배치할 수도 없었습니다.</p>
+              <span class="grain">5,225 문항 · 1994 – 2025</span>
+            </div>
+            <div data-for="src_rec" hidden>
+              <h4>수기 점수 · 오답</h4>
+              <p class="ko">수업이 있는 날마다 본 진단평가 점수와 조교가 손으로 표시하던 오답입니다. 종이로만 남아 있었고 조교와 강사마다 적는 방식이 달랐습니다.</p>
+              <span class="grain">종이 기록 · 작성 규칙 없음</span>
+            </div>
+            <div data-for="src_att" hidden>
+              <h4>출결 · 연락처</h4>
+              <p class="ko">등원 여부와 학부모 연락처입니다. 문자 발송과 월별 출석 집계의 재료가 됩니다.</p>
+              <span class="grain">등원 · 보호자 연락처</span>
+            </div>
+            <div data-for="std_name" hidden>
+              <h4>파일명 규칙</h4>
+              <p class="ko">문항 이미지 파일명을 시험_연도_과목_번호_정답으로 통일했습니다. 파일명만 읽으면 어느 시험 몇 번이고 정답이 뭔지 알 수 있어, 이미지를 열지 않고 조회와 정답 대조가 됩니다.</p>
+              <span class="grain">파일명 = 조회 키 + 정답</span>
+            </div>
+            <div data-for="std_img" hidden>
+              <h4>이미지 정규화</h4>
+              <p class="ko">가로를 240pt로 맞추고 세로를 비율대로 계산합니다. 세로가 가로의 1.47배를 넘으면 아래 칸에 쌓지 않고 옆 칸으로 넘깁니다.</p>
+              <span class="grain">240pt 고정 · 1.47 비율 규칙</span>
+            </div>
+            <div data-for="t_item" hidden>
+              <h4>문항</h4>
+              <p class="ko">시험 구분, 번호, 연도, 과목, 대단원, 중단원, 난이도, 메모를 담습니다. 난이도는 처음 스키마에 없었고 쓰다가 넣었습니다.</p>
+              <span class="grain">파일명을 키로 이미지와 연결</span>
+            </div>
+            <div data-for="t_wrong" hidden>
+              <h4>오답</h4>
+              <p class="ko">학생 × 날짜 × 문항. 첫 오답과 재오답을 나눠 저장합니다. 한 테이블에 섞으면 같은 문제를 두 번 틀린 기록이 한 번으로 세어집니다.</p>
+              <span class="grain">첫 오답 / 재오답 분리</span>
+            </div>
+            <div data-for="t_score" hidden>
+              <h4>성적</h4>
+              <p class="ko">학생 × 시험일 × 점수. 진단평가와 모의평가를 구분하고, 진단평가는 본 시험지의 난이도 단계를 함께 기록합니다. 85점을 넘으면 다음 단계, 넘지 못하면 같은 단계를 다시 보도록 판정합니다.</p>
+              <span class="grain">100점 만점 · 난이도 5단계 · 85점 기준</span>
+            </div>
+            <div data-for="t_att" hidden>
+              <h4>출결</h4>
+              <p class="ko">학생 × 날짜. 등원 여부가 들어오면 월별 집계와 문자 발송이 함께 움직입니다.</p>
+              <span class="grain">학생 × 날짜</span>
+            </div>
+            <div data-for="a_trend" hidden>
+              <h4>성적 추이 · 경고</h4>
+              <p class="ko">학생별 점수를 시험일 순으로 늘어놓고, 직전보다 10점 이상 떨어지면 경고로 표시합니다. 처음에는 5점을 기준으로 잡았다가 현장 의견을 받아 10점으로 바꿨습니다.</p>
+              <span class="grain">직전 대비 10점 이상 하락</span>
+            </div>
+            <div data-for="a_unit" hidden>
+              <h4>단원별 오답</h4>
+              <p class="ko">오답을 문항의 대단원과 중단원으로 묶습니다. 어느 단원에서 반복해 틀리는지 보여줘 강사가 다시 다룰 내용을 정합니다.</p>
+              <span class="grain">대단원 · 중단원 집계</span>
+            </div>
+            <div data-for="a_subj" hidden>
+              <h4>과목별 평균</h4>
+              <p class="ko">최근 60일, 응시 2건 이상인 과목의 평균 점수를 함께 보여줍니다. 평균이 낮은 과목이 먼저 눈에 들어오게 색을 달리했습니다.</p>
+              <span class="grain">60일 · 응시 2건 이상</span>
+            </div>
+            <div data-for="a_att" hidden>
+              <h4>월별 출석 인원</h4>
+              <p class="ko">출결을 월 단위로 묶습니다. 원장님이 학원 전체 흐름을 보는 숫자입니다.</p>
+              <span class="grain">월 단위 인원</span>
+            </div>
+            <div data-for="v_screen" hidden>
+              <h4>원장 · 강사 화면</h4>
+              <p class="ko">분석 결과를 보고서로 넘기지 않고 평소 쓰는 화면에 띄웠습니다. 읽는 사람이 분석가가 아니라 현장 사람이었기 때문입니다. 경고가 뜬 학생은 집중 관리로 넘어갑니다.</p>
+              <span class="grain">집계를 읽기만 함 · 계산은 입력 시점</span>
+            </div>
+            <div data-for="v_pdf" hidden>
+              <h4>맞춤 PDF</h4>
+              <p class="ko">오답 이력과 문항 분류를 연결해 맞춤 문제지, 오답노트, 재오답노트를 만듭니다. 길게는 3일 걸리던 작업이 5분으로 줄었습니다.</p>
+              <span class="grain">문제 · 답지 · 표지 · 생성 기록</span>
+            </div>
+            <div data-for="v_sms" hidden>
+              <h4>학부모 문자</h4>
+              <p class="ko">등원, 숙제 확인, 새 숙제, 시험 점수를 기록하면 학부모님께 일괄 발송됩니다. 결석·보강·시험 결과 등 템플릿을 두고 이름과 날짜를 치환합니다.</p>
+              <span class="grain">템플릿 11종 · 수신 대상 분리</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- grade -->
     <section id="grade" class="rv">
       <div class="sec-head"><h2><span class="ko">성적 분석과 알림</span><span class="en">Grades and alerts</span></h2></div>
       <div class="blk">
-        <p class="ko">학원은 수업이 있는 날마다 진단평가를 봅니다. 그 점수를 학생별로 쌓아 추이를 보여주고, 떨어지는 학생이 원장님과 강사 화면에 먼저 뜨도록 만들었습니다.</p>
+        <p class="ko">학원은 수업이 있는 날마다 진단평가를 봅니다. 그 점수를 학생별로 쌓아 추이를 보여주고, 떨어지는 학생이 원장님과 강사 화면에 먼저 뜨도록 만들었습니다. 다음에 어느 난이도를 봐야 하는지도 점수에서 바로 나옵니다.</p>
         <p class="en">The academy runs a short diagnostic test every lesson day. Those scores accumulate per student, and a student whose score drops surfaces on the director's and instructors' screen before anyone has to go looking.</p>
 
         <ul class="bul">
           <li class="ko"><b>직전 시험보다 10점 이상 떨어지면 경고가 뜹니다.</b> 처음에는 5점을 기준으로 잡았습니다. 강사와 조교로부터 5점은 학생의 당일 상태에 따라 생길 수 있는 작은 오차라는 의견을 받아 10점으로 바꿨습니다. 100점 만점 기준입니다.</li>
           <li class="en"><b>A drop of 10 points or more raises a warning.</b> The first threshold was 5. Instructors and assistants pointed out that 5 points can come from how a student happens to feel that day, so it moved to 10. Out of 100.</li>
+
+          <li class="ko"><b>진단평가는 시험지 난이도를 1단계부터 5단계까지 나눠 기록합니다.</b> 85점을 넘으면 다음 단계로 올라가고, 넘지 못하면 같은 단계를 다시 보도록 화면에 표시합니다. 점수만 보여주면 강사가 매번 다음 시험지를 고르는 판단을 다시 해야 해서, 그 판단까지 화면이 들고 있게 했습니다.</li>
+          <li class="en"><b>Diagnostic tests are graded across five difficulty levels.</b> Above 85 the student moves up a level; below it, the same level comes again, and the screen says which. Showing only the score would leave an instructor deciding the next paper every time, so that decision sits in the screen.</li>
 
           <li class="ko"><b>경고가 뜬 학생은 집중 관리로 넘어갑니다.</b> 원장님이 대상을 확인하고, 강사가 그 학생의 수업 방식과 과제량을 다시 정했습니다. 화면이 판단하는 것이 아니라 사람이 판단할 대상을 좁혀 줍니다.</li>
           <li class="en"><b>A flagged student moves into closer supervision.</b> The director reviews who came up and the instructor adjusts that student's lesson format and workload. The screen does not decide anything; it narrows down who a person needs to look at.</li>
