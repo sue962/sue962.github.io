@@ -55,7 +55,7 @@
         <span>Full-Stack · Data · R&amp;D</span>
       </div>
       <div>
-        <b><span class="ko">CS 석사 2027.02</span><span class="en">M.S. Feb 2027</span></b>
+        <b><span class="ko">CS 석사 2026.11</span><span class="en">M.S. Nov 2026</span></b>
         <span>The University of Sydney</span>
       </div>
     </div>
@@ -134,12 +134,12 @@
       <!-- 2. 증명수학 학습자료 자동화 -->
       <article class="rec">
         <div class="rec-title">
-          <h3><a href="projects/proofmath.html"><span class="ko">맞춤 학습자료 자동화 시스템 (오답노트 · 수능흐름파악)</span><span class="en">Automated Personalized Study-Material System</span></a></h3>
-          <span class="rec-when">2021.03 – 2025.02</span>
+          <h3><a href="projects/proofmath.html"><span class="ko">학원 운영 데이터 시스템 (성적 분석 · 학습자료 자동화)</span><span class="en">Academy Operations Data System</span></a></h3>
+          <span class="rec-when">2022.12 – 2025.02</span>
         </div>
         <p class="rec-lede">
-          <span class="ko">수학 조교와 강사로 일하며 오답노트와 기출 자료를 만드는 프로그램 두 개를 개발했습니다. 학생별로 필요한 문제를 골라 PDF로 출력해 수업에 사용했습니다.</span>
-          <span class="en">Two programs built alone to remove friction I hit myself while teaching, and run in a real academy.</span>
+          <span class="ko">수업마다 보는 진단평가 점수를 학생별로 쌓아 성적이 떨어지는 학생을 먼저 찾아내고, 오답 이력으로 맞춤 학습자료를 자동 생성했습니다.</span>
+          <span class="en">Scores from every lesson accumulate per student so a falling grade surfaces early, and wrong-answer history generates study material automatically.</span>
         </p>
         <div class="rec-cols">
           <dl class="meta">
@@ -149,15 +149,16 @@
             </div>
             <div>
               <dt><span class="ko">역할</span><span class="en">Role</span></dt>
-              <dd><span class="ko">단독 개발 · 문항 데이터 구조 설계 · 풀스택</span><span class="en">Sole developer · item data modeling · full-stack</span></dd>
+              <dd><span class="ko">단독 개발 · 지표 설계 · 데이터 구조 · 풀스택</span><span class="en">Sole developer · metric design · data modeling · full-stack</span></dd>
             </div>
           </dl>
           <div class="rec-body">
-            <p class="ko">1994학년도 이후 수능과 모의고사 문항을 과목, 단원, 연도별로 분류했습니다. 학생의 오답과 학습 이력을 바탕으로 맞춤 PDF와 오답노트를 자동 생성했습니다. 직접 수업에 쓰면서 출력물을 원본과 대조하고 분류 기준과 생성 코드를 수정했습니다. 출결과 성적 관리, 문자 발송 기능도 개발했습니다.</p>
-            <p class="en">Structured national exam and mock-test items from 1994 onward by subject, unit and year, then linked each student's wrong answers and learning history to generate personalized PDFs and error notebooks automatically. Because I used the material myself as a teaching assistant and instructor, I kept checking output against the original items and revised the classification rules and generation logic accordingly. Attendance, grades and SMS notifications were wired in so the system carried real academy operations.</p>
+            <p class="ko">직전 시험보다 10점 이상 떨어진 학생이 원장님과 강사 화면에 경고로 뜨도록 만들었습니다. 처음 5점으로 잡았던 기준은 당일 상태에 따른 오차라는 현장 의견을 받아 10점으로 바꿨습니다. 단원별 오답과 월별 출석 인원도 함께 집계했습니다. 1994학년도 이후 기출 문항을 과목·단원·연도로 분류해 오답 이력과 연결하고 맞춤 PDF를 자동 생성했으며, 출결·성적 기록과 학부모 문자 발송까지 한 웹사이트에 묶었습니다.</p>
+            <p class="en">A student whose score fell 10 or more points from the previous test surfaced as a warning on the director's and instructors' screen. The first threshold was 5 points; instructors pointed out that much can come from how a student feels that day, so it moved to 10. Wrong answers roll up by unit and attendance by month. Past exam items from 1994 onward are classified by subject, unit and year, linked to each student's error history to generate personalised PDFs, with attendance, grades and parent SMS all in one site.</p>
             <ul class="facts">
               <li class="fact"><b>5,225</b><span><span class="ko">데이터화한 기출 문항</span><span class="en">exam items indexed</span></span></li>
-              <li class="fact"><b>32</b><span><span class="ko">학년도 (1994 – 2025)</span><span class="en">years covered</span></span></li>
+              <li class="fact"><b>200+</b><span><span class="ko">누적 학생</span><span class="en">students on record</span></span></li>
+              <li class="fact"><b>3일 → 5분</b><span><span class="ko">오답노트 제작 시간</span><span class="en">notebook build time</span></span></li>
               <li class="fact"><b><span class="ko">2년 2개월</span><span class="en">2 yrs 2 mos</span></b><span><span class="ko">실제 현장 운영</span><span class="en">in production</span></span></li>
             </ul>
             <ul class="stack">
@@ -510,8 +511,8 @@
           <div class="row-main">
             <h3><span class="ko">전공과목 튜터</span><span class="en">Peer tutor, major subjects</span></h3>
             <p class="row-org"><span class="ko">덕성여자대학교</span><span class="en">Duksung Women's University</span></p>
-            <p class="desc ko">C언어, Python, 자료구조 및 알고리즘, Java 튜터로 실습을 지도했습니다. 최우수 튜터 1회, 우수 튜터 2회에 선정됐습니다.</p>
-            <p class="desc en">Tutored C, Python, data structures and algorithms, and Java. Named top tutor once and distinguished tutor twice.</p>
+            <p class="desc ko">C언어, Python, 자료구조 및 알고리즘, Java 튜터로 실습을 지도했습니다. 최우수 튜터로 3회 선정됐습니다.</p>
+            <p class="desc en">Tutored C, Python, data structures and algorithms, and Java. Named top tutor three times.</p>
           </div>
         </li>
         <li class="row">
@@ -560,12 +561,12 @@
       </div>
       <ul class="rows">
         <li class="row">
-          <div class="row-when">2025.02 – 2027.02</div>
+          <div class="row-when">2025.02 – 2026.11</div>
           <div class="row-main">
             <h3>The University of Sydney<span class="tag"><span class="ko">석사 · 졸업예정</span><span class="en">M.S. · expected</span></span></h3>
             <p class="row-org">Master of Computer Science (Advanced Entry) · 72.5 / 100</p>
-            <p class="desc ko">세부전공 Data Science &amp; AI, Software Engineering · DUAL Lab · 지도교수 Nguyen H. Tran<br>연구분야: 연합학습 모델의 설명가능성과 데이터 기반 신뢰성 평가</p>
-            <p class="desc en">Specializations in Data Science &amp; AI and Software Engineering · DUAL Lab · Supervisor Nguyen H. Tran<br>Research: explainability and data-driven reliability of federated learning models</p>
+            <p class="desc ko">세부전공 Data Science &amp; AI, Software Engineering · DUAL Lab · 지도교수 Nguyen H. Tran<br>Sydney International Student Award (Scholarship)<br>연구분야: 연합학습 모델의 설명가능성과 데이터 기반 신뢰성 평가</p>
+            <p class="desc en">Specializations in Data Science &amp; AI and Software Engineering · DUAL Lab · Supervisor Nguyen H. Tran<br>Sydney International Student Award (Scholarship)<br>Research: explainability and data-driven reliability of federated learning models</p>
           </div>
         </li>
         <li class="row">
@@ -573,8 +574,8 @@
           <div class="row-main">
             <h3><span class="ko">덕성여자대학교</span><span class="en">Duksung Women's University</span><span class="tag"><span class="ko">학사 · 졸업</span><span class="en">B.E. · graduated</span></span></h3>
             <p class="row-org"><span class="ko">IT미디어공학과 (주전공) · 수학과 (부전공) · 3.81 / 4.5</span><span class="en">IT Media Engineering (major) · Mathematics (minor) · 3.81 / 4.5</span></p>
-            <p class="desc ko">주전공 3.83 · 부전공 3.65 · 총 이수학점 166</p>
-            <p class="desc en">Major GPA 3.83 · Minor GPA 3.65 · 166 credits</p>
+            <p class="desc ko">주전공 3.83 · 부전공 3.65 · 총 이수학점 166<br>수석 1회 · 차석 1회 · 성적우수장학금 2회</p>
+            <p class="desc en">Major GPA 3.83 · Minor GPA 3.65 · 166 credits<br>Ranked 1st once and 2nd once · two merit scholarships</p>
           </div>
         </li>
       </ul>
@@ -640,7 +641,7 @@
         <li><span class="label">Email</span><a href="mailto:sueit962@gmail.com">sueit962@gmail.com</a></li>
         <li><span class="label">GitHub</span><a href="https://github.com/sue962" target="_blank" rel="noopener">github.com/sue962</a></li>
         <li><span class="label">Location</span><span class="val">Sydney, AU → Seoul, KR</span></li>
-        <li><span class="label">Available</span><span class="val"><span class="ko">2026.12 귀국 · 2027.02 석사 졸업</span><span class="en">Dec 2026 (returning) · M.S. Feb 2027</span></span></li>
+        <li><span class="label">Available</span><span class="val"><span class="ko">2026.11 석사 졸업 · 2026.12 귀국</span><span class="en">M.S. Nov 2026 · returning Dec 2026</span></span></li>
       </ul>
     </section>
 

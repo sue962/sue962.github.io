@@ -88,6 +88,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#data"><span class="ko">수집하는 데이터</span><span class="en">What is collected</span></a></li>
         <li><a href="#design"><span class="ko">설계 결정</span><span class="en">Design decisions</span></a></li>
         <li><a href="#ops"><span class="ko">서버와 배포</span><span class="en">Server &amp; release</span></a></li>
@@ -108,6 +109,129 @@
           <span class="ko">SwiftUI로 iOS 앱을 개발하고 PHP 8로 API를 구현했습니다. MySQL과 MariaDB로 데이터베이스를 설계하고, AWS 웹 서버와 RDS를 설정해 개발 환경을 운영했습니다. 앱은 TestFlight로 배포했습니다.</span>
           <span class="en">I built the SwiftUI iOS app and the PHP 8 API, designed the database on MySQL and MariaDB, set up the web server and RDS environment on AWS to run the development server, and released the app through TestFlight.</span>
         </p>
+      </div>
+    </section>
+
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">참여자가 2주 동안 매일 답하는 연구에서, 응답이 나중에 분석 가능한 형태로 남기까지의 순서입니다. 같은 사람이 같은 문항에 여러 번 답하는 구조가 설계의 출발점이었습니다.</p>
+        <p class="en">In a study where participants answer daily for two weeks, what it took for a response to remain analysable afterwards. The starting point was that the same person answers the same item many times.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">연구 요건</span><span class="en">Design</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">반복 측정 연구</span><span class="en">A repeated-measures study</span></span>
+                <span class="flow-m">자해 위험도 예측</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">수집 주기</span><span class="en">Cadence</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">세 종류를 다른 주기로</span><span class="en">Three types, three cadences</span></span>
+                <span class="flow-m">시작·종료 / 매일 14일 / 생체</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">저장 구조</span><span class="en">Model</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">응답에 시점을 붙여 저장</span><span class="en">Store the response with its moment</span></span>
+                <span class="flow-m">참여자 · 문항 · 응답 시점</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">규칙 강제</span><span class="en">Rules</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">하루 한 번은 서버가 확인</span><span class="en">The server enforces once a day</span></span>
+                <span class="flow-m">중복 등록 차단</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">앱 · API</span><span class="en">Build</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">수집 화면과 서버 구현</span><span class="en">Build the screens and the API</span></span>
+                <span class="flow-m">85 views · 66 endpoints</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ph6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">운영 · 배포</span><span class="en">Release</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">실제 기기에서 확인</span><span class="en">Verify on real devices</span></span>
+                <span class="flow-m">AWS RDS · TestFlight</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="ph1">
+              <h4>연구 요건</h4>
+              <p class="ko">한국연구재단 일반공동연구 지원사업 국가연구과제에 학부연구생으로 참여했습니다. 자해위험군의 생체정보와 설문 데이터를 합쳐 위험도를 예측하는 연구였고, 저는 데이터를 모으는 앱과 서버를 맡았습니다.</p>
+              <p class="en">I joined a national research project funded by the NRF Korea as an undergraduate researcher. The study combined biometric and survey data to predict self-harm risk, and my part was the app and server that collect the data.</p>
+              <span class="grain">한국연구재단 일반공동연구 · 학부연구생 · 앱 · 서버 담당</span>
+            </div>
+
+            <div data-step-for="ph2" hidden>
+              <h4>수집 주기</h4>
+              <p class="ko">참여자별로 설문과 일일 기록, 생체정보를 서로 다른 주기로 수집합니다. 사전과 사후 설문은 연구 시작과 종료 시점에 받아 참여 전후를 비교하는 기준으로 쓰고, 일일 기록은 14일 동안 매일 받습니다. 일일 기록은 그날의 상태를 당일에 적는 값이라 나중에 돌이켜 적는 응답과 다릅니다.</p>
+              <p class="en">Surveys, daily entries and biometric readings are collected on different cadences. Pre and post surveys bracket the study as the baseline for before-and-after comparison, and daily entries run every day for 14 days. A daily entry records that day's state on the day itself, which is a different value from one reconstructed later.</p>
+              <span class="grain">사전·사후 설문 · 일일 기록 14일 · 생체정보</span>
+            </div>
+
+            <div data-step-for="ph3" hidden>
+              <h4>저장 구조</h4>
+              <p class="ko">같은 참여자가 같은 문항에 여러 번 답하는 연구여서, 응답만 저장하면 어느 날 몇 번째 응답인지 구분되지 않습니다. 각 응답에 참여자와 문항, 응답 시점을 함께 저장했습니다. 나중에 같은 시점의 설문과 생체정보를 맞춰 비교할 수 있도록 수집 시각을 기준으로 삼았습니다.</p>
+              <p class="en">Because the same participant answers the same item repeatedly, storing only the answer makes it impossible to say which day or which round it came from. Participant, item and timestamp are recorded together with every response, and the collection time is what later allows a survey entry and a biometric reading from the same moment to be lined up.</p>
+              <span class="grain">응답 = 참여자 + 문항 + 시점</span>
+            </div>
+
+            <div data-step-for="ph4" hidden>
+              <h4>규칙 강제</h4>
+              <p class="ko">일일 기록은 하루에 한 번만 등록되도록 서버에서 확인했습니다. 앱 화면에서만 막으면 재설치나 요청 재전송으로 같은 날 기록이 두 번 들어갈 수 있고, 그러면 14일 연속 기록이라는 전제가 깨집니다.</p>
+              <p class="en">The once-a-day rule for daily entries is checked on the server. Blocking it only in the app leaves reinstallation or a resent request able to file two entries for the same day, which breaks the premise that the series is 14 consecutive days.</p>
+              <span class="grain">서버에서 일일 중복 차단 · 14일 연속 기록 유지</span>
+            </div>
+
+            <div data-step-for="ph5" hidden>
+              <h4>앱 · API</h4>
+              <p class="ko">SwiftUI로 화면 85개를 만들고 PHP 8 API 엔드포인트 66개를 구현했습니다. 설문과 일일 기록, 생체정보가 각각 다른 주기로 들어오므로 저장 경로도 나눠 두었습니다.</p>
+              <p class="en">85 SwiftUI views and 66 PHP 8 API endpoints. Surveys, daily entries and biometric readings arrive on separate cadences, so their write paths are kept separate too.</p>
+              <span class="grain">SwiftUI 85 views · PHP 8 · 66 endpoints</span>
+            </div>
+
+            <div data-step-for="ph6" hidden>
+              <h4>운영 · 배포</h4>
+              <p class="ko">AWS에 서버와 RDS를 설정해 직접 운영하고, TestFlight로 배포해 연구진의 아이폰에서 동작을 확인했습니다. 연구 참여자에게 나가기 전에 실제 기기에서 수집이 끊기지 않는지 먼저 봐야 했습니다.</p>
+              <p class="en">The server and RDS on AWS were set up and operated by me, and the build was distributed through TestFlight so the research team could check it on their own iPhones. Collection had to be shown unbroken on real devices before it reached participants.</p>
+              <span class="grain">AWS EC2 · RDS · TestFlight 배포</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

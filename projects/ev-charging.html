@@ -101,6 +101,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#source"><span class="ko">원본 상태</span><span class="en">The source</span></a></li>
         <li><a href="#cleaning"><span class="ko">정제</span><span class="en">Cleaning</span></a></li>
         <li><a href="#judgment"><span class="ko">판단 기준</span><span class="en">Judgment</span></a></li>
@@ -118,11 +119,134 @@
       <div class="sec-head"><h2><span class="ko">담당 범위</span><span class="en">Scope</span></h2></div>
       <div class="blk">
         <p class="note">
-          <span class="ko">데이터 수집, 정제, 공간 결합, 데이터베이스 설계를 맡았습니다. 이 페이지에는 제가 수행한 작업을 정리했습니다. 외부 출처를 이용한 속성 증강은 담당 범위에 포함되지 않습니다.</span>
+          <span class="ko">데이터 수집, 정제, 공간 결합, 데이터베이스 설계를 맡았습니다. 이 페이지에는 제가 맡은 작업을 정리했습니다. 외부 출처를 이용한 속성 증강은 담당 범위에 포함되지 않습니다.</span>
           <span class="en">My scope was retrieval, cleaning, spatial integration and database design. Attribute augmentation from external sources sat outside my part; everything on this page is work I did myself.</span>
         </p>
         <p class="ko">결과물은 NSW 전역 충전소 1,939건이 SA4 통계 지역에 배정된 상태로 들어 있는 DuckDB 데이터베이스입니다. 스키마는 DDL로 다시 만들 수 있고, 공간 질의는 Spatial 확장을 사용합니다.</p>
         <p class="en">The output is a DuckDB database holding 1,939 NSW charging-station records, each assigned to an SA4 statistical area. The schema can be rebuilt from DDL, and spatial queries run on the Spatial extension.</p>
+      </div>
+    </section>
+
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">두 기관의 공개 데이터가 조회 가능한 데이터베이스가 되기까지 거친 순서입니다. 각 단계에서 무엇을 확인했고 고치지 않기로 한 것은 무엇인지 함께 적었습니다.</p>
+        <p class="en">How two public datasets became one queryable database, and what was deliberately left uncorrected along the way.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">원천 데이터</span><span class="en">Source</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">두 기관에서 수집</span><span class="en">Retrieve from two agencies</span></span>
+                <span class="flow-m">1,958 rows · 2 sources</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">정제·가공</span><span class="en">Clean</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">컬럼 세 곳의 오류 분리</span><span class="en">Separate three broken columns</span></span>
+                <span class="flow-m">타입/상태 혼입 98 · 우편번호 오류 156</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">판단 기준</span><span class="en">Judgment</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">근거 없으면 고치지 않음</span><span class="en">No evidence, no correction</span></span>
+                <span class="flow-m">16/17 병합 · 25 플래그 보존</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">공간 결합</span><span class="en">Spatial join</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">SA4 경계에 배정</span><span class="en">Assign to SA4 boundaries</span></span>
+                <span class="flow-m">1,938 within · 1 nearest</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">데이터 구조</span><span class="en">Model</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">반복되는 값을 테이블로 분리</span><span class="en">Lift repeated values into tables</span></span>
+                <span class="flow-m">8 tables · 41 operators · 13 aliases</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ev6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">정합성 검증</span><span class="en">Verify</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">데이터베이스가 직접 강제</span><span class="en">Enforced by the database</span></span>
+                <span class="flow-m">CHECK 제약 · 적재 후 재확인</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="ev1">
+              <h4>원천 데이터</h4>
+              <p class="ko">NSW 교통부의 충전소 위치와 호주 통계청의 SA4 행정경계(2026)를 Python으로 수집했습니다. 두 자료는 식별자도 좌표 표기도 서로 달라서, 합치기 전에 각 컬럼이 실제로 무엇을 담고 있는지부터 확인했습니다.</p>
+              <p class="en">Charging-station locations from Transport for NSW and SA4 administrative boundaries (2026) from the ABS, collected with Python. The two sources share no identifier and record coordinates differently, so the first task was establishing what each column actually contained.</p>
+              <span class="grain">Transport for NSW · ABS SA4 2026 · 1,958 rows</span>
+            </div>
+
+            <div data-step-for="ev2" hidden>
+              <h4>정제·가공</h4>
+              <p class="ko">Charger_Type에 충전기 종류가 아닌 운영 상태 Upcoming 98행이 섞여 있었습니다. 종류와 상태를 별도 컬럼으로 나눴습니다. Charger_rating은 2x350kW처럼 여러 출력이 한 문자열에 들어가거나 숫자 대신 AC가 적혀 있어, 최고 출력만 수치로 뽑고 원본 문자열은 그대로 남겼습니다. 우편번호는 공백 121행, 주 이름이 붙은 10행, 주소와 어긋난 25행으로 세 가지가 동시에 깨져 있었습니다.</p>
+              <p class="en">Charger_Type held 98 rows reading Upcoming, which is a status rather than a type, so type and status were split into separate columns. Charger_rating packed several outputs into one string such as 2x350kW, or carried the word AC instead of a figure; the highest output was extracted as a number while the original string was kept. Postcodes were broken three ways at once: 121 blank, 10 carrying a state name, 25 disagreeing with the address.</p>
+              <span class="grain">타입 혼입 98 · 자유 문자열 1,425 복구 · 우편번호 121 + 10 + 25</span>
+            </div>
+
+            <div data-step-for="ev3" hidden>
+              <h4>판단 기준</h4>
+              <p class="ko">운영사명과 종류, 좌표 5자리로 37행 17그룹을 중복 후보로 잡았지만, 역 이름이 서로 모순되지 않을 때만 병합했습니다. 빈 이름은 모순으로 보지 않았고, 이름이 충돌한 1그룹은 합치지 않고 남겨 16그룹만 병합했습니다. 주소와 어긋난 우편번호 25행은 어느 쪽이 맞는지 판단할 근거가 없어 고치지 않고 location_conflict로 표시했습니다. 역 이름 1,438행은 비어 있는 채로 두었습니다.</p>
+              <p class="en">Normalised operator names, cleaned types and coordinates rounded to five decimals flagged 37 rows in 17 groups as duplicate candidates, but a group was merged only when station names did not contradict each other. A blank name was not treated as a contradiction; the one group with conflicting names was left unmerged, so 16 groups merged. The 25 postcodes disagreeing with their address were not corrected but marked location_conflict, and 1,438 blank station names were left blank.</p>
+              <span class="grain">병합 16/17 그룹 · 19행 제거 · location_conflict 25 · 미보정 1,438</span>
+            </div>
+
+            <div data-step-for="ev4" hidden>
+              <h4>공간 결합</h4>
+              <p class="ko">GeoPandas로 좌표를 SA4 경계에 매칭했습니다. 1,938건은 경계 안에 들어갔고 1건만 포함되는 경계가 없어 최근접으로 배정했습니다. 경계 안쪽 점 중 가장 가까운 것도 경계에서 8.8m 떨어져 있어, 배정이 경계선 위의 우연이 아님을 확인했습니다.</p>
+              <p class="en">Coordinates were matched to SA4 boundaries with GeoPandas. 1,938 fell inside a boundary; the single point with no containing boundary was assigned to its nearest. The closest inside point still sits 8.8 m from its boundary, confirming the assignment does not hinge on borderline cases.</p>
+              <span class="grain">within 1,938 · nearest 1 · 최소 경계거리 8.8 m</span>
+            </div>
+
+            <div data-step-for="ev5" hidden>
+              <h4>데이터 구조</h4>
+              <p class="ko">운영사 41개를 충전소 행마다 반복하지 않도록 별도 테이블로 분리하고, 원본의 서로 다른 표기 13건을 정제된 이름에 연결하는 별칭 테이블을 두었습니다. 매핑을 코드가 아니라 테이블에 둔 덕분에 이후 단계도 같은 이름으로 조회됩니다.</p>
+              <p class="en">The 41 operator names were lifted into their own table so operator details are not repeated on every charger row, with an alias table linking 13 original spellings to their cleaned names. Keeping the mapping in a table rather than in code means later stages resolve to the same names.</p>
+              <span class="grain">operators 41 · operator_aliases 13 · chargers 1,939</span>
+            </div>
+
+            <div data-step-for="ev6" hidden>
+              <h4>정합성 검증</h4>
+              <p class="ko">좌표 범위, 충전기 종류와 상태의 허용값, 양수 출력값, 네 자리 우편번호 형식을 적재 코드가 아니라 스키마의 CHECK 제약으로 걸었습니다. 좌표계는 타입 주석이 아닌 별도 컬럼에 저장해 데이터베이스를 다시 열었을 때도 확인됩니다. 적재 후 검증에서 공간 조인 결과 1,938 within과 1 nearest가 데이터베이스 안에서도 그대로 재현되는지 다시 확인했습니다.</p>
+              <p class="en">Coordinate ranges, allowed values for type and status, finite positive power figures and the four-digit postcode format are CHECK constraints in the schema, enforced by the database rather than by the loading code. The CRS is held in its own column so it survives reopening the database. Post-load validation re-checks that 1,938 within and one nearest reproduce inside the database.</p>
+              <span class="grain">CHECK 제약 · CRS 컬럼 · R-tree 인덱스 2 · 정제 로그로 전 수치 추적</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -230,7 +354,7 @@
       <div class="sec-head"><h2><span class="ko">공간 결합</span><span class="en">Spatial integration</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko">원본에 좌표의 측지계가 명시돼 있지 않아 ABS 경계와 같은 GDA2020(EPSG:7844)을 가정했습니다. 확인된 정보가 아니라는 점을 문서에 명시했습니다.</li>
+          <li class="ko">원본에 좌표의 측지계가 명시돼 있지 않아 ABS 경계와 같은 GDA2020(EPSG:7844)을 가정했습니다. 확인된 정보가 아니라고 문서에 적어 두었습니다.</li>
           <li class="en">The source never states the datum of its coordinates, so I <b>assumed GDA2020 (EPSG:7844) to match the ABS boundaries and recorded that as an assumption</b> — keeping what was verified separate from what was assumed.</li>
 
           <li class="ko">경계에 걸친 점이 두 지역에 중복 배정되지 않도록 <code>intersects</code> 대신 <code>within</code>으로 먼저 배정하고, 포함되지 않은 점만 100m 이내 최근접 SA4를 찾아 <code>nearest</code>로 표시했습니다. 거리는 MGA zone 55(EPSG:7855)에서 계산했습니다.</li>

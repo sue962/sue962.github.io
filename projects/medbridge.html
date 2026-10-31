@@ -154,7 +154,123 @@
     <section id="pipeline" class="rv">
       <div class="sec-head"><h2><span class="ko">처리 흐름</span><span class="en">Pipeline</span></h2></div>
       <div class="blk">
-        <p class="ko">번역 후 역번역과 모호성 검사를 수행합니다. 검사에서 위험도가 기준을 넘으면 다시 번역합니다.</p>
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">원문 수집</span><span class="en">Source</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">실제 복약지시 수집</span><span class="en">Collect real instructions</span></span>
+                <span class="flow-m">30건 · openFDA · TGA</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">판정 기준</span><span class="en">Criteria</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">오해 패턴 12가지 정의</span><span class="en">Define twelve misreading patterns</span></span>
+                <span class="flow-m">실제 복약 오류에서 추출</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">번역</span><span class="en">Translate</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">약품 맥락을 찾아 번역</span><span class="en">Retrieve drug context, then translate</span></span>
+                <span class="flow-m">1 · 2단계 · RAG</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">역번역</span><span class="en">Back-translate</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">의미가 남았는지 확인</span><span class="en">Check what survived</span></span>
+                <span class="flow-m">3단계</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">모호성 점검</span><span class="en">Check</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">12패턴으로 위험도 판정</span><span class="en">Score risk against the patterns</span></span>
+                <span class="flow-m">4단계 · 기준 초과 10건</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mb6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">재번역·출력</span><span class="en">Re-translate</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">되돌아가 다시 번역</span><span class="en">Send it back, then publish</span></span>
+                <span class="flow-m">5 · 6단계 · 17 → 30</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="mb1">
+              <h4>원문 수집</h4>
+              <p class="ko">호주 TGA와 미국 openFDA에서 실제 복약지시 30건을 모았습니다. 지어낸 예문이 아니라 실제로 환자에게 전달되는 문장을 기준으로 삼아야 누락이 어디서 생기는지 확인할 수 있기 때문입니다.</p>
+              <p class="en">Thirty real medication instructions were collected from Australia's TGA and the US openFDA. Using sentences that actually reach patients, rather than invented examples, is what makes it possible to see where information goes missing.</p>
+              <span class="grain">openFDA · TGA · 30건</span>
+            </div>
+
+            <div data-step-for="mb2" hidden>
+              <h4>판정 기준</h4>
+              <p class="ko">실제 복약 오류에서 반복되는 오해를 12가지 패턴으로 정리했습니다. 복용 간격, 하루 최대량, 복용 시점처럼 빠지면 위험한 항목을 기준으로 삼았습니다. 예를 들어 1정에 반응 없으면 2정 가능이라는 문장이 안 들으면 2정으로 번역되면 평소 복용량이 2정으로 읽힙니다. 이런 경우를 패턴으로 등록해 두고 일반 번역과 같은 기준으로 비교했습니다.</p>
+              <p class="en">Twelve recurring misreadings were distilled from real medication errors, anchored on the details that are dangerous when lost: dosing interval, daily maximum, timing. For instance, may take 2 if 1 is ineffective, rendered as take 2 if it doesn't work, reads as a standing dose of two. Cases like this were registered as patterns so plain translation and MedBridge could be scored the same way.</p>
+              <span class="grain">12 패턴 · 복용 간격 · 하루 최대량 · 복용 시점</span>
+            </div>
+
+            <div data-step-for="mb3" hidden>
+              <h4>번역</h4>
+              <p class="ko">번역 전에 해당 약품의 맥락을 검색해 함께 제공합니다(1단계). 그 맥락과 함께 목표 언어로 번역합니다(2단계). 문장만 보고 옮기면 약품별로 다른 복용 조건이 반영되지 않기 때문입니다.</p>
+              <p class="en">Before translating, context for the drug is retrieved and supplied alongside the text (stage 1), and the translation into the target language is produced with that context (stage 2). Translating the sentence alone does not carry the dosing conditions that differ by drug.</p>
+              <span class="grain">1 · RAG 약품 맥락 검색 → 2 · 번역</span>
+            </div>
+
+            <div data-step-for="mb4" hidden>
+              <h4>역번역</h4>
+              <p class="ko">번역문을 다시 원래 언어로 되돌려 원문과 비교합니다(3단계). 번역문이 자연스럽게 읽히는 것과 조건이 남아 있는 것은 다른 문제라서, 읽기만 해서는 무엇이 빠졌는지 드러나지 않습니다.</p>
+              <p class="en">The translation is rendered back into the original language and compared with the source (stage 3). Reading fluently and retaining the conditions are separate properties, and reading alone does not reveal what dropped out.</p>
+              <span class="grain">3 · 역번역 후 원문 대조</span>
+            </div>
+
+            <div data-step-for="mb5" hidden>
+              <h4>모호성 점검</h4>
+              <p class="ko">역번역 결과를 12개 패턴에 대어 모호성과 위험도를 점검합니다(4단계). 기준을 넘으면 그대로 내보내지 않고 2단계로 되돌립니다. 30건 가운데 10건이 이 조건에 걸렸습니다.</p>
+              <p class="en">The back-translation is scored for ambiguity and risk against the twelve patterns (stage 4). Anything above the threshold is not shipped but sent back to stage 2. Ten of the thirty crossed it.</p>
+              <span class="grain">4 · 12 패턴 판정 · 30건 중 10건 기준 초과</span>
+            </div>
+
+            <div data-step-for="mb6" hidden>
+              <h4>재번역·출력</h4>
+              <p class="ko">기준을 넘은 건은 2단계로 돌아가 다시 번역하고(5단계), 최종 번역문과 위험 표시를 함께 출력합니다(6단계). 같은 30건을 같은 기준으로 비교했을 때 모호성이 해소된 건수가 17건에서 30건으로 달라졌습니다.</p>
+              <p class="en">Items over the threshold return to stage 2 for another pass (stage 5), and the final translation is published together with its risk flags (stage 6). Scored the same way over the same thirty instructions, resolved ambiguity moved from 17 to 30.</p>
+              <span class="grain">5 · 재번역 10건 · 6 · 출력 + 위험 표시 · 모호성 해소 17 → 30</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="blk">
+        <p class="ko">번역 후 역번역과 모호성 검사를 거칩니다. 검사에서 위험도가 기준을 넘으면 다시 번역합니다.</p>
         <p class="en">Rather than translating once and stopping, the flow adds steps that check the result, and re-translates on the spot when the risk score crosses the threshold.</p>
 
         <div class="viz">
@@ -300,7 +416,7 @@
           <li class="ko"><b>평가 대상은 복약지시 30건입니다.</b> 두 방식의 번역 결과를 비교하고 안전성 관련 주석을 달았습니다. 이 결과만으로 실제 복약 상황에서의 안전성을 보장할 수는 없습니다.</li>
           <li class="en"><b>This is a 30-item case study.</b> Not a large-scale benchmark — the outputs of two methods on thirty real instructions, annotated for safety. These figures cannot establish that the system is safe in use.</li>
 
-          <li class="ko"><b>정답 번역은 원어민 팀원이 검토했습니다.</b> 사람이 판단하는 과정이 포함됐으며, 독립적인 자동 평가는 수행하지 못했습니다.</li>
+          <li class="ko"><b>정답 번역은 원어민 팀원이 검토했습니다.</b> 사람이 판단하는 과정이 포함됐으며, 독립적인 자동 평가는 하지 못했습니다.</li>
           <li class="en"><b>Native-speaking team members reviewed the reference translations.</b> The evaluation included human judgement; an independent automated evaluation was not performed.</li>
 
           <li class="ko"><b>한국어와 중국어를 평가했습니다.</b> 두 언어의 원어민 팀원이 정답을 확인했습니다. 다른 언어로 확대하려면 해당 언어의 번역 결과를 검증해야 합니다.</li>

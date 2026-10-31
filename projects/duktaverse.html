@@ -88,6 +88,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#problem"><span class="ko">통합의 문제</span><span class="en">The integration problem</span></a></li>
         <li><a href="#design"><span class="ko">서버 · DB 설계</span><span class="en">Server &amp; database</span></a></li>
         <li><a href="#lead"><span class="ko">팀 운영</span><span class="en">Running the team</span></a></li>
@@ -112,6 +113,129 @@
       </div>
     </section>
 
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">따로 만든 다섯 기능이 하나의 공연장에서 동시에 돌아가기까지의 순서입니다. 개별 테스트를 통과한 기능도 같이 켜면 달라졌습니다.</p>
+        <p class="en">How five separately built subsystems came to run at once inside one venue. Passing its own test did not mean a feature survived being switched on with the others.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">기능 분리</span><span class="en">Subsystems</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">다섯 영역으로 나눔</span><span class="en">Five areas to integrate</span></span>
+                <span class="flow-m">회원 · 예약 · 접속 · 음성 · 영상</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">저장소 분리</span><span class="en">Stores</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">역할에 따라 나눠 둠</span><span class="en">Split by what each is for</span></span>
+                <span class="flow-m">MySQL / Photon</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">식별자 연결</span><span class="en">Identity</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">같은 사람으로 인식시키기</span><span class="en">Make both servers agree</span></span>
+                <span class="flow-m">인증 번호 전달</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">통합 테스트</span><span class="en">Integration</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">다섯 기능을 동시에</span><span class="en">Switch all five on at once</span></span>
+                <span class="flow-m">개별 통과 ≠ 동시 통과</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">지연 조정</span><span class="en">Tuning</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">음성과 영상이 겹치는 구간</span><span class="en">Where voice meets video</span></span>
+                <span class="flow-m">서버 역할 · 통신 경로</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="dv6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">결과</span><span class="en">Outcome</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">출품과 논문</span><span class="en">Competition and paper</span></span>
+                <span class="flow-m">장관상 금상 · ACK 2022</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="dv1">
+              <h4>기능 분리</h4>
+              <p class="ko">회원가입, 공연 예약, 실시간 접속, 음성 및 텍스트 대화, 영상 송출의 다섯 기능을 연결하는 플랫폼입니다. 코로나로 대학 행사가 취소되거나 온라인으로 바뀌던 시기에, 관객이 영상을 보면서 서로 대화하고 참여할 수 있는 공연장을 만들고자 했습니다. 저는 팀장으로 기획과 일정 관리, 시스템 설계를 맡고 서버와 백엔드, 데이터베이스를 구현했습니다.</p>
+              <p class="en">The platform ties together five subsystems: sign-up, performance booking, live presence, voice and text chat, and video streaming. It began while university events were being cancelled or moved online, with the aim of a venue where an audience could watch together and still talk to each other. As team lead I owned planning, scheduling and system design, and built the server, backend and database.</p>
+              <span class="grain">5개 기능 영역 · 9개월 (기획 – 발표)</span>
+            </div>
+
+            <div data-step-for="dv2" hidden>
+              <h4>저장소 분리</h4>
+              <p class="ko">회원 정보와 공연 예약은 MySQL에서 관리하고, 실시간 접속과 채팅은 Photon Server에서 처리했습니다. 영구 보관이 필요한 데이터와 접속 중에만 유지되는 상태는 성격이 다릅니다. 화면과 기능에 필요한 정보를 정리해 ERD를 작성하고 각 기능에서 무엇을 저장하고 조회할지 정한 뒤 데이터베이스를 만들었습니다.</p>
+              <p class="en">Accounts and bookings live in MySQL while live presence and chat run on Photon Server, because data that must persist and state that exists only during a session are different things. An ERD was drawn from what the screens and features actually needed, and the database was built after deciding what each feature writes and reads.</p>
+              <span class="grain">MySQL 계정·예약 · Photon 접속·채팅</span>
+            </div>
+
+            <div data-step-for="dv3" hidden>
+              <h4>식별자 연결</h4>
+              <p class="ko">두 서버가 같은 사용자를 같은 사람으로 인식해야 했습니다. 인증된 사용자의 식별 번호를 Photon에 전달해 로그인 계정과 가상 공간의 사용자를 연결했고, 채팅에서는 데이터베이스에 저장된 학번으로 발화자를 구분했습니다. 공연 예약도 같은 데이터베이스를 거쳐, 공연장에 들어갈 때 그 기록을 불러와 공연자와 관객을 구분합니다.</p>
+              <p class="en">Both servers had to recognise the same user as the same person. An authenticated user's identifier is carried into Photon, linking the login account to the avatar in the space, and chat distinguishes speakers by the student number held in the database. Bookings pass through the same database, and entering the venue loads that record to separate performers from audience.</p>
+              <span class="grain">인증 식별 번호 → Photon · 학번으로 발화자 구분</span>
+            </div>
+
+            <div data-step-for="dv4" hidden>
+              <h4>통합 테스트</h4>
+              <p class="ko">개별 테스트에서 정상 작동하던 기능도 함께 실행하면 지연과 끊김이 생겼습니다. 기능별 동작을 확인한 뒤 실제 사용 순서대로 접속, 대화, 영상 관람을 이어서 해보며 연동 문제를 점검했습니다.</p>
+              <p class="en">Features that behaved in isolation produced lag and dropouts once they ran together. After checking each on its own, the sequence was exercised in the order a real user follows: join, talk, watch, with integration problems caught along the way.</p>
+              <span class="grain">5개 동시 실행 · 실제 사용 순서로 점검</span>
+            </div>
+
+            <div data-step-for="dv5" hidden>
+              <h4>지연 조정</h4>
+              <p class="ko">음성 채팅과 영상 송출을 함께 실행하면 지연이 발생했습니다. 각 서버의 역할과 통신 경로를 확인하며 지연과 끊김이 생기는 부분을 조정했습니다.</p>
+              <p class="en">Running voice chat alongside video streaming introduced lag. Working through each server's role and the communication paths between them isolated where the delay and the dropouts were coming from, and those points were adjusted.</p>
+              <span class="grain">음성 + 영상 동시 구간 조정</span>
+            </div>
+
+            <div data-step-for="dv6" hidden>
+              <h4>결과</h4>
+              <p class="ko">학부 졸업프로젝트로 시작해 이브와 ICT멘토링 공모전에 출품했습니다. 과학기술정보통신부장관상 금상과 한국정보처리학회장상 최우수상을 받았고, ACK 2022 학술발표대회에 제1저자 논문으로 실렸습니다.</p>
+              <p class="en">Begun as an undergraduate capstone and entered into the EVEWA ICT Mentoring competition. It received the Gold Award from the Minister of Science and ICT and the Grand Prize from the President of KIPS, and was published as a first-author paper at ACK 2022.</p>
+              <span class="grain">장관상 금상 · KIPS 최우수상 · ACK 2022 제1저자</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- problem -->
     <section id="problem" class="rv">
       <div class="sec-head"><h2><span class="ko">통합의 문제</span><span class="en">The integration problem</span></h2></div>
@@ -126,7 +250,7 @@
           <li class="ko"><b>음성 채팅과 영상 송출을 함께 실행하면 지연이 생겼습니다.</b> 각 서버의 역할과 통신 경로를 확인하며 지연과 끊김이 발생하는 부분을 조정했습니다.</li>
           <li class="en"><b>Voice and video competed for the same path.</b> Running voice chat and video streaming together introduced lag and dropouts, so I worked through what each server was responsible for and which route each stream took, adjusting as I went.</li>
 
-          <li class="ko"><b>다섯 기능을 동시에 켜고 테스트했습니다.</b> 개별 기능의 동작을 확인한 뒤 실제 사용 순서대로 접속, 대화, 영상 관람을 진행하며 연동 문제를 점검했습니다.</li>
+          <li class="ko"><b>다섯 기능을 동시에 켜고 테스트했습니다.</b> 개별 기능의 동작을 확인한 뒤 실제 사용 순서대로 접속, 대화, 영상 관람을 이어가며 연동 문제를 점검했습니다.</li>
           <li class="en"><b>Passing feature-level tests was not enough.</b> Nothing counted as done until it had been checked again with all five running at once — the failures almost always sat between the features rather than inside them.</li>
         </ul>
       </div>
@@ -202,7 +326,7 @@
           <li class="ko"><b>캐릭터 구현에 어려움을 겪던 팀원과 제작 방법을 찾아봤습니다.</b> 기능 축소를 고민하던 팀원과 제작 도구를 함께 공부했습니다. 교수님께 요청해 해당 분야 실무자의 자문을 받고 구현 문제를 해결했습니다.</li>
           <li class="en"><b>When someone was stuck, I asked what was happening first.</b> The member handling 3D character work considered cutting the feature because it would not come together. Before arguing to keep it, I checked that they wanted a good result too and simply could not find the way — then we learned the tool together and, through our supervisor, got advice from a practitioner in that field to get past it.</li>
 
-          <li class="ko"><b>중간에 추가된 영상 송출 기능은 자료 조사를 나눠 진행했습니다.</b> 팀원들과 구현 방법을 조사하고, 모델링이 끝나는 시점에 맞춰 기능을 통합했습니다.</li>
+          <li class="ko"><b>중간에 추가된 영상 송출 기능은 자료 조사를 나눠 맡았습니다.</b> 팀원들과 구현 방법을 조사하고, 모델링이 끝나는 시점에 맞춰 기능을 통합했습니다.</li>
           <li class="en"><b>A late feature was split across the team.</b> Video streaming was added midway, with the remaining schedule under pressure. Instead of absorbing it alone, we divided the research and then merged the feature in once the venue modelling was finished.</li>
         </ul>
       </div>

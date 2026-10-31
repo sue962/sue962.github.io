@@ -526,6 +526,85 @@ figure.fig figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);
 }
 .dgm-info .idle{color:var(--muted);font-size:13px}
 
+/* ---------- sequential pipeline flow ---------- */
+.flow-wrap{display:grid;gap:14px}
+.flow{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  row-gap:12px;align-items:stretch;
+  margin:0;padding:14px 16px;list-style:none;
+  border:1px solid var(--rule);border-radius:4px;background:var(--surface);
+}
+.flow-step{display:flex;align-items:stretch;min-width:0}
+.flow-step + .flow-step::before{
+  content:"";align-self:center;flex:none;
+  width:19px;height:9px;margin:0 7px;background:var(--rule);
+  clip-path:polygon(0 40%,58% 40%,58% 0,100% 50%,58% 100%,58% 60%,0 60%);
+  transition:background .22s;
+}
+.flow-step.done + .flow-step::before{background:var(--accent)}
+/* 줄 맨 앞 칸에는 들어오는 화살표를 두지 않는다 */
+.flow-step:nth-child(3n+1)::before{content:none}
+
+.flow-node{
+  display:grid;gap:6px;align-content:start;width:100%;
+  font:inherit;color:inherit;text-align:left;cursor:pointer;
+  padding:11px 12px 12px;
+  border:1px solid var(--rule);border-radius:3px;background:var(--paper);
+  transition:border-color .2s,background .2s;
+}
+.flow-node:hover{border-color:var(--accent)}
+
+.flow-head{display:flex;align-items:baseline;gap:7px;min-width:0;flex-wrap:wrap}
+.flow-n{
+  flex:none;font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.06em;
+  color:var(--muted);background:var(--surface);
+  border:1px solid var(--rule);border-radius:2px;padding:1px 5px;
+  transition:color .2s,background .2s,border-color .2s;
+}
+.flow-stage{
+  font-family:var(--mono);font-size:9.5px;line-height:1.5;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);transition:color .2s;
+}
+.flow-t{font-size:13px;font-weight:600;line-height:1.45;color:var(--ink);letter-spacing:-.01em}
+.flow-m{
+  font-family:var(--mono);font-size:10.5px;line-height:1.5;
+  color:var(--muted);font-variant-numeric:tabular-nums;
+}
+
+.flow-node[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.flow-node[aria-expanded="true"] .flow-n{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.flow-node[aria-expanded="true"] .flow-stage{color:var(--accent)}
+
+.flow-info{
+  border:1px solid var(--rule);border-radius:4px;background:var(--surface);
+  padding:15px 17px;min-height:112px;
+}
+.flow-info h4{
+  font-family:var(--mono);font-size:12.5px;font-weight:600;color:var(--accent);
+  letter-spacing:.02em;margin-bottom:7px;
+}
+.flow-info p{font-size:13.5px;color:var(--ink-2);max-width:66ch;margin:0}
+.flow-info p + p{margin-top:7px}
+.flow-info .grain{
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  display:block;margin-top:9px;padding-top:9px;border-top:1px solid var(--rule-soft);
+}
+
+@media (max-width:980px){
+  .flow{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow-step + .flow-step::before{content:""}
+  .flow-step:nth-child(2n+1)::before{content:none}
+}
+@media (max-width:760px){
+  .flow{grid-template-columns:1fr;row-gap:0;padding:12px}
+  .flow-step{flex-direction:column}
+  .flow-step + .flow-step::before{
+    content:"";align-self:flex-start;
+    width:9px;height:17px;margin:5px 0 5px 20px;
+    clip-path:polygon(40% 0,40% 58%,0 58%,50% 100%,100% 58%,60% 58%,60% 0);
+  }
+}
+
 .case-foot{display:flex;flex-wrap:wrap;gap:12px;padding:38px 0 60px}
 
 /* ---------- reveal ---------- */
@@ -535,6 +614,10 @@ figure.fig figcaption{font-family:var(--mono);font-size:11px;color:var(--muted);
 /* ---------- responsive ---------- */
 @media (max-width:860px){
   .grid{grid-template-columns:1fr;gap:0}
+  /* 좁은 화면에서 그리드 항목이 내용 최소폭 때문에 뷰포트를 넘지 않게 한다 */
+  .grid > .rail,.grid > main,.blk,.blk > *,.dgm-wrap,.dgm-wrap > *,
+  .flow-wrap,.flow-wrap > *,ul.bul,ul.bul > li{min-width:0}
+  code{white-space:normal}
   .rail{
     display:flex;align-items:center;gap:14px;
     position:sticky;top:var(--bar-h);z-index:20;padding:0 var(--gut);

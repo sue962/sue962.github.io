@@ -153,4 +153,31 @@
       if (ev.key === 'Escape' && locked) { locked = null; clear(); }
     });
   }
+
+  /* ---------- sequential pipeline flow ---------- */
+  Array.prototype.slice.call(document.querySelectorAll('.flow-wrap'))
+    .forEach(function (wrap) {
+      var flow = wrap.querySelector('.flow');
+      var info = wrap.querySelector('.flow-info');
+      if (!flow || !info) return;
+
+      var steps = Array.prototype.slice.call(flow.querySelectorAll('.flow-step'));
+      var nodes = Array.prototype.slice.call(flow.querySelectorAll('.flow-node'));
+      var cards = Array.prototype.slice.call(info.querySelectorAll('[data-step-for]'));
+
+      function select(id) {
+        var idx = -1;
+        nodes.forEach(function (n, i) {
+          var on = n.getAttribute('data-step') === id;
+          n.setAttribute('aria-expanded', on ? 'true' : 'false');
+          if (on) idx = i;
+        });
+        steps.forEach(function (s, i) { s.classList.toggle('done', idx > -1 && i < idx); });
+        cards.forEach(function (c) { c.hidden = c.getAttribute('data-step-for') !== id; });
+      }
+
+      nodes.forEach(function (n) {
+        n.addEventListener('click', function () { select(n.getAttribute('data-step')); });
+      });
+    });
 })();

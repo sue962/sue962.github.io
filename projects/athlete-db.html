@@ -96,6 +96,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#audit"><span class="ko">AI 초안 검증</span><span class="en">Auditing the draft</span></a></li>
         <li><a href="#model"><span class="ko">설계 결정</span><span class="en">Design decisions</span></a></li>
         <li><a href="#review"><span class="ko">스키마 점검</span><span class="en">Schema review</span></a></li>
@@ -120,6 +121,129 @@
       </div>
     </section>
 
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">생성형 AI가 만든 설계 초안이 제약을 지키는 데이터베이스가 되기까지의 순서입니다. AI 산출물을 그대로 쓰지 않고 요구사항과 하나씩 대조한 과정입니다.</p>
+        <p class="en">How an AI-generated schema draft became a database that enforces its own rules, by checking the draft against the requirements one line at a time.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">요구사항</span><span class="en">Requirements</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">규칙을 체크리스트로</span><span class="en">Turn the rules into a checklist</span></span>
+                <span class="flow-m">선수 · 선발전 · 심판 · 장비 · 지원금</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">AI 초안</span><span class="en">AI draft</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">생성형 AI로 ERD 작성</span><span class="en">Generate the first ERD</span></span>
+                <span class="flow-m">초안 그대로 쓰지 않음</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">대조 검토</span><span class="en">Review</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">네 영역으로 나눠 점검</span><span class="en">Audit across four areas</span></span>
+                <span class="flow-m">문제 13건</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">관계 수정</span><span class="en">Fix</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">성적을 참가 기록으로</span><span class="en">Move the result onto participation</span></span>
+                <span class="flow-m">복합 기본키 (선수ID, 경기ID)</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">제약 복원</span><span class="en">Constraints</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">빠진 규칙 다섯 가지</span><span class="en">Five rules that had vanished</span></span>
+                <span class="flow-m">초안에 하나도 없었음</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="ad6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">조회 계층</span><span class="en">Query layer</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">저장 함수로 고정</span><span class="en">Fix the logic in stored functions</span></span>
+                <span class="flow-m">14 tables · 5 functions</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="ad1">
+              <h4>요구사항</h4>
+              <p class="ko">선수와 선발전, 심판, 장비, 의료 패키지, 여행 지원금을 다루는 데이터베이스입니다. 요구사항에 적힌 규칙을 먼저 체크리스트로 정리하고, 나중에 ERD의 항목과 하나씩 대응시킬 수 있도록 준비했습니다.</p>
+              <p class="en">The database covers athletes, trials, officials, equipment, medical packages and travel stipends. The rules stated in the requirements were first written out as a checklist, so each one could later be matched against an element of the ERD.</p>
+              <span class="grain">6개 업무 영역 · 규칙을 항목화</span>
+            </div>
+
+            <div data-step-for="ad2" hidden>
+              <h4>AI 초안</h4>
+              <p class="ko">생성형 AI로 초기 ERD를 만들었습니다. 초안은 빠르게 나오지만 요구사항에 적힌 제약과 다중성이 그대로 반영됐는지는 보장되지 않습니다. 그래서 초안을 결과물이 아니라 검토 대상으로 두고 다음 단계로 넘겼습니다.</p>
+              <p class="en">The first ERD was generated with an LLM. A draft arrives quickly, but nothing guarantees that the constraints and cardinalities stated in the requirements survived into it. The draft was therefore treated as something to audit rather than as the result.</p>
+              <span class="grain">생성형 AI ERD · 검토 대상으로 취급</span>
+            </div>
+
+            <div data-step-for="ad3" hidden>
+              <h4>대조 검토</h4>
+              <p class="ko">속성, 관계, 식별자, 제약의 네 영역에서 초안을 요구사항과 대조했습니다. 각 항목에 해당하는 요구사항을 함께 적어 두어, 무엇을 근거로 문제라고 판단했는지 남겼습니다. 이 과정에서 누락된 속성뿐 아니라 요구사항에 없는데 들어간 속성도 확인했습니다. 의료 패키지의 PackageID와 Cost가 그런 경우입니다.</p>
+              <p class="en">The draft was checked against the requirements across four areas: attributes, relationships, identifiers and constraints. Each finding was recorded alongside the requirement it came from, so the basis for calling it a problem stayed visible. The pass caught attributes that were missing and also attributes present without a requirement behind them, such as PackageID and Cost on the medical package.</p>
+              <span class="grain">속성 · 관계 · 식별자 · 제약 4영역 · 발견 13건</span>
+            </div>
+
+            <div data-step-for="ad4" hidden>
+              <h4>관계 수정</h4>
+              <p class="ko">참가 관계가 1:N으로 되어 있었지만 한 선수가 여러 경기에 나가고 한 경기에 여러 선수가 참가하므로 다대다여야 했습니다. 성적은 그 경기의 기록이 아니라 그 선수가 그 경기에서 낸 기록이므로, 초안처럼 경기에 두면 선수별로 구분되지 않습니다. 성적을 참가 기록으로 옮기고 선수 ID와 경기 ID를 묶어 복합 기본키로 지정했습니다. 심판 배정도 1:N 제한을 풀었고, 한 경기의 우승자는 한 명이라는 규칙은 우승 테이블의 기본키를 경기 ID로 두어 데이터베이스에서 막았습니다.</p>
+              <p class="en">Participation was modelled 1:N, but an athlete enters many trials and a trial holds many athletes, so it had to be many-to-many. A result is not the trial's record but what a given athlete achieved in it; left on the trial, as in the draft, results cannot be told apart per athlete. The result moved onto the participation record, with athlete ID and trial ID forming a composite primary key. The 1:N limit on officials was lifted, and the rule that a trial has one winner is enforced by making trial ID the primary key of the winner table.</p>
+              <span class="grain">참가 1:N → 다대다 · 성적 위치 이동 · 우승 테이블 PK = 경기 ID</span>
+            </div>
+
+            <div data-step-for="ad5" hidden>
+              <h4>제약 복원</h4>
+              <p class="ko">요구사항에 있었지만 초안에서 사라진 규칙은 다섯 가지입니다. 선수는 전문과 아마추어 중 하나에만 속한다, 전문 선수는 의료 패키지를 1개에서 5개까지 골라야 한다, 아마추어는 그 패키지를 쓸 수 없다, 하루에 한 경기만 참가할 수 있다, 상태가 good 이상인 장비만 쓸 수 있다. 초안에는 이 중 어느 것도 들어 있지 않았습니다. 여행 지원금은 선수와 계약일의 조합으로 구분해야 하는데 계약일 자체가 빠져 있어, 두 값을 함께 식별자로 사용하도록 고쳤습니다.</p>
+              <p class="en">Five rules stated in the requirements had disappeared from the draft: an athlete belongs to either the professional or the amateur category but not both; a professional must select between one and five medical packages; an amateur cannot use those packages; an athlete may enter only one trial per day; only equipment rated good or better may be used. None of them were present. Travel stipends must be distinguished by athlete and contract date, but the contract date was missing entirely, so the two were made the identifier together.</p>
+              <span class="grain">배타 소속 · 패키지 1–5 · 아마추어 제외 · 하루 1경기 · 장비 good 이상 · 지원금 식별자 보정</span>
+            </div>
+
+            <div data-step-for="ad6" hidden>
+              <h4>조회 계층</h4>
+              <p class="ko">관계와 제약을 먼저 고친 뒤 조회와 갱신 기능을 구현했습니다. PostgreSQL 저장 함수를 Python에서 호출하는 구조로 두어, 같은 규칙이 화면마다 다시 구현되지 않게 했습니다. 연결 과정에서 NULL 처리와 경기 완료를 판단하는 날짜 기준, 반환 자료형이 화면까지 일관되게 전달되도록 로직을 수정했습니다.</p>
+              <p class="en">Relationships and constraints were corrected before any query work began. PostgreSQL stored functions are called from Python, so the same rule is not reimplemented per screen. Wiring the two up meant reworking NULL handling, the date rule deciding whether a trial has completed, and return types, so the same values reach the screen.</p>
+              <span class="grain">14 테이블 · 조회·갱신 함수 5종 · PL/pgSQL + Python</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- audit -->
     <section id="audit" class="rv">
       <div class="sec-head"><h2><span class="ko">AI 설계 초안 검증</span><span class="en">Auditing the AI-generated draft</span></h2></div>
@@ -131,7 +255,7 @@
           <li class="ko"><b>필요한 속성이 빠지거나 합쳐져 있었습니다.</b> 선수의 이름, 성, 휴대폰, 이메일, 고유 여권번호가 <code>Name</code>과 <code>Contact Details</code>로 묶여 있었습니다. 아마추어의 클럽 위치와 장비의 제조사, 모델, 연식, 상태 등급도 누락됐습니다. 의료 패키지에는 요구사항에 없는 <code>PackageID</code>와 <code>Cost</code>가 추가돼 있었습니다.</li>
           <li class="en"><b>Entities and attributes were flattened.</b> The athlete was reduced to a name and contact details, where the domain called for first name, last name, mobile, email and a unique passport number separately. Amateur had a training club but no club location, and Medical Package had <b>gained</b> a PackageID and Cost the requirements never mentioned. Equipment was missing manufacturer, model, year and condition rating entirely.</li>
 
-          <li class="ko"><b>관계의 다중성이 틀렸습니다.</b> 참가 관계가 1:N으로 되어 있었지만, 한 선수가 여러 경기에 나가고 한 경기에 여러 선수가 참가하므로 다대다여야 했습니다. 경기 기록(PerformanceData)도 경기가 아니라 <b>참가 관계에 두어야</b> 특정 선수의 특정 경기 결과를 표현할 수 있었습니다. 심판 관계도 한 경기에 여러 심판이 배정될 수 있는데 1:N으로 제한돼 있었고, 한 경기의 우승자는 한 명이라는 규칙은 아예 빠져 있었습니다.</li>
+          <li class="ko"><b>관계의 다중성이 틀렸습니다.</b> 참가 관계가 1:N으로 되어 있었지만, 한 선수가 여러 경기에 나가고 한 경기에 여러 선수가 참가하므로 다대다여야 했습니다. 경기 기록(PerformanceData)도 경기가 아니라 <b>참가 관계에 두어야</b> 특정 선수의 특정 경기 결과가 구분됩니다. 심판 관계도 한 경기에 여러 심판이 배정될 수 있는데 1:N으로 제한돼 있었고, 한 경기의 우승자는 한 명이라는 규칙은 아예 빠져 있었습니다.</li>
           <li class="en"><b>Relationship cardinalities were wrong.</b> Participation was modelled 1:N, but an athlete competes in many trials and a trial involves many athletes, so it had to be many-to-many — and performance data belongs <b>on the participation</b>, not on the trial, to express one athlete's result in one trial. Officials were likewise capped at one per trial when the domain allows several, and the rule that a trial has a single winner was missing altogether.</li>
 
           <li class="ko"><b>여행 지원금의 식별에 필요한 계약일이 빠져 있었습니다.</b> 지원금은 선수와 계약일의 조합으로 구분해야 하는데, 초안에는 계약일이 없었습니다. 선수와 계약일을 함께 식별자로 사용하도록 수정했습니다.</li>

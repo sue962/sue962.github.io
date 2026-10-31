@@ -87,6 +87,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#split"><span class="ko">데이터 분할 기준</span><span class="en">Data splits</span></a></li>
         <li><a href="#design"><span class="ko">비교 설계</span><span class="en">Comparison design</span></a></li>
         <li><a href="#result"><span class="ko">결과</span><span class="en">Results</span></a></li>
@@ -108,6 +109,129 @@
           <span class="ko">연합학습 과정에서 가중치가 올바르게 전달되고 복원되는지 확인했습니다. 클라이언트의 상태가 잘못 복원돼도 실행 자체는 완료될 수 있어, 실행 로그와 실제 가중치를 함께 점검했습니다.</span>
           <span class="en">Most of my time here went into <b>checking that a score belonged to the method it was filed under</b>. In federated training a server update can overwrite a local head or restore another client's state, producing a plausible score for the wrong method — and a “run succeeded” message will not tell you that.</span>
         </p>
+      </div>
+    </section>
+
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">실험 결과를 믿기 전에 먼저 데이터와 실행을 확인한 순서입니다. 연합학습은 상태가 잘못 복원돼도 실행 자체는 완료되기 때문에, 결과보다 앞 단계를 먼저 점검했습니다.</p>
+        <p class="en">What had to be checked before any result could be trusted. A federated run completes even when client state is restored wrongly, so the stages before the result were verified first.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">원본 점검</span><span class="en">Source</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">쓰기 전에 먼저 센다</span><span class="en">Count it before using it</span></span>
+                <span class="flow-m">2,248 → 2,244</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">분할 기준</span><span class="en">Split</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">질문이 아니라 이미지 단위</span><span class="en">Split images, not questions</span></span>
+                <span class="flow-m">251 / 31 / 32 images</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">누수 차단</span><span class="en">Leakage</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">지켜졌는지 검사로 확인</span><span class="en">Verify the split held</span></span>
+                <span class="flow-m">질문 ID · 이미지 중복 · 클라이언트 배정</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">실험 실행</span><span class="en">Runs</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">공유 범위를 바꿔 비교</span><span class="en">Vary what gets shared</span></span>
+                <span class="flow-m">51 runs · 3 seeds</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">재채점</span><span class="en">Rescore</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">저장 모델을 다시 채점</span><span class="en">Score the saved models again</span></span>
+                <span class="flow-m">99 exports · 216 predictions</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="mv6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">결과 해석</span><span class="en">Decompose</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">오른 점수를 나눠 본다</span><span class="en">Split the gain apart</span></span>
+                <span class="flow-m">정답 여부 · 부분 일치</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="mv1">
+              <h4>원본 점검</h4>
+              <p class="ko">질문과 답변 쌍 2,248건 가운데 완전히 같은 중복 4건을 찾아 제거하고, 어떤 질문도 참조하지 않는 이미지 1장을 제외했습니다. 남은 2,244건과 이미지 314장으로 분할을 구성했습니다.</p>
+              <p class="en">Of 2,248 question-answer pairs, 4 exact duplicates were removed and one image referenced by no question was dropped, leaving 2,244 pairs over 314 images to split.</p>
+              <span class="grain">중복 4건 제거 · 미참조 이미지 1장 제외 · 2,244 Q&A · 314 images</span>
+            </div>
+
+            <div data-step-for="mv2" hidden>
+              <h4>분할 기준</h4>
+              <p class="ko">학습, 검증, 평가 데이터를 이미지 단위로 나눴습니다. 한 영상에 여러 질문이 연결돼 있어 질문 단위로 나누면 같은 영상이 학습과 평가에 중복으로 들어갈 수 있습니다. 학습 251장 1,787문항, 검증 31장 216문항, 평가 32장 241문항으로 나눴습니다.</p>
+              <p class="en">Train, validation and test were split at the image level. One scan carries several questions, so splitting by question lets the same scan appear in both training and evaluation. The result: 251 images and 1,787 questions for training, 31 and 216 for validation, 32 and 241 held out.</p>
+              <span class="grain">train 251 / 1,787 · val 31 / 216 · test 32 / 241</span>
+            </div>
+
+            <div data-step-for="mv3" hidden>
+              <h4>누수 차단</h4>
+              <p class="ko">분할이 실제로 지켜지는지 검사로 확인했습니다. 질문 ID가 모두 고유한지, 세 묶음 사이에 이미지가 겹치지 않는지, 학습 이미지 하나가 정확히 한 클라이언트에만 배정됐는지를 점검했습니다. 평가 데이터는 최종 평가 규칙이 정해질 때까지 예측도 채점도 하지 않은 채로 두고, 비교는 검증 데이터로만 했습니다.</p>
+              <p class="en">Checks confirmed the split actually held: that question IDs are unique, that no image appears in more than one of the three sets, and that each training image is assigned to exactly one client. The test set was left unpredicted and unscored until the final evaluation rule was settled, and all comparison ran on validation.</p>
+              <span class="grain">ID 고유성 · 묶음 간 이미지 비중복 · 이미지당 클라이언트 1 · test 미사용</span>
+            </div>
+
+            <div data-step-for="mv4" hidden>
+              <h4>실험 실행</h4>
+              <p class="ko">기관 간 모델 공유 범위를 바꿔가며 답변 품질을 비교했습니다. 난수 시드를 3개로 반복해 한 번의 실행으로 결론이 나지 않도록 했습니다. 저장소 커밋 41건 가운데 28건이 제 작업입니다.</p>
+              <p class="en">Answer quality was compared while varying how much of the model is shared between institutions, repeated across three random seeds so no conclusion rests on a single run. Of 41 commits in the repository, 28 are mine.</p>
+              <span class="grain">실행 51 · 시드 3 · 커밋 28 / 41</span>
+            </div>
+
+            <div data-step-for="mv5" hidden>
+              <h4>재채점</h4>
+              <p class="ko">연합학습은 클라이언트 상태가 잘못 복원돼도 실행 자체는 완료될 수 있어서, 실행 로그와 실제 가중치를 함께 점검했습니다. 51개 실행에서 나온 모델 결과 99개를 공통 평가기로 다시 채점하고, 모델마다 예측 216건을 재현했습니다.</p>
+              <p class="en">A federated run can complete even when client state is restored incorrectly, so run logs were checked against the actual weights. The 99 model exports from 51 runs were rescored through a shared evaluator, replaying 216 predictions per export.</p>
+              <span class="grain">99 exports 재채점 · 216 예측/모델 · 로그와 가중치 교차 점검</span>
+            </div>
+
+            <div data-step-for="mv6" hidden>
+              <h4>결과 해석</h4>
+              <p class="ko">점수가 높아진 조건은 그대로 받아들이지 않고 정답 여부와 부분 일치 점수를 나눠 어느 쪽이 올랐는지 확인했습니다. 데이터 분포에 따라 효과의 부호가 바뀌는 구간도 함께 기록했습니다.</p>
+              <p class="en">Where a score improved, the figure was not taken at face value: exact correctness and partial-match credit were separated to see which of the two had risen. Conditions where the effect changes sign with the data partition were recorded alongside.</p>
+              <span class="grain">정답 여부 / 부분 일치 분해 · 분포별 부호 변화 기록</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 

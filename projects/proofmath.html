@@ -36,17 +36,17 @@
     <p class="case-eyebrow">
       <span class="ko">케이스 스터디</span><span class="en">Case study</span>
       <span class="sep">/</span>
-      <span>2021.03 – 2025.02</span>
+      <span>2022.12 – 2025.02</span>
       <span class="sep">/</span>
       <span class="ko">단독 개발</span><span class="en">sole developer</span>
     </p>
     <h1>
-      <span class="ko">맞춤 학습자료 자동화 시스템</span>
-      <span class="en">Automated Personalized Study-Material System</span>
+      <span class="ko">학원 운영 데이터 시스템</span>
+      <span class="en">Academy Operations Data System</span>
     </h1>
     <p class="case-lede">
-      <span class="ko">수학 학원에서 조교와 강사로 일하면서 프로그램 두 개를 만들었습니다. 하나는 학생이 틀린 문제로 오답노트를 자동 생성하는 프로그램이고, 다른 하나는 1994년 이후 평가원 기출을 데이터화해 조건에 맞는 문항만 뽑아 자료로 만드는 프로그램입니다.</span>
-      <span class="en">Two programs built to remove friction I ran into myself while working as a teaching assistant and instructor at a maths academy: one that turns a student's wrong answers into an error notebook automatically, and one that makes every national exam item since 1994 searchable so only the needed part has to be pulled.</span>
+      <span class="ko">수업마다 보는 진단평가 점수를 학생별로 쌓아 성적이 떨어지는 학생을 먼저 찾아냅니다. 오답 이력과 기출 문항 데이터베이스를 연결해 맞춤 학습자료를 자동 생성하고, 출결과 성적 기록, 학부모 문자까지 한 곳에 묶었습니다.</span>
+      <span class="en">Diagnostic scores from every lesson accumulate per student so a falling grade surfaces before anyone goes looking. Wrong-answer history joins a database of past exam items to generate study material automatically, with attendance, grades and parent messaging in the same place.</span>
     </p>
 
     <dl class="case-meta">
@@ -56,7 +56,7 @@
       </div>
       <div>
         <dt><span class="ko">기간</span><span class="en">Period</span></dt>
-        <dd>2021.03 – 2025.02</dd>
+        <dd>2022.12 – 2025.02</dd>
       </div>
       <div>
         <dt><span class="ko">환경</span><span class="en">Stack</span></dt>
@@ -70,8 +70,8 @@
 
     <div class="kpis">
       <div class="kpi"><b>5,225</b><span><span class="ko">데이터화한 기출 문항</span><span class="en">exam items indexed</span></span></div>
-      <div class="kpi"><b>32</b><span><span class="ko">학년도 (1994 – 2025)</span><span class="en">years covered (1994 – 2025)</span></span></div>
-      <div class="kpi"><b>2</b><span><span class="ko">개발한 프로그램</span><span class="en">programs in daily use</span></span></div>
+      <div class="kpi"><b>200+</b><span><span class="ko">누적 학생</span><span class="en">students on record</span></span></div>
+      <div class="kpi"><b>3일 → 5분</b><span><span class="ko">오답노트 제작 시간</span><span class="en">error-notebook build time</span></span></div>
       <div class="kpi"><b><span class="ko">2년 2개월</span><span class="en">2 yrs 2 mos</span></b><span><span class="ko">계약 개발 기간</span><span class="en">as contracted developer</span></span></div>
     </div>
 
@@ -88,6 +88,8 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#why"><span class="ko">개발 배경</span><span class="en">Background</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
+        <li><a href="#grade"><span class="ko">성적 분석과 알림</span><span class="en">Grades &amp; alerts</span></a></li>
         <li><a href="#products"><span class="ko">개발한 프로그램</span><span class="en">Two programs</span></a></li>
         <li><a href="#data"><span class="ko">문항 데이터 구조</span><span class="en">Item data model</span></a></li>
         <li><a href="#pdf"><span class="ko">PDF 자동 생성</span><span class="en">Generating material</span></a></li>
@@ -103,14 +105,169 @@
     <section id="why" class="rv">
       <div class="sec-head"><h2><span class="ko">개발 배경</span><span class="en">Background</span></h2></div>
       <div class="blk">
-        <p class="ko">같은 학원에서 4년 동안 수학 조교와 강사로 일했습니다. 학생이 문제집 한 권을 다 풀고 나면, 조교가 틀린 문제를 PDF에서 하나씩 잘라 오답노트를 만들거나 학생이 같은 문제집을 새로 사서 틀린 것만 다시 풀었습니다. 이 과정을 매번 반복했습니다.</p>
-        <p class="en">I spent four years as a maths teaching assistant and instructor at the same academy, running into the same loop over and over. When a student finished a workbook, an assistant would clip each wrong problem out of a PDF by hand, or the student would buy the same workbook again just to redo what they had missed.</p>
+        <p class="ko">2018년 12월부터 같은 수학 전문 학원에서 조교와 강사로 일했습니다. 학생이 문제집 한 권을 다 풀고 나면, 조교가 틀린 문제를 PDF에서 하나씩 잘라 오답노트를 만들거나 학생이 같은 문제집을 새로 사서 틀린 것만 다시 풀었습니다. 이 과정을 매번 반복했습니다.</p>
+        <p class="en">From December 2018 I worked as a maths teaching assistant and instructor at the same academy, running into the same loop over and over. When a student finished a workbook, an assistant would clip each wrong problem out of a PDF by hand, or the student would buy the same workbook again just to redo what they had missed.</p>
         <p class="ko">기출 문항을 찾을 때도 연도별 폴더를 하나씩 열어야 했습니다. 학원에는 1994년 이후 기출을 단원별로 모아 둔 자료가 없어, 학생이 어려워하는 단원의 문제를 찾는 데 시간이 들었습니다.</p>
         <p class="en">Past exam items were stored in year-by-year folders. The academy had no unit-based collection of papers dating back to 1994, so finding questions from a student’s weak unit meant checking files one at a time.</p>
         <p class="note">
-          <span class="ko">학생과 조교, 원장님이 각각 어떤 상황에서 불편한지 보면서 필요한 기능을 정했습니다. 그 내용을 정리해 학원에 시스템 개발을 제안했고, 제안이 받아들여져 풀스택 개발자로 계약을 전환했습니다. 기획과 설계, 개발, 운영을 혼자 맡았습니다.</span>
+          <span class="ko">진단평가 점수도 종이로만 남았고, 조교와 강사마다 기록하는 방법이 달라 학생별 성적 변화를 확인하기 어려웠습니다. 학생과 조교, 강사, 원장님이 각각 어떤 상황에서 불편한지 보면서 필요한 기능을 정했습니다. 그 내용을 정리해 학원에 시스템 개발을 제안했고, 2022년 12월 풀스택 개발자로 계약을 전환했습니다. 기획과 설계, 개발, 운영을 혼자 맡았습니다.</span>
           <span class="en">Because I knew from using the material where it jammed, I proposed building the system to the academy myself. The proposal was accepted, my contract changed to full-stack developer, and I owned it end to end.</span>
         </p>
+      </div>
+    </section>
+
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">현장에서 반복되던 작업이 자동 생성되는 학습자료가 되기까지의 순서입니다. 만든 사람이 곧 쓰는 사람이라, 마지막 단계에서 다시 앞 단계로 돌아갑니다.</p>
+        <p class="en">How repeated manual work in a classroom became generated study material. Because the person who built it also used it, the last stage feeds back into the earlier ones.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">현장 관찰</span><span class="en">Observation</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">누가 어디서 막히는지 확인</span><span class="en">Watch where people get stuck</span></span>
+                <span class="flow-m">조교 · 강사 · 원장 · 학생</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">원천 자료</span><span class="en">Source</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">기출 문항 이미지 수집</span><span class="en">Collect past exam items</span></span>
+                <span class="flow-m">5,225 items · 32 years</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">식별 규칙</span><span class="en">Keys</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">파일명을 식별자로 통일</span><span class="en">Make the filename the key</span></span>
+                <span class="flow-m">시험_연도_과목_번호_정답</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">분류 구조</span><span class="en">Model</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">조건 조회가 되도록 저장</span><span class="en">Store so it can be queried</span></span>
+                <span class="flow-m">시험 구분 · 번호 · 연도 · 과목 · 난이도</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">자동 생성</span><span class="en">Output</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">조건에 맞는 문항만 PDF로</span><span class="en">Only the items that match, as a PDF</span></span>
+                <span class="flow-m">2×2 배치 · 240pt 정규화</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="pm6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">운영 피드백</span><span class="en">Feedback</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">수업에서 쓰며 기준을 고침</span><span class="en">Used in class, then corrected</span></span>
+                <span class="flow-m">난이도 컬럼 추가 · 2년 2개월 운영</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="pm1">
+              <h4>현장 관찰</h4>
+              <p class="ko">2018년 12월부터 조교와 강사로 일했습니다. 학생이 문제집을 다 풀면 조교가 틀린 문제를 PDF에서 하나씩 잘라 오답노트를 만들거나, 학생이 같은 문제집을 새로 사서 틀린 것만 다시 풀었습니다. 기출을 찾을 때는 연도별 폴더를 하나씩 열어야 했습니다. 학생과 조교, 원장이 각각 어떤 상황에서 불편한지 보면서 필요한 기능을 정하고 학원에 개발을 제안했습니다.</p>
+              <p class="en">I worked at the same academy for four years as a teaching assistant and instructor. When a student finished a workbook, an assistant cut the wrong questions out of a PDF one by one, or the student bought the same workbook again to redo them. Finding past exam items meant opening year folders one at a time. Watching where students, assistants and the director each got stuck determined the feature list, which I then proposed to the academy.</p>
+              <span class="grain">4년 근무 중 관찰 · 제안 후 풀스택 개발자로 계약 전환</span>
+            </div>
+
+            <div data-step-for="pm2" hidden>
+              <h4>원천 자료</h4>
+              <p class="ko">1994학년도 이후 평가원 기출 문항 이미지를 모았습니다. 학원에는 단원별로 정리된 자료가 없어, 학생이 어려워하는 단원의 문제를 찾는 데 시간이 걸렸습니다. 1994학년도부터 2025학년도까지 5,225문항이 대상이었습니다.</p>
+              <p class="en">Past national exam items since 1994 were gathered as images. The academy had nothing organised by unit, so finding questions for a unit a student struggled with took time. The scope was 5,225 items across 32 academic years.</p>
+              <span class="grain">1994 – 2025 · 32 학년도 · 5,225 문항</span>
+            </div>
+
+            <div data-step-for="pm3" hidden>
+              <h4>식별 규칙</h4>
+              <p class="ko">문항 이미지 파일명을 시험_연도_과목_번호_정답 규칙으로 통일했습니다. 파일명만 읽어도 어느 시험 몇 번 문제이고 정답이 무엇인지 알 수 있어서, 이미지를 열지 않고도 조회와 정답 대조가 됩니다. 나중에 답지를 자동 생성할 때도 이 규칙을 그대로 사용했습니다.</p>
+              <p class="en">Item image filenames were standardised as exam_year_subject_number_answer. The filename alone identifies which exam, which question and what the answer is, so lookup and answer-checking work without opening the image. The same rule later generated the answer sheets.</p>
+              <span class="grain">파일명 = 조회 키 + 정답 · 5,225 문항에 적용</span>
+            </div>
+
+            <div data-step-for="pm4" hidden>
+              <h4>분류 구조</h4>
+              <p class="ko">문항 분류 정보는 테이블에 저장했습니다. 시험 구분(6월 모의평가, 9월 모의평가, 수능)과 문항 번호, 연도, 과목, 난이도, 메모를 담고 파일명을 키로 문항 이미지와 연결했습니다. 학원에서 이미 관리하던 문항 목록을 다시 입력하지 않아도 되도록 엑셀 가져오기도 만들었습니다.</p>
+              <p class="en">Item classification lives in a table holding exam type (June mock, September mock, the national exam), question number, year, subject, difficulty and notes, linked to the image through the filename key. An Excel import was added so the lists the academy already maintained did not have to be retyped.</p>
+              <span class="grain">과목 · 대단원 · 중단원 · 연도 조회 · 엑셀 가져오기</span>
+            </div>
+
+            <div data-step-for="pm5" hidden>
+              <h4>자동 생성</h4>
+              <p class="ko">두 프로그램 모두 마지막에는 PDF를 만듭니다. 한 면에 네 문제를 2×2로 배치하고 문제 번호와 출처를 함께 찍습니다. 스캔 원본이라 이미지 가로폭과 비율이 제각각이어서, 가로를 240pt로 맞추고 세로를 비율대로 계산해 지면 위에서 글씨 크기가 같아 보이게 했습니다. 세로가 가로의 1.47배를 넘는 문제는 아래 칸에 다음 문제를 넣지 않고 옆 칸으로 넘깁니다. 그래프나 표가 붙은 문제를 억지로 쌓으면 잘리거나 다음 장으로 밀리기 때문입니다.</p>
+              <p class="en">Both programs end in a PDF: four questions per page in a 2×2 grid, stamped with the question number and its source. Because the images are scans with differing widths and ratios, each is normalised to 240pt wide with the height derived from the ratio, so type appears the same size across the page. An item taller than 1.47× its width moves to the next column instead of stacking, since questions carrying a graph or table get clipped or pushed to the next page when forced.</p>
+              <span class="grain">한 면 4문항 · 가로 240pt 고정 · 세로/가로 1.47 초과 시 칸 이동 · 정답지 동시 생성</span>
+            </div>
+
+            <div data-step-for="pm6" hidden>
+              <h4>운영 피드백</h4>
+              <p class="ko">직접 수업에 쓰면서 출력물을 원본과 대조하고 분류 기준과 생성 코드를 고쳤습니다. 같은 단원이라도 학생 수준에 맞는 문제를 골라야 해서 난이도를 조건에 추가했는데, 처음 스키마에는 없던 컬럼입니다. 다시 틀린 문항은 재오답으로 구분해 첫 오답과 나눠 저장했고, 재오답만 모은 노트도 만들 수 있게 했습니다. 두 프로그램은 학원에서 조교와 강사가 실제로 사용했습니다.</p>
+              <p class="en">Using the material in my own lessons meant checking output against the originals and revising both the classification rules and the generation code. Difficulty was added as a filter because the right question within a unit still depends on the student; it was not in the first schema. Repeat mistakes were stored separately from first-time ones so a notebook of only the repeats could be produced. Both programs were used by assistants and instructors in the academy.</p>
+              <span class="grain">난이도 컬럼 후속 추가 · 재오답 분리 저장 · 2년 2개월 현장 운영</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- grade -->
+    <section id="grade" class="rv">
+      <div class="sec-head"><h2><span class="ko">성적 분석과 알림</span><span class="en">Grades and alerts</span></h2></div>
+      <div class="blk">
+        <p class="ko">학원은 수업이 있는 날마다 진단평가를 봅니다. 그 점수를 학생별로 쌓아 추이를 보여주고, 떨어지는 학생이 원장님과 강사 화면에 먼저 뜨도록 만들었습니다.</p>
+        <p class="en">The academy runs a short diagnostic test every lesson day. Those scores accumulate per student, and a student whose score drops surfaces on the director's and instructors' screen before anyone has to go looking.</p>
+
+        <ul class="bul">
+          <li class="ko"><b>직전 시험보다 10점 이상 떨어지면 경고가 뜹니다.</b> 처음에는 5점을 기준으로 잡았습니다. 강사와 조교로부터 5점은 학생의 당일 상태에 따라 생길 수 있는 작은 오차라는 의견을 받아 10점으로 바꿨습니다. 100점 만점 기준입니다.</li>
+          <li class="en"><b>A drop of 10 points or more raises a warning.</b> The first threshold was 5. Instructors and assistants pointed out that 5 points can come from how a student happens to feel that day, so it moved to 10. Out of 100.</li>
+
+          <li class="ko"><b>경고가 뜬 학생은 집중 관리로 넘어갑니다.</b> 원장님이 대상을 확인하고, 강사가 그 학생의 수업 방식과 과제량을 다시 정했습니다. 화면이 판단하는 것이 아니라 사람이 판단할 대상을 좁혀 줍니다.</li>
+          <li class="en"><b>A flagged student moves into closer supervision.</b> The director reviews who came up and the instructor adjusts that student's lesson format and workload. The screen does not decide anything; it narrows down who a person needs to look at.</li>
+
+          <li class="ko"><b>단원별 오답을 함께 집계했습니다.</b> 어느 대단원과 중단원에서 반복해서 틀리는지 보여줘, 강사가 어떤 내용을 다시 설명할지 정하는 근거로 썼습니다.</li>
+          <li class="en"><b>Wrong answers are also rolled up by unit.</b> Showing which major and minor units a student keeps missing gave instructors a basis for deciding what to re-teach.</li>
+
+          <li class="ko"><b>월별 출석 인원은 따로 제공했습니다.</b> 원장님이 학원 전체 흐름을 보는 숫자입니다.</li>
+          <li class="en"><b>Monthly attendance counts sit separately.</b> That is the figure the director uses to read the academy as a whole.</li>
+        </ul>
+
+        <p class="note">
+          <span class="ko">점수와 오답을 저장하는 테이블과 화면이 읽는 집계를 나눠 뒀습니다. 새 기록이 들어오면 집계도 같이 갱신되므로, 화면을 열 때마다 성적 테이블을 처음부터 훑지 않아도 되고 원장님과 강사가 같은 숫자를 봅니다.</span>
+          <span class="en">The tables that receive scores and wrong answers are kept apart from the aggregates the screen reads. A new record updates the aggregates with it, so opening the screen does not re-scan the score table, and the director and the instructors are looking at the same number.</span>
+        </p>
+
+        <p class="ko">매 수업마다 등원 여부, 숙제 확인, 새로 배부한 숙제, 시험 점수를 기록하면 학부모님께 일괄 문자가 나갑니다. 소통이 잘 되는 느낌이라 학원을 더 믿고 맡길 수 있다는 평가를 받았고, 학생이 어떻게 성장하고 있는지 볼 수 있어 좋다는 피드백도 여러 번 받았습니다.</p>
+        <p class="en">Recording arrival, homework checked, homework assigned and the day's score sends one combined message to the parent. Parents said it made the academy feel easier to trust, and several said they liked being able to watch their child progress.</p>
       </div>
     </section>
 
@@ -170,7 +327,7 @@
       <div class="sec-head"><h2><span class="ko">문항 데이터 구조</span><span class="en">Item data model</span></h2></div>
       <div class="blk">
         <ul class="bul">
-          <li class="ko"><b>파일명을 식별자로 사용했습니다.</b> 문항 이미지를 <code>시험_연도_과목_번호_정답</code> 규칙으로 통일했습니다. 파일명만 읽어도 어느 시험 몇 번 문제이고 정답이 뭔지 알 수 있어서, 이미지를 열지 않고도 조회와 정답 대조가 됩니다. 1994학년도부터 2025학년도까지 32개 학년도, 5,225문항에 적용했습니다.</li>
+          <li class="ko"><b>파일명을 식별자로 사용했습니다.</b> 문항 이미지를 <code>시험_연도_과목_번호_정답</code> 규칙으로 통일했습니다. 파일명만 읽어도 어느 시험 몇 번 문제이고 정답이 뭔지 알 수 있어서, 이미지를 열지 않고도 조회와 정답 대조가 됩니다. 1994학년도부터 2025학년도까지 5,225문항에 적용했습니다.</li>
           <li class="en"><b>The filename became the identifier.</b> Item images follow <code>exam_year_subject_number_answer</code>, so reading the name alone tells you which paper, which question and what the answer is — queries and answer-key checks work without opening a single image. Applied across 5,225 items spanning 32 academic years, 1994 to 2025.</li>
 
           <li class="ko"><b>문항 분류 정보는 테이블에 저장했습니다.</b> 시험 구분(6월 모의평가, 9월 모의평가, 수능), 문항 번호, 연도, 과목, 난이도, 메모를 저장했습니다. 파일명을 키로 사용해 문항 이미지와 분류 정보를 연결했습니다.</li>

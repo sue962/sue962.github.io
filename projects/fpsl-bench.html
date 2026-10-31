@@ -88,6 +88,7 @@
     <nav aria-label="Sections">
       <ul>
         <li><a href="#scope"><span class="ko">담당 범위</span><span class="en">Scope</span></a></li>
+        <li><a href="#flow"><span class="ko">처리 순서</span><span class="en">How it moves</span></a></li>
         <li><a href="#problem"><span class="ko">기존 방식의 문제</span><span class="en">The problem</span></a></li>
         <li><a href="#axes"><span class="ko">평가 축</span><span class="en">Evaluation axes</span></a></li>
         <li><a href="#checks"><span class="ko">자동 검사</span><span class="en">Automated checks</span></a></li>
@@ -109,6 +110,129 @@
           <span class="ko">제가 개발한 <b>FPSL-Bench는 연구의 표준 평가 방식으로 사용됐습니다.</b> 모델의 학습 결과를 같은 지표와 파일 형식으로 비교할 수 있도록 했습니다.</span>
           <span class="en"><b>FPSL-Bench became the study’s standard evaluation.</b> I implemented the metrics and file formats used to compare model outputs across experiments.</span>
         </p>
+      </div>
+    </section>
+
+    <!-- flow -->
+    <section id="flow" class="rv">
+      <div class="sec-head"><h2><span class="ko">처리 순서</span><span class="en">How the data moves</span></h2></div>
+      <div class="blk">
+        <p class="ko">실행마다 모양이 달랐던 실험 결과가 같은 기준으로 비교되기까지의 순서입니다. 사람이 눈으로 맞추던 확인을 코드가 하도록 옮긴 과정입니다.</p>
+        <p class="en">How results that came out shaped differently on every run became comparable, by moving checks that a person had been doing by eye into code.</p>
+
+        <div class="flow-wrap">
+          <p class="dgm-hint">
+            <span class="ko">단계를 선택하면 그 단계에서 무엇을 확인하고 어떻게 판단했는지 나타납니다</span>
+            <span class="en">Select a stage to see what was checked there and how it was decided</span>
+          </p>
+
+          <ol class="flow">
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb1" aria-expanded="true">
+                <span class="flow-head">
+                  <span class="flow-n">01</span>
+                  <span class="flow-stage"><span class="ko">문제 확인</span><span class="en">Problem</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">실행마다 형식이 달랐음</span><span class="en">Every run, a different shape</span></span>
+                <span class="flow-m">컬럼 이름 · 구조 불일치</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb2" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">02</span>
+                  <span class="flow-stage"><span class="ko">축 분리</span><span class="en">Axes</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">다섯 질문으로 나눔</span><span class="en">Split it into five questions</span></span>
+                <span class="flow-m">5 axes · 34 metrics</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb3" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">03</span>
+                  <span class="flow-stage"><span class="ko">지표 설계</span><span class="en">Metrics</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">유사도만 보지 않음</span><span class="en">Similarity alone is not enough</span></span>
+                <span class="flow-m">유사도 · 순위 · 간격</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb4" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">04</span>
+                  <span class="flow-stage"><span class="ko">형식 고정</span><span class="en">Schema</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">산출물 모양을 통일</span><span class="en">One shape for every artifact</span></span>
+                <span class="flow-m">8 schemas · JSON</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb5" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">05</span>
+                  <span class="flow-stage"><span class="ko">자동 검사</span><span class="en">Checks</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">사람 대신 코드가 확인</span><span class="en">Code checks it instead</span></span>
+                <span class="flow-m">9 checks</span>
+              </button>
+            </li>
+            <li class="flow-step">
+              <button type="button" class="flow-node" data-step="fb6" aria-expanded="false">
+                <span class="flow-head">
+                  <span class="flow-n">06</span>
+                  <span class="flow-stage"><span class="ko">표준으로 사용</span><span class="en">Standard</span></span>
+                </span>
+                <span class="flow-t"><span class="ko">연구의 기준 평가 방식</span><span class="en">The study's standard method</span></span>
+                <span class="flow-m">FPSL-Bench</span>
+              </button>
+            </li>
+          </ol>
+
+          <div class="flow-info" aria-live="polite">
+            <div data-step-for="fb1">
+              <h4>문제 확인</h4>
+              <p class="ko">실험을 돌릴 때마다 결과 파일의 컬럼 이름과 구조가 조금씩 달라서, 두 실험을 나란히 놓으려면 매번 사람이 맞춰야 했습니다. 하나의 유사도 지표에 저자의 평소 문체를 따르는 정도와 특정 예시의 정답에 가까운 정도가 섞여 보고돼 각각을 구분하기 어려웠고, 데이터 누수 확인도 눈으로 대조하고 있었습니다.</p>
+              <p class="en">Column names and structure shifted slightly from run to run, so comparing two experiments meant reconciling them by hand each time. A single similarity figure mixed how closely output followed an author's habitual style with how close it came to the reference for a specific example, leaving the two indistinguishable, and leakage was being checked by eye.</p>
+              <span class="grain">결과 형식 불일치 · 지표 의미 혼재 · 누수 수동 확인</span>
+            </div>
+
+            <div data-step-for="fb2" hidden>
+              <h4>축 분리</h4>
+              <p class="ko">평가 기준을 다섯 축으로 나누고 34개 지표를 각각 하나의 축에 배정했습니다. 지표마다 무엇을 재는지 구분하고 소속 축을 스키마 파일에 적어 코드에서 확인하도록 했습니다. 평소 문체를 재는 축과 특정 예시의 정답을 재는 축을 따로 둔 것이 핵심입니다.</p>
+              <p class="en">The evaluation was split into five axes, with each of 34 metrics assigned to exactly one. What a metric measures is stated per metric, and its axis is recorded in a schema file so code can check it. The decisive split is between the axis measuring habitual style and the axis measuring closeness to the reference for a given example.</p>
+              <span class="grain">5 축 · 34 지표 배정 · 축 소속을 스키마에 기록</span>
+            </div>
+
+            <div data-step-for="fb3" hidden>
+              <h4>지표 설계</h4>
+              <p class="ko">출력을 저자의 과거 글 중심점과 견준 유사도, 저자 50명 가운데 맞는 저자가 몇 번째로 가까운지의 순위, 맞는 저자와 나머지 저자 사이의 간격을 함께 뒀습니다. 순위와 간격을 같이 보는 이유는 모두와 비슷해져서 유사도가 올라가는 경우를 걸러내기 위해서입니다.</p>
+              <p class="en">Three figures are reported together: similarity against the centroid of the author's past writing, the rank of the correct author among 50, and the margin between the correct author and the rest. Rank and margin accompany similarity in order to catch the case where a score rises because the output has become similar to everyone.</p>
+              <span class="grain">hist_align_* 9 metrics · 50 authors · 23 prompts · 10 source texts</span>
+            </div>
+
+            <div data-step-for="fb4" hidden>
+              <h4>형식 고정</h4>
+              <p class="ko">결과 파일 형식을 스키마 8종으로 고정했습니다. per_example_metrics.jsonl처럼 산출물마다 들어갈 필드를 정해 두어, 실행이 달라도 같은 자리에서 같은 값을 읽습니다. 평가 프롬프트 23개와 공개 원문 10개는 v0.1에서 고정하고 이후 버전에서도 유지했습니다.</p>
+              <p class="en">Output formats were fixed as eight schemas. Each artifact, such as per_example_metrics.jsonl, declares its fields, so the same value is read from the same place regardless of the run. The 23 evaluation prompts and 10 public source texts were frozen at v0.1 and carried forward unchanged.</p>
+              <span class="grain">산출물 스키마 8종 · 프롬프트 23 · 원문 10 고정</span>
+            </div>
+
+            <div data-step-for="fb5" hidden>
+              <h4>자동 검사</h4>
+              <p class="ko">학습, 검증, 평가 데이터의 중복 여부와 평가 프롬프트의 원문이 학습 데이터에 포함됐는지, 프롬프트 구성과 소스 균형이 맞는지를 자동 검사 9종으로 옮겼습니다. 눈으로 대조하던 확인을 코드가 하면 실행할 때마다 같은 기준이 적용됩니다.</p>
+              <p class="en">Nine automated checks took over what had been done by eye: overlap between train, validation and evaluation data, whether an evaluation prompt's source text appears in training data, prompt composition and source balance. Once code performs the check, the same standard applies on every run.</p>
+              <span class="grain">자동 검사 9종 · 누수 · 프롬프트 구성 · 소스 균형</span>
+            </div>
+
+            <div data-step-for="fb6" hidden>
+              <h4>표준으로 사용</h4>
+              <p class="ko">결과 파일의 무결성은 SHA-256 체크섬으로 확인하도록 했습니다. 제가 만든 FPSL-Bench는 이후 이 연구의 표준 평가 방식으로 사용됐고, 모델의 학습 결과를 같은 지표와 같은 파일 형식으로 비교할 수 있게 됐습니다.</p>
+              <p class="en">File integrity is verified with SHA-256 checksums. FPSL-Bench became the study's standard evaluation method, so model outcomes are compared through the same metrics and the same file formats.</p>
+              <span class="grain">SHA-256 무결성 확인 · 연구 표준 평가 방식으로 채택</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
